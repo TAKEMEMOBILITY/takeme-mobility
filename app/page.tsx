@@ -30,9 +30,10 @@ const PILLARS = [
 const CITIES = ['New York', 'London', 'Zurich', 'Berlin', 'Paris', 'Tokyo', 'Singapore', 'Dubai'];
 
 // Hero — street-level, wet pavement, headlight reflections, dark and cinematic
-const HERO_IMG = 'https://images.unsplash.com/photo-1494783367193-149034c05e8f?w=2400&q=90&auto=format&fit=crop';
-// Secondary — dark road with motion, abstract light trails
-const SECONDARY_IMG = 'https://images.unsplash.com/photo-1545351425-9fc4874fd030?w=1920&q=85&auto=format&fit=crop';
+// Hero — dark car, near-black environment, headlights visible, zero clutter
+const HERO_IMG = 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=2400&q=90&auto=format&fit=crop';
+// Secondary — black car in motion, urban night, motion blur
+const SECONDARY_IMG = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=1920&q=85&auto=format&fit=crop';
 
 // ── Hooks ─────────────────────────────────────────────────────────────────
 
@@ -65,7 +66,7 @@ function ClosingStatement({ href }: { href: string }) {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-[#050507]">
+    <section className="relative overflow-hidden bg-[#040406]">
       {/* Subtle radial glow — prevents pure flat black */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(255,255,255,0.02),transparent)]" />
 
@@ -100,11 +101,11 @@ export default function HomePage() {
   const scrolled = useScrolled();
 
   return (
-    <div className="min-h-screen bg-[#060608]">
+    <div className="min-h-screen bg-[#040406]">
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
       <nav className={`fixed top-0 z-50 w-full transition-all duration-700 ${
-        scrolled ? 'bg-[#060608]/90 backdrop-blur-2xl' : ''
+        scrolled ? 'bg-[#040406]/90 backdrop-blur-2xl' : ''
       }`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
           <Link href="/" className="text-[18px] font-semibold tracking-[-0.01em] text-white/90">
@@ -141,7 +142,7 @@ export default function HomePage() {
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="relative flex min-h-[100svh] items-center overflow-hidden">
-        {/* Image with cinematic zoom */}
+        {/* Image — car-focused, dark environment */}
         <div className="absolute inset-0">
           <Image
             src={HERO_IMG}
@@ -149,27 +150,22 @@ export default function HomePage() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center animate-cinematic-zoom"
+            className="object-cover object-[center_40%] animate-cinematic-zoom"
             unoptimized
           />
         </div>
 
-        {/* Overlay system — 5 layers for cinematic depth */}
-        {/* 1. Base darkness — brings the entire image down */}
-        <div className="absolute inset-0 bg-black/[0.65]" />
-        {/* 2. Left directional — heavy on text side, clear on right */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#060608] via-[#060608]/50 to-transparent" />
-        {/* 3. Bottom anchor — grounds the composition */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#060608] via-transparent to-transparent" />
-        {/* 4. Top vignette — cinematic framing */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#060608]/50 to-transparent" />
-        {/* 5. Cool tone — shifts warmth out of the highlights */}
-        <div className="absolute inset-0 bg-blue-950/[0.08]" />
+        {/* Overlay system — heavy, cinematic, car as atmosphere not subject */}
+        <div className="absolute inset-0 bg-black/[0.7]" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#040406] via-[#040406]/60 to-[#040406]/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#040406] via-[#040406]/30 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#040406]/40 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_70%_50%,transparent,#040406_90%)]" />
 
         {/* Content */}
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
           <div className="max-w-2xl">
-            <h1 className="text-[clamp(3.25rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.04em] text-white">
+            <h1 className="text-[clamp(3.5rem,9vw,8rem)] font-bold leading-[0.88] tracking-[-0.045em] text-white">
               Move
               <br />
               without
@@ -177,7 +173,7 @@ export default function HomePage() {
               friction.
             </h1>
 
-            <p className="mt-8 max-w-sm text-[15px] leading-[1.8] text-white/35">
+            <p className="mt-8 max-w-xs text-[15px] leading-[1.8] text-white/30">
               Premium mobility, designed for clarity and control.
             </p>
 
@@ -235,8 +231,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="relative flex min-h-[55vh] items-center justify-center overflow-hidden rounded-2xl md:min-h-[70vh] md:rounded-3xl">
             <Image src={SECONDARY_IMG} alt="" fill className="object-cover" sizes="(max-width:1280px) 100vw, 1280px" unoptimized />
-            <div className="absolute inset-0 bg-black/50" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30" />
+            <div className="absolute inset-0 bg-black/60" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/40" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_50%_at_50%_50%,transparent,black_85%)]" />
 
             <div className="relative z-10 px-6 text-center">
               <h2 className="text-[clamp(1.75rem,5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
@@ -324,7 +321,7 @@ export default function HomePage() {
       <ClosingStatement href={user ? '/dashboard' : '/auth/signup'} />
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-white/[0.05] bg-[#060608]">
+      <footer className="border-t border-white/[0.05] bg-[#040406]">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
           <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
             <div>
