@@ -121,30 +121,33 @@ export default function HomePage() {
         scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
       }`}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="flex items-baseline gap-[5px] text-[19px] tracking-[-0.015em] text-[#1D1D1F]">
-            <span className="font-bold">TakeMe</span>
-            <span className="font-normal text-[#A1A1A6]">Mobility</span>
+          {/* Logo */}
+          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1D1D1F]">
+            <span className="font-semibold">TakeMe</span>
+            <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
           </Link>
 
-          <div className="hidden items-center gap-10 lg:flex">
+          {/* Nav */}
+          <div className="hidden items-center gap-12 lg:flex">
             {NAV_ITEMS.map((item) => (
-              <span key={item} className="cursor-pointer text-[15px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
+              <span key={item} className="cursor-pointer text-[14px] font-medium text-[#8E8E93] transition-opacity duration-250 hover:opacity-60">
                 {item}
               </span>
             ))}
           </div>
 
-          <div className="flex items-center gap-5">
+          {/* Right */}
+          <div className="flex items-center gap-6">
             {loading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#D2D2D7] border-t-[#1D1D1F]" />
             ) : (
               <>
-                <Link href={signInHref} className="hidden text-[15px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F] sm:block">
+                <Link href={signInHref} className="hidden text-[14px] font-medium text-[#8E8E93] transition-opacity duration-250 hover:opacity-60 sm:block">
                   Sign in
                 </Link>
                 <Link
                   href={ctaHref}
-                  className="rounded-full bg-[#1D1D1F] px-6 py-2.5 text-[15px] font-semibold text-white transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.97]"
+                  className="inline-flex h-10 items-center rounded-[999px] bg-[#0A0A0A] px-6 text-[14px] font-semibold text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-all duration-250 hover:bg-[#1A1A1A] active:scale-[0.97]"
                 >
                   Get started
                 </Link>
@@ -183,16 +186,16 @@ export default function HomePage() {
                 Arrive with confidence.
               </p>
 
-              <div className="mt-14 flex items-center gap-5 animate-fade-in stagger-3">
+              <div className="mt-12 flex items-center gap-4 animate-fade-in stagger-3">
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-16 items-center justify-center rounded-[32px] bg-[#000000] px-10 text-[18px] font-bold tracking-[-0.025em] text-white shadow-[0_4px_14px_rgba(0,0,0,0.25),0_0_0_1px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_6px_20px_rgba(0,0,0,0.35)] hover:translate-y-[-1px] active:translate-y-0 active:shadow-[0_2px_8px_rgba(0,0,0,0.2)]"
+                  className="inline-flex h-[54px] items-center rounded-[999px] bg-[#0A0A0A] px-9 text-[17px] font-semibold tracking-[-0.01em] text-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-250 hover:bg-[#1A1A1A] hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)] active:scale-[0.97]"
                 >
                   Get started
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-flex h-16 items-center justify-center rounded-[32px] border-2 border-[#C7C7CC] bg-white px-10 text-[18px] font-bold tracking-[-0.025em] text-[#000000] transition-all duration-300 hover:border-[#8E8E93] hover:bg-[#F2F2F7] hover:translate-y-[-1px] active:translate-y-0 active:bg-[#E5E5EA]"
+                  className="inline-flex h-[54px] items-center rounded-[999px] border border-[#D5D5DA] bg-transparent px-9 text-[17px] font-semibold tracking-[-0.01em] text-[#1D1D1F] transition-all duration-250 hover:bg-[#F5F5F7] hover:border-[#C0C0C5] active:scale-[0.97]"
                 >
                   How it works
                 </Link>
@@ -482,7 +485,7 @@ export default function HomePage() {
             <div className="mt-10">
               <Link
                 href={ctaHref}
-                className="inline-block rounded-full bg-[#1D1D1F] px-10 py-4 text-[17px] font-semibold text-white shadow-[0_4px_20px_rgba(0,0,0,0.10)] transition-all duration-200 hover:bg-[#2C2C2E] hover:shadow-[0_6px_28px_rgba(0,0,0,0.14)] active:scale-[0.97]"
+                className="inline-flex h-[54px] items-center rounded-[999px] bg-[#0A0A0A] px-9 text-[17px] font-semibold tracking-[-0.01em] text-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-250 hover:bg-[#1A1A1A] hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)] active:scale-[0.97]"
               >
                 Get started
               </Link>
@@ -519,9 +522,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
           <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="flex items-baseline gap-[5px] text-[17px] tracking-[-0.01em] text-[#1D1D1F]">
-                <span className="font-bold">TakeMe</span>
-                <span className="font-normal text-[#A1A1A6]">Mobility</span>
+              <div className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+                <span className="font-semibold">TakeMe</span>
+                <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
               </div>
               <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
                 Premium global transportation.
