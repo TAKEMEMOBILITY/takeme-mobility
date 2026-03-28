@@ -1,30 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
-
-// Lazy-load the booking card — it depends on Google Maps + Stripe.
-// Loaded client-only to avoid hydration mismatch and SDK crashes.
-const HeroBookingLazy = dynamic(
-  () => import('@/components/HeroBookingWrapper'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
-        <div className="h-[280px] bg-[#F2F2F7] flex items-center justify-center">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
-        </div>
-        <div className="p-5 space-y-3">
-          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-          <div className="h-10 rounded-xl bg-[#F5F5F7]" />
-        </div>
-      </div>
-    ),
-  },
-);
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -241,9 +219,18 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* ── Right: Live Product UI ─────────────────────────────── */}
+            {/* ── Right: Product UI (temporarily disabled for debugging) ── */}
             <div className="animate-fade-in stagger-2">
-              <HeroBookingLazy ctaHref={ctaHref} />
+              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+                <div className="h-[280px] bg-[#F2F2F7] flex items-center justify-center">
+                  <p className="text-[15px] text-[#86868B]">Book a ride</p>
+                </div>
+                <div className="p-5">
+                  <Link href={ctaHref} className="flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white">
+                    Get started
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
