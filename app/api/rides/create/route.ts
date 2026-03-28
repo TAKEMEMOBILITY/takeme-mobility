@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { findOrCreateCustomer, createPaymentIntent } from '@/lib/stripe';
+import { assignDriver } from '@/lib/dispatch';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/rides/create
@@ -180,11 +181,27 @@ export async function POST(request: NextRequest) {
       console.warn('Payment setup failed (ride still created):', payErr);
     }
 
-    // 6. Return ride + payment
+    // 6. Attempt driver assignment (non-blocking, best-effort)
+    let assignedDriver: { name: string; vehicle: string; plate: string } | null = null;
+    try {
+      const dispatch = await assignDriver(rideData.id);
+      if (dispatch.success && dispatch.driver) {
+        assignedDriver = {
+          name: dispatch.driver.driver_name,
+          vehicle: `${dispatch.driver.vehicle_make} ${dispatch.driver.vehicle_model}`,
+          plate: dispatch.driver.plate_number,
+        };
+      }
+    } catch (dispatchErr) {
+      // Non-fatal — rider can retry or system polls
+      console.warn('Auto-dispatch failed (ride still created):', dispatchErr);
+    }
+
+    // 7. Return ride + payment + driver
     return NextResponse.json({
       ride: {
         id: rideData.id,
-        status: rideData.status,
+        status: assignedDriver ? 'driver_assigned' : rideData.status,
         estimatedFare: rideData.estimated_fare,
         currency: rideData.currency,
         requestedAt: rideData.requested_at,
@@ -194,6 +211,7 @@ export async function POST(request: NextRequest) {
         clientSecret,
         paymentIntentId,
       } : null,
+      driver: assignedDriver,
     }, { status: 201 });
   } catch (err) {
     console.error('POST /api/rides/create failed:', err);
