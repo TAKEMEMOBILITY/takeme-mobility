@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -44,6 +44,53 @@ function useScrolled(threshold = 20) {
     return () => window.removeEventListener('scroll', onScroll);
   }, [onScroll]);
   return scrolled;
+}
+
+// ── Closing statement — scroll-triggered fade ─────────────────────────────
+
+function ClosingStatement({ href }: { href: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.3 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section className="relative overflow-hidden bg-[#050507]">
+      {/* Subtle radial glow — prevents pure flat black */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_50%,rgba(255,255,255,0.02),transparent)]" />
+
+      <div
+        ref={ref}
+        className={`relative flex min-h-[75vh] flex-col items-center justify-center px-6 py-36 transition-all duration-[1.5s] ease-out md:py-48 ${
+          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}
+      >
+        <h2 className="text-center text-[clamp(3.5rem,9vw,8rem)] font-bold leading-[0.85] tracking-[-0.045em] text-white">
+          Pay. Ride. Go.
+        </h2>
+        <p className="mt-7 text-[15px] font-medium tracking-[-0.01em] text-white/20">
+          With TakeMe.
+        </p>
+
+        <Link
+          href={href}
+          className="mt-16 rounded-full bg-[#ebebef] px-7 py-3.5 text-[14px] font-semibold text-[#050507] transition-opacity duration-300 hover:opacity-80 active:scale-[0.97]"
+        >
+          Get started
+        </Link>
+      </div>
+    </section>
+  );
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────
@@ -273,35 +320,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ CLOSING — Brand statement ═══════════════════════════════════
-          Typography-only. Centered. Maximum restraint.
-          The page ends the way it began: confident and quiet.
-          ═════════════════════════════════════════════════════════════════ */}
-      <section className="bg-[#060608]">
-        <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-32 md:py-44">
-          <h2 className="text-center text-[clamp(3rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.04em] text-white">
-            Pay. Ride. Go.
-          </h2>
-          <p className="mt-6 text-[15px] font-normal tracking-[-0.01em] text-white/25">
-            With TakeMe.
-          </p>
-
-          <div className="mt-14 flex items-center gap-4">
-            <Link
-              href={user ? '/dashboard' : '/auth/signup'}
-              className="rounded-full bg-[#ebebef] px-7 py-3.5 text-[14px] font-semibold text-[#060608] transition-opacity duration-300 hover:opacity-80 active:scale-[0.97]"
-            >
-              Get started
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="rounded-full border border-white/[0.1] px-7 py-3.5 text-[14px] font-semibold text-white/35 transition-all duration-300 hover:border-white/20 hover:text-white/65"
-            >
-              How it works
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ═══ CLOSING — Final frame ═════════════════════════════════════════ */}
+      <ClosingStatement href={user ? '/dashboard' : '/auth/signup'} />
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
       <footer className="border-t border-white/[0.05] bg-[#060608]">
