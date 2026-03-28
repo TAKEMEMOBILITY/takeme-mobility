@@ -147,7 +147,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-10 items-center rounded-[999px] bg-[#0A0A0A] px-6 text-[14px] font-semibold text-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-all duration-250 hover:bg-[#1A1A1A] active:scale-[0.97]"
+                  className="inline-flex h-10 items-center rounded-[999px] bg-[#1D1D1F] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
                 >
                   Get started
                 </Link>
@@ -186,16 +186,16 @@ export default function HomePage() {
                 Arrive with confidence.
               </p>
 
-              <div className="mt-12 flex items-center gap-4 animate-fade-in stagger-3">
+              <div className="mt-10 flex items-center gap-3.5 animate-fade-in stagger-3">
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-[54px] items-center rounded-[999px] bg-[#0A0A0A] px-9 text-[17px] font-semibold tracking-[-0.01em] text-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-250 hover:bg-[#1A1A1A] hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)] active:scale-[0.97]"
+                  className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
                 >
                   Get started
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-flex h-[54px] items-center rounded-[999px] border border-[#D5D5DA] bg-transparent px-9 text-[17px] font-semibold tracking-[-0.01em] text-[#1D1D1F] transition-all duration-250 hover:bg-[#F5F5F7] hover:border-[#C0C0C5] active:scale-[0.97]"
+                  className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-[#F5F5F7]"
                 >
                   How it works
                 </Link>
@@ -203,7 +203,7 @@ export default function HomePage() {
 
               {/* Store badges */}
               <div className="mt-12 flex flex-wrap gap-3 animate-fade-in stagger-4">
-                <a href="#" className="flex h-[56px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-6 transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.97]">
+                <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
                   <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
                   </svg>
@@ -212,7 +212,7 @@ export default function HomePage() {
                     <span className="mt-0.5 text-[16px] font-semibold leading-tight text-white">App Store</span>
                   </div>
                 </a>
-                <a href="#" className="flex h-[56px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-6 transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.97]">
+                <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
                   <svg className="h-5 w-5" viewBox="0 0 24 24">
                     <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
                     <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
@@ -229,7 +229,7 @@ export default function HomePage() {
 
             {/* ── Right: Product UI ────────────────────────────────────── */}
             <div className="animate-fade-in stagger-2">
-              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_2px_48px_rgba(0,0,0,0.08),0_0_0_1px_rgba(0,0,0,0.04)]">
+              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
 
                 {/* ── Map ──────────────────────────────────────────────── */}
                 <div className="relative h-[280px] bg-[#F2F2F7] overflow-hidden">
@@ -278,7 +278,7 @@ export default function HomePage() {
 
                   {/* Vehicle */}
                   <div className="absolute left-[52%] top-[42%] animate-float">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D1D1F] shadow-[0_4px_12px_rgba(0,0,0,0.2)]">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D1D1F] shadow-[0_1px_4px_rgba(0,0,0,0.1)]">
                       <svg className="h-4 w-4 -rotate-45 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
                       </svg>
@@ -343,7 +343,7 @@ export default function HomePage() {
                           onClick={() => setSelectedVehicle(v.id)}
                           className={`flex-1 rounded-xl px-2 py-3 text-center transition-all duration-150 ${
                             active
-                              ? 'bg-[#1D1D1F] text-white shadow-[0_2px_8px_rgba(0,0,0,0.15)]'
+                              ? 'bg-[#1D1D1F] text-white'
                               : 'bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#E8E8ED]'
                           }`}
                         >
@@ -371,7 +371,7 @@ export default function HomePage() {
 
                   <Link
                     href={ctaHref}
-                    className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-4 text-[16px] font-semibold text-white transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.98]"
+                    className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
                   >
                     Confirm ride
                   </Link>
@@ -485,13 +485,13 @@ export default function HomePage() {
             <div className="mt-10">
               <Link
                 href={ctaHref}
-                className="inline-flex h-[54px] items-center rounded-[999px] bg-[#0A0A0A] px-9 text-[17px] font-semibold tracking-[-0.01em] text-white shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-250 hover:bg-[#1A1A1A] hover:shadow-[0_2px_6px_rgba(0,0,0,0.12)] active:scale-[0.97]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
               >
                 Get started
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.97]">
+              <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
                 <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
                 </svg>
@@ -500,7 +500,7 @@ export default function HomePage() {
                   <span className="mt-0.5 text-[14px] font-semibold leading-tight text-white">App Store</span>
                 </div>
               </a>
-              <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-all duration-200 hover:bg-[#2C2C2E] active:scale-[0.97]">
+              <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
                 <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24">
                   <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
                   <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
