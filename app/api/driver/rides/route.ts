@@ -72,7 +72,7 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   driver_assigned:  ['driver_arriving', 'cancelled'],
   driver_arriving:  ['arrived', 'cancelled'],
   arrived:          ['in_progress', 'cancelled'],
-  in_progress:      ['completed'],
+  in_progress:      ['completed', 'cancelled'],
 };
 
 const updateSchema = z.object({
@@ -155,13 +155,20 @@ export async function PUT(request: NextRequest) {
         break;
     }
 
-    const { error: updateError } = await svc
+    const { data: updated, error: updateError } = await svc
       .from('rides')
       .update(update)
-      .eq('id', body.rideId);
+      .eq('id', body.rideId)
+      .eq('status', ride.status)  // optimistic lock — prevent race
+      .select('id')
+      .maybeSingle();
 
     if (updateError) {
       return NextResponse.json({ error: 'Update failed' }, { status: 500 });
+    }
+
+    if (!updated) {
+      return NextResponse.json({ error: 'Ride status changed — please refresh' }, { status: 409 });
     }
 
     // Update driver status

@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { GoogleMap, Marker, DirectionsRenderer } from '@react-google-maps/api';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { GoogleMap, Marker } from '@react-google-maps/api';
 import { useGoogleMaps } from './GoogleMapsProvider';
 import { useActiveRide, type RidePhase } from '@/lib/useActiveRide';
 
@@ -100,10 +100,35 @@ interface RideTrackerProps {
   onClose?: () => void;
 }
 
+const RIDER_CANCELLABLE: RidePhase[] = [
+  'searching_driver',
+  'driver_assigned',
+  'driver_arriving',
+  'arrived',
+];
+
 export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
   const { isLoaded } = useGoogleMaps();
   const { ride, driver, driverPosition, loading } = useActiveRide(rideId);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancel = useCallback(async () => {
+    if (cancelling) return;
+    setCancelling(true);
+    try {
+      await fetch('/api/rides/cancel', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rideId }),
+      });
+      // Realtime will deliver the cancelled status update
+    } catch {
+      // Ride status will reflect the actual state via Realtime
+    } finally {
+      setCancelling(false);
+    }
+  }, [rideId, cancelling]);
 
   // Fit bounds when ride loads or driver moves
   useEffect(() => {
@@ -248,6 +273,17 @@ export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
             ${(ride.finalFare ?? ride.estimatedFare).toFixed(2)}
           </span>
         </div>
+
+        {/* Cancel button — only for cancellable phases */}
+        {!isTerminal && RIDER_CANCELLABLE.includes(ride.status) && (
+          <button
+            onClick={handleCancel}
+            disabled={cancelling}
+            className="mt-4 flex w-full items-center justify-center rounded-xl border border-[#E8E8ED] py-3 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:bg-[#F5F5F7] disabled:opacity-40"
+          >
+            {cancelling ? 'Cancelling...' : 'Cancel ride'}
+          </button>
+        )}
 
         {/* Close / done button */}
         {isTerminal && onClose && (
