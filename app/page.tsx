@@ -3,16 +3,12 @@
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
+import { GoogleMapsProvider } from '@/components/GoogleMapsProvider';
+import HeroBooking from '@/components/HeroBooking';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
 const NAV_ITEMS = ['Rides', 'Technology', 'Safety', 'Cities'] as const;
-
-const VEHICLE_TYPES = [
-  { id: 'economy',  label: 'Economy',  eta: '3 min', price: '$18.50', icon: '🚗' },
-  { id: 'comfort',  label: 'Comfort',  eta: '5 min', price: '$24.00', icon: '🚙' },
-  { id: 'premium',  label: 'Premium',  eta: '4 min', price: '$32.50', icon: '🚘' },
-];
 
 const TRUST_CARDS = [
   {
@@ -111,9 +107,8 @@ export default function HomePage() {
   const ctaHref = user ? '/dashboard' : '/auth/signup';
   const signInHref = user ? '/dashboard' : '/auth/login';
 
-  const [selectedVehicle, setSelectedVehicle] = useState('comfort');
-
   return (
+    <GoogleMapsProvider>
     <div className="min-h-screen bg-white">
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
@@ -227,156 +222,9 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* ── Right: Product UI ────────────────────────────────────── */}
+            {/* ── Right: Live Product UI ─────────────────────────────── */}
             <div className="animate-fade-in stagger-2">
-              <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
-
-                {/* ── Map ──────────────────────────────────────────────── */}
-                <div className="relative h-[280px] bg-[#F2F2F7] overflow-hidden">
-                  {/* Grid lines */}
-                  <div className="absolute inset-0 opacity-[0.12]">
-                    {[15, 30, 45, 60, 75, 85].map(p => (
-                      <div key={`h${p}`} className="absolute h-[1px] w-full bg-[#86868B]" style={{ top: `${p}%` }} />
-                    ))}
-                    {[20, 40, 55, 70, 85].map(p => (
-                      <div key={`v${p}`} className="absolute h-full w-[1px] bg-[#86868B]" style={{ left: `${p}%` }} />
-                    ))}
-                  </div>
-
-                  {/* Water feature */}
-                  <div className="absolute right-0 bottom-0 h-[40%] w-[30%] rounded-tl-[60px] bg-[#D6E4F0] opacity-40" />
-
-                  {/* Park */}
-                  <div className="absolute left-[10%] top-[20%] h-[60px] w-[80px] rounded-2xl bg-[#E8F0E4] opacity-50" />
-
-                  {/* Route line */}
-                  <svg className="absolute inset-0 h-full w-full" viewBox="0 0 480 280" fill="none">
-                    <path
-                      d="M 100 210 C 120 180, 150 150, 190 140 S 280 100, 340 80 S 390 60, 400 55"
-                      stroke="#1D1D1F"
-                      strokeWidth="3"
-                      strokeLinecap="round"
-                      opacity="0.6"
-                    />
-                    {/* Route dots */}
-                    <circle cx="140" cy="175" r="2" fill="#1D1D1F" opacity="0.15" />
-                    <circle cx="200" cy="138" r="2" fill="#1D1D1F" opacity="0.15" />
-                    <circle cx="260" cy="110" r="2" fill="#1D1D1F" opacity="0.15" />
-                    <circle cx="320" cy="85" r="2" fill="#1D1D1F" opacity="0.15" />
-                  </svg>
-
-                  {/* Pickup pin */}
-                  <div className="absolute left-[18%] top-[68%] flex flex-col items-center">
-                    <div className="relative">
-                      <div className="h-[18px] w-[18px] rounded-full border-[3px] border-white bg-[#34C759] shadow-[0_2px_8px_rgba(52,199,89,0.4)]" />
-                      <div className="absolute -inset-2 animate-ping rounded-full bg-[#34C759] opacity-15" />
-                    </div>
-                    <div className="mt-1.5 rounded-md bg-white px-2 py-0.5 shadow-[0_1px_4px_rgba(0,0,0,0.1)]">
-                      <span className="text-[10px] font-semibold text-[#1D1D1F]">Pickup</span>
-                    </div>
-                  </div>
-
-                  {/* Vehicle */}
-                  <div className="absolute left-[52%] top-[42%] animate-float">
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1D1D1F] shadow-[0_1px_4px_rgba(0,0,0,0.1)]">
-                      <svg className="h-4 w-4 -rotate-45 text-white" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19.5v-15m0 0l-6.75 6.75M12 4.5l6.75 6.75" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  {/* Destination pin */}
-                  <div className="absolute right-[14%] top-[14%] flex flex-col items-center">
-                    <div className="h-[18px] w-[18px] rounded-full border-[3px] border-white bg-[#1D1D1F] shadow-[0_2px_8px_rgba(0,0,0,0.2)]" />
-                    <div className="mt-1.5 rounded-md bg-white px-2 py-0.5 shadow-[0_1px_4px_rgba(0,0,0,0.1)]">
-                      <span className="text-[10px] font-semibold text-[#1D1D1F]">Dropoff</span>
-                    </div>
-                  </div>
-
-                  {/* ETA badge */}
-                  <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_2px_8px_rgba(0,0,0,0.08)] backdrop-blur-sm">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34C759] opacity-40" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34C759]" />
-                    </span>
-                    <span className="text-[12px] font-semibold text-[#1D1D1F]">Driver 4 min away</span>
-                  </div>
-                </div>
-
-                {/* ── Booking form ─────────────────────────────────────── */}
-                <div className="p-5">
-                  {/* Location inputs */}
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#34C759]" />
-                      <span className="text-[15px] font-medium text-[#1D1D1F]">350 5th Avenue, New York</span>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-                      <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#1D1D1F]" />
-                      <span className="text-[15px] font-medium text-[#1D1D1F]">JFK International Airport</span>
-                    </div>
-                  </div>
-
-                  {/* Date / Time row */}
-                  <div className="mt-3 grid grid-cols-2 gap-2">
-                    <div className="flex items-center gap-2 rounded-xl bg-[#F5F5F7] px-4 py-3">
-                      <svg className="h-4 w-4 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
-                      </svg>
-                      <span className="text-[14px] font-medium text-[#1D1D1F]">Today</span>
-                    </div>
-                    <div className="flex items-center gap-2 rounded-xl bg-[#F5F5F7] px-4 py-3">
-                      <svg className="h-4 w-4 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                      </svg>
-                      <span className="text-[14px] font-medium text-[#1D1D1F]">Now</span>
-                    </div>
-                  </div>
-
-                  {/* Vehicle type selector */}
-                  <div className="mt-4 flex gap-2">
-                    {VEHICLE_TYPES.map((v) => {
-                      const active = selectedVehicle === v.id;
-                      return (
-                        <button
-                          key={v.id}
-                          onClick={() => setSelectedVehicle(v.id)}
-                          className={`flex-1 rounded-xl px-2 py-3 text-center transition-all duration-150 ${
-                            active
-                              ? 'bg-[#1D1D1F] text-white'
-                              : 'bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#E8E8ED]'
-                          }`}
-                        >
-                          <p className="text-[16px] leading-none">{v.icon}</p>
-                          <p className={`mt-1.5 text-[12px] font-semibold ${active ? 'text-white' : 'text-[#1D1D1F]'}`}>{v.label}</p>
-                          <p className={`mt-0.5 text-[11px] tabular-nums ${active ? 'text-white/60' : 'text-[#86868B]'}`}>{v.eta}</p>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {/* Fare + confirm */}
-                  <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F5F5F7] px-4 py-3">
-                    <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Estimated fare</p>
-                      <p className="mt-0.5 text-[22px] font-bold tabular-nums tracking-tight text-[#1D1D1F]">
-                        {VEHICLE_TYPES.find(v => v.id === selectedVehicle)?.price}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Distance</p>
-                      <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-[#1D1D1F]">28.4 km</p>
-                    </div>
-                  </div>
-
-                  <Link
-                    href={ctaHref}
-                    className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
-                  >
-                    Confirm ride
-                  </Link>
-                </div>
-              </div>
+              <HeroBooking ctaHref={ctaHref} />
             </div>
           </div>
         </div>
@@ -566,5 +414,6 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
+    </GoogleMapsProvider>
   );
 }
