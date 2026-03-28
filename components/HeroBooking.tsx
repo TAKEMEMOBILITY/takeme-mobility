@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { GoogleMap, Marker, DirectionsRenderer, Autocomplete } from '@react-google-maps/api';
 import { useGoogleMaps } from './GoogleMapsProvider';
+import { useAuth } from '@/lib/auth/context';
 import type { QuoteResult } from '@/lib/pricing';
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -17,6 +19,13 @@ interface RouteInfo {
   distanceKm: number;
   durationMin: number;
   polyline: string;
+}
+
+interface CreatedRide {
+  id: string;
+  status: string;
+  estimatedFare: number;
+  currency: string;
 }
 
 type VehicleClass = 'economy' | 'comfort' | 'premium';
@@ -57,6 +66,8 @@ function pinSvg(fill: string): string {
 
 export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const { isLoaded, status } = useGoogleMaps();
+  const { user } = useAuth();
+  const router = useRouter();
 
   // Location state
   const [pickup, setPickup] = useState<LocationState | null>(null);
@@ -70,6 +81,11 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const [selectedTier, setSelectedTier] = useState<VehicleClass>('comfort');
   const [quoteLoading, setQuoteLoading] = useState(false);
 
+  // Booking state
+  const [booking, setBooking] = useState(false);
+  const [createdRide, setCreatedRide] = useState<CreatedRide | null>(null);
+  const [bookingError, setBookingError] = useState('');
+
   // Map state
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const mapRef = useRef<google.maps.Map | null>(null);
@@ -81,6 +97,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // ── Fetch quotes from API ──────────────────────────────────────────
   const fetchQuotes = useCallback(async (p: LocationState, d: LocationState) => {
     setQuoteLoading(true);
+    setBookingError('');
     try {
       const res = await fetch('/api/quotes', {
         method: 'POST',
@@ -107,7 +124,63 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     }
   }, []);
 
-  // ── Calculate directions for map display ───────────────────────────
+  // ── Create ride ────────────────────────────────────────────────────
+  const confirmRide = useCallback(async () => {
+    if (!user) {
+      router.push('/auth/signup');
+      return;
+    }
+
+    const quote = quotes.find(q => q.vehicleClass === selectedTier);
+    if (!pickup || !dropoff || !route || !quote) return;
+
+    setBooking(true);
+    setBookingError('');
+
+    try {
+      const res = await fetch('/api/rides/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickupAddress: pickup.address,
+          pickupLat: pickup.lat,
+          pickupLng: pickup.lng,
+          dropoffAddress: dropoff.address,
+          dropoffLat: dropoff.lat,
+          dropoffLng: dropoff.lng,
+          distanceKm: route.distanceKm,
+          durationMin: route.durationMin,
+          polyline: route.polyline,
+          vehicleClass: selectedTier,
+          baseFare: quote.fare.baseFare,
+          distanceFare: quote.fare.distanceFare,
+          timeFare: quote.fare.timeFare,
+          totalFare: quote.fare.total,
+          surgeMultiplier: quote.fare.surgeMultiplier,
+          currency: quote.fare.currency,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 401) {
+          router.push('/auth/signup');
+          return;
+        }
+        throw new Error(data.error || 'Booking failed');
+      }
+
+      setCreatedRide(data.ride);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Could not book ride. Please try again.';
+      setBookingError(msg);
+    } finally {
+      setBooking(false);
+    }
+  }, [user, pickup, dropoff, route, quotes, selectedTier, router]);
+
+  // ── Calculate directions for map ───────────────────────────────────
   useEffect(() => {
     if (!pickup || !dropoff || !isLoaded) {
       setDirections(null);
@@ -120,8 +193,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         destination: new google.maps.LatLng(dropoff.lat, dropoff.lng),
         travelMode: google.maps.TravelMode.DRIVING,
       },
-      (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK && result) {
+      (result, dirStatus) => {
+        if (dirStatus === google.maps.DirectionsStatus.OK && result) {
           setDirections(result);
           if (mapRef.current) {
             const bounds = result.routes?.[0]?.bounds;
@@ -143,6 +216,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     };
     setPickup(loc);
     setPickupText(place.formatted_address);
+    setCreatedRide(null);
     if (dropoff) fetchQuotes(loc, dropoff);
   }, [dropoff, fetchQuotes]);
 
@@ -156,6 +230,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     };
     setDropoff(loc);
     setDropoffText(place.formatted_address);
+    setCreatedRide(null);
     if (pickup) fetchQuotes(pickup, loc);
   }, [pickup, fetchQuotes]);
 
@@ -164,7 +239,90 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const hasRoute = pickup && dropoff && route && quotes.length > 0;
   const defaultCenter = { lat: 40.7128, lng: -74.006 };
 
-  // ── Render ─────────────────────────────────────────────────────────
+  // ── Render: Ride confirmed state ───────────────────────────────────
+  if (createdRide) {
+    return (
+      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+        {/* Map stays visible */}
+        <div className="relative h-[280px] bg-[#F2F2F7] overflow-hidden">
+          {isLoaded && (
+            <GoogleMap
+              mapContainerStyle={{ width: '100%', height: '100%' }}
+              center={pickup || defaultCenter}
+              zoom={12}
+              onLoad={(map) => { mapRef.current = map; }}
+              options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
+            >
+              {pickup && (
+                <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
+              )}
+              {dropoff && (
+                <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
+              )}
+              {directions && (
+                <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />
+              )}
+            </GoogleMap>
+          )}
+
+          {/* Status badge */}
+          <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34C759] opacity-40" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34C759]" />
+            </span>
+            <span className="text-[12px] font-semibold text-[#1D1D1F]">Finding your driver</span>
+          </div>
+        </div>
+
+        {/* Confirmed card */}
+        <div className="p-5">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#34C759]/10">
+              <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-[16px] font-semibold text-[#1D1D1F]">Ride confirmed</p>
+              <p className="text-[13px] text-[#86868B]">Searching for a nearby driver</p>
+            </div>
+          </div>
+
+          {/* Trip summary */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[#34C759]" />
+              <span className="truncate text-[14px] text-[#1D1D1F]">{pickup?.address}</span>
+            </div>
+            <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[#1D1D1F]" />
+              <span className="truncate text-[14px] text-[#1D1D1F]">{dropoff?.address}</span>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F5F5F7] px-4 py-3">
+            <div className="flex items-center gap-4">
+              <span className="text-[14px] text-[#86868B]">{route?.distanceKm} km</span>
+              <span className="text-[14px] text-[#86868B]">{route?.durationMin} min</span>
+            </div>
+            <span className="text-[18px] font-bold tabular-nums text-[#1D1D1F]">
+              ${createdRide.estimatedFare.toFixed(2)}
+            </span>
+          </div>
+
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+          >
+            Track your ride
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Render: Booking form ───────────────────────────────────────────
   return (
     <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
 
@@ -176,37 +334,19 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             center={pickup || defaultCenter}
             zoom={12}
             onLoad={(map) => { mapRef.current = map; }}
-            options={{
-              styles: MAP_STYLES,
-              disableDefaultUI: true,
-              zoomControl: false,
-              clickableIcons: false,
-            }}
+            options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
           >
             {pickup && (
-              <Marker
-                position={pickup}
-                icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }}
-              />
+              <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
             )}
             {dropoff && (
-              <Marker
-                position={dropoff}
-                icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }}
-              />
+              <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
             )}
             {directions && (
-              <DirectionsRenderer
-                directions={directions}
-                options={{
-                  suppressMarkers: true,
-                  polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 },
-                }}
-              />
+              <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />
             )}
           </GoogleMap>
         ) : (
-          /* Static placeholder while maps loads */
           <div className="flex h-full w-full items-center justify-center">
             {status === 'degraded' ? (
               <p className="text-[13px] text-[#86868B]">Enter locations below to see your route</p>
@@ -216,7 +356,6 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           </div>
         )}
 
-        {/* ETA badge */}
         {hasRoute && (
           <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
             <span className="relative flex h-2 w-2">
@@ -227,7 +366,6 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           </div>
         )}
 
-        {/* No route — placeholder pins */}
         {!pickup && !dropoff && !isLoaded && (
           <>
             <div className="absolute inset-0 opacity-[0.12]">
@@ -241,6 +379,14 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
 
       {/* ── Booking form ─────────────────────────────────────── */}
       <div className="p-5">
+        {/* Error */}
+        {bookingError && (
+          <div className="mb-4 flex items-center gap-2.5 rounded-xl bg-[#FFF5F5] px-4 py-3">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#FF3B30]" />
+            <p className="text-[13px] font-medium text-[#1D1D1F]">{bookingError}</p>
+          </div>
+        )}
+
         {/* Location inputs */}
         <div className="space-y-2">
           {isLoaded ? (
@@ -363,16 +509,24 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         </div>
 
         {/* CTA */}
-        <a
-          href={hasRoute ? ctaHref : undefined}
+        <button
+          onClick={hasRoute ? confirmRide : undefined}
+          disabled={!hasRoute || booking || quoteLoading}
           className={`mt-3 flex w-full items-center justify-center rounded-xl py-3.5 text-[15px] font-medium transition-colors duration-200 ${
-            hasRoute
+            hasRoute && !booking
               ? 'bg-[#1D1D1F] text-white hover:bg-[#424245] cursor-pointer'
               : 'bg-[#E8E8ED] text-[#A1A1A6] cursor-default'
           }`}
         >
-          {quoteLoading ? 'Calculating...' : hasRoute ? 'Confirm ride' : 'Enter pickup & destination'}
-        </a>
+          {booking
+            ? 'Booking...'
+            : quoteLoading
+              ? 'Calculating...'
+              : hasRoute
+                ? `Confirm ride · $${selectedQuote?.fare.total.toFixed(2)}`
+                : 'Enter pickup & destination'
+          }
+        </button>
       </div>
     </div>
   );
