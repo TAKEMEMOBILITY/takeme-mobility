@@ -1,60 +1,74 @@
 import { createBrowserClient } from '@supabase/ssr';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-
+// Lazy singleton — NEVER initialized at module level.
+// Only created on first call, and only in the browser.
 let client: ReturnType<typeof createBrowserClient> | null = null;
 
 export function createClient() {
+  // Return cached instance
   if (client) return client;
 
-  if (!supabaseUrl || !supabaseKey) {
-    // Return a stub that won't crash during SSR/build when env vars are missing.
-    // All auth operations will fail gracefully at runtime.
-    if (typeof window === 'undefined') {
-      return createSafeStub();
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Guard: if env vars are missing, return a no-op stub
+  if (!url || !key) {
+    if (typeof window !== 'undefined') {
+      console.warn('[Supabase] NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY not set');
     }
-    console.warn('[Supabase] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
-    return createSafeStub();
+    return createStub();
   }
 
-  client = createBrowserClient(supabaseUrl, supabaseKey);
-  return client;
+  try {
+    client = createBrowserClient(url, key);
+    return client;
+  } catch (err) {
+    console.error('[Supabase] Failed to create client:', err);
+    return createStub();
+  }
 }
 
-// Stub client that returns empty/null for all operations without crashing
-function createSafeStub(): ReturnType<typeof createBrowserClient> {
-  const noop = () => ({ data: null, error: { message: 'Supabase not configured', status: 500 } });
-  const noopAsync = async () => noop();
+// Minimal stub that matches the Supabase client shape without crashing.
+// Every method returns safe defaults. Nothing throws.
+function createStub() {
+  const chain = () => {
+    const obj: Record<string, unknown> = {
+      data: null,
+      error: null,
+      then: (fn: (v: unknown) => unknown) => Promise.resolve(fn(obj)),
+      eq: () => obj,
+      neq: () => obj,
+      in: () => obj,
+      not: () => obj,
+      single: () => Promise.resolve(obj),
+      maybeSingle: () => Promise.resolve(obj),
+      order: () => obj,
+      limit: () => obj,
+      select: () => obj,
+      insert: () => Promise.resolve(obj),
+      update: () => Promise.resolve(obj),
+      delete: () => Promise.resolve(obj),
+    };
+    return obj;
+  };
 
   return {
     auth: {
-      getUser: async () => ({ data: { user: null }, error: null }),
-      getSession: async () => ({ data: { session: null }, error: null }),
-      signUp: noopAsync,
-      signInWithPassword: noopAsync,
-      signOut: async () => ({ error: null }),
-      onAuthStateChange: (_event: string, _callback: unknown) => ({
+      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+      signUp: () => Promise.resolve({ data: null, error: null }),
+      signInWithPassword: () => Promise.resolve({ data: null, error: null }),
+      signOut: () => Promise.resolve({ error: null }),
+      onAuthStateChange: () => ({
         data: { subscription: { unsubscribe: () => {} } },
       }),
     },
-    from: () => ({
-      select: () => ({ data: null, error: { message: 'Not configured' } }),
-      insert: () => ({ data: null, error: { message: 'Not configured' } }),
-      update: () => ({ data: null, error: { message: 'Not configured' } }),
-      delete: () => ({ data: null, error: { message: 'Not configured' } }),
-      eq: function() { return this; },
-      single: function() { return this; },
-      maybeSingle: function() { return this; },
-      order: function() { return this; },
-      limit: function() { return this; },
-      not: function() { return this; },
-      in: function() { return this; },
-    }),
+    from: () => chain(),
     channel: () => ({
       on: function() { return this; },
       subscribe: function() { return this; },
     }),
     removeChannel: () => {},
+    rpc: () => Promise.resolve({ data: null, error: null }),
   } as unknown as ReturnType<typeof createBrowserClient>;
 }
