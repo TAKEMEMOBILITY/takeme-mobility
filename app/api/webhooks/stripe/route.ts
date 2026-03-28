@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyWebhookSignature } from '@/lib/stripe';
-import { createServerClient } from '@supabase/ssr';
+import { createServiceClient } from '@/lib/supabase/service';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/webhooks/stripe
 //
-// Handles Stripe webhook events. Uses the service role key to bypass RLS —
-// webhooks run without a user session.
+// Handles Stripe webhook events. Uses the service role key to bypass RLS.
 //
 // Events handled:
 //   payment_intent.amount_capturable_updated — authorization successful
@@ -15,22 +14,6 @@ import { createServerClient } from '@supabase/ssr';
 //   charge.refunded                          — refund processed
 //   charge.dispute.created                   — dispute opened
 // ═══════════════════════════════════════════════════════════════════════════
-
-// Service role client — bypasses RLS for webhook writes
-function createServiceClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  // Fall back to anon key if service key not set (dev mode)
-  const key = serviceKey || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-  return createServerClient(url, key, {
-    cookies: {
-      getAll: () => [],
-      setAll: () => {},
-    },
-  });
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,36 +49,46 @@ export async function POST(request: NextRequest) {
         const piId = obj.id as string;
         const rideId = (obj.metadata as Record<string, string>)?.ride_id;
 
+        // Verify the payment exists in our database before updating
+        const { data: existingPayment } = await supabase
+          .from('payments')
+          .select('id, rider_id, amount')
+          .eq('stripe_payment_intent', piId)
+          .single();
+
+        if (!existingPayment) {
+          console.warn(`[Webhook] Unknown PaymentIntent: ${piId}`);
+          break;
+        }
+
+        // Verify authorized amount matches expected (within 1% tolerance)
+        const authorizedAmountCents = obj.amount_capturable as number ?? obj.amount as number ?? 0;
+        const expectedCents = Math.round(existingPayment.amount * 100);
+        if (Math.abs(authorizedAmountCents - expectedCents) > expectedCents * 0.01) {
+          console.error(`[Webhook] Amount mismatch for ${piId}: authorized=${authorizedAmountCents}, expected=${expectedCents}`);
+          // Still update but flag it
+        }
+
         await supabase
           .from('payments')
           .update({
             status: 'authorized',
             authorized_at: new Date().toISOString(),
           })
-          .eq('stripe_payment_intent', piId);
+          .eq('id', existingPayment.id);
 
         // Save the payment method for future rides
         const pmId = obj.payment_method as string | null;
-        if (pmId && rideId) {
-          const { data: payment } = await supabase
+        if (pmId && existingPayment.rider_id) {
+          await supabase
+            .from('riders')
+            .update({ default_payment_method: pmId })
+            .eq('id', existingPayment.rider_id);
+
+          await supabase
             .from('payments')
-            .select('rider_id')
-            .eq('stripe_payment_intent', piId)
-            .single();
-
-          if (payment?.rider_id) {
-            await supabase
-              .from('riders')
-              .update({
-                default_payment_method: pmId,
-              })
-              .eq('id', payment.rider_id);
-
-            await supabase
-              .from('payments')
-              .update({ payment_method_type: 'card' })
-              .eq('stripe_payment_intent', piId);
-          }
+            .update({ payment_method_type: 'card' })
+            .eq('id', existingPayment.id);
         }
 
         break;

@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { findOrCreateCustomer, createPaymentIntent } from '@/lib/stripe';
 import { assignDriver } from '@/lib/dispatch';
+import { TIERS, calculateFare, type VehicleClass } from '@/lib/pricing';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/rides/create
@@ -65,7 +66,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
-    // 3. Save quote snapshot (immutable record of the price the rider saw)
+    // 3. Server-side fare verification — prevent client-side price manipulation
+    const tier = TIERS[body.vehicleClass as VehicleClass];
+    if (!tier) {
+      return NextResponse.json({ error: 'Invalid vehicle class' }, { status: 400 });
+    }
+
+    const serverFare = calculateFare(tier, body.distanceKm, body.durationMin, {
+      surgeMultiplier: body.surgeMultiplier,
+      currency: body.currency,
+    });
+
+    // Allow $1.00 tolerance for floating-point rounding differences
+    if (Math.abs(serverFare.total - body.totalFare) > 1.0) {
+      return NextResponse.json({
+        error: 'Fare mismatch — please refresh your quote.',
+      }, { status: 400 });
+    }
+
+    // Use server-calculated fare as the source of truth
+    const verifiedFare = serverFare.total;
+
+    // Cap maximum fare as a sanity check
+    if (verifiedFare > 500) {
+      return NextResponse.json({ error: 'Fare exceeds maximum allowed.' }, { status: 400 });
+    }
+
+    // 4. Save quote snapshot (immutable record of the price the rider saw)
     const quoteExpiry = new Date(Date.now() + 5 * 60 * 1000).toISOString();
 
     const { data: quoteData, error: quoteError } = await supabase
@@ -86,7 +113,7 @@ export async function POST(request: NextRequest) {
         distance_fare: body.distanceFare,
         time_fare: body.timeFare,
         surge_multiplier: body.surgeMultiplier,
-        total_fare: body.totalFare,
+        total_fare: verifiedFare,
         currency: body.currency,
         expires_at: quoteExpiry,
       })
@@ -116,7 +143,7 @@ export async function POST(request: NextRequest) {
         distance_km: body.distanceKm,
         duration_min: body.durationMin,
         route_polyline: body.polyline ?? null,
-        estimated_fare: body.totalFare,
+        estimated_fare: verifiedFare,
         currency: body.currency,
         surge_multiplier: body.surgeMultiplier,
         requested_at: new Date().toISOString(),
@@ -155,7 +182,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Create PaymentIntent with manual capture
-      const amountCents = Math.round(body.totalFare * 100);
+      const amountCents = Math.round(verifiedFare * 100);
       const intent = await createPaymentIntent({
         amount: amountCents,
         currency: body.currency.toLowerCase(),
@@ -172,7 +199,7 @@ export async function POST(request: NextRequest) {
         ride_id: rideData.id,
         rider_id: user.id,
         stripe_payment_intent: intent.id,
-        amount: body.totalFare,
+        amount: verifiedFare,
         currency: body.currency,
         status: 'pending',
       });

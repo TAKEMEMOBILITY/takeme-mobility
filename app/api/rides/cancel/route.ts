@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { cancelPaymentIntent } from '@/lib/stripe';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/rides/cancel
@@ -81,6 +82,23 @@ export async function POST(request: NextRequest) {
         .update({ status: 'available' })
         .eq('id', ride.assigned_driver_id)
         .in('status', ['busy', 'on_trip']);
+    }
+
+    // Cancel the PaymentIntent if one exists
+    const { data: payment } = await svc
+      .from('payments')
+      .select('stripe_payment_intent, status')
+      .eq('ride_id', body.rideId)
+      .in('status', ['pending', 'authorized'])
+      .maybeSingle();
+
+    if (payment?.stripe_payment_intent) {
+      try {
+        await cancelPaymentIntent(payment.stripe_payment_intent, 'requested_by_customer');
+        await svc.from('payments').update({ status: 'failed', failure_reason: 'Ride cancelled' }).eq('stripe_payment_intent', payment.stripe_payment_intent);
+      } catch (stripeErr) {
+        console.warn('PaymentIntent cancel failed (non-fatal):', stripeErr);
+      }
     }
 
     // Log event

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { createServiceClient } from '@/lib/supabase/service';
 import { capturePaymentIntent } from '@/lib/stripe';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -13,8 +14,11 @@ import { capturePaymentIntent } from '@/lib/stripe';
 
 const requestSchema = z.object({
   rideId: z.string().uuid(),
-  finalFare: z.number().positive().optional(),  // override amount if fare changed
+  finalFare: z.number().positive().optional(),
 });
+
+// Maximum allowed adjustment ratio (final vs estimated)
+const MAX_FARE_ADJUSTMENT = 1.5; // 50% above estimated
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +38,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
 
-    // 3. Fetch ride + payment
+    // 3. Fetch ride — verify ownership
     const { data: ride } = await supabase
       .from('rides')
       .select('id, rider_id, estimated_fare, status')
@@ -45,9 +49,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
     }
 
-    const { data: payment } = await supabase
+    // 4. Fetch payment — use service client to bypass RLS for cross-table validation
+    const svc = createServiceClient();
+    const { data: payment } = await svc
       .from('payments')
-      .select('id, stripe_payment_intent, status, amount')
+      .select('id, stripe_payment_intent, status, rider_id')
       .eq('ride_id', body.rideId)
       .eq('status', 'authorized')
       .single();
@@ -56,31 +62,53 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No authorized payment found for this ride' }, { status: 400 });
     }
 
-    // 4. Capture
-    const finalAmount = body.finalFare ?? ride.estimated_fare;
-    const amountCents = Math.round(finalAmount * 100);
+    // Verify payment belongs to this rider
+    if (payment.rider_id !== user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
 
+    // 5. Validate final fare adjustment
+    const finalAmount = body.finalFare ?? ride.estimated_fare;
+
+    if (finalAmount > ride.estimated_fare * MAX_FARE_ADJUSTMENT) {
+      return NextResponse.json({
+        error: `Final fare cannot exceed ${MAX_FARE_ADJUSTMENT * 100}% of estimated fare`,
+      }, { status: 400 });
+    }
+
+    // 6. Capture via Stripe
+    const amountCents = Math.round(finalAmount * 100);
     const result = await capturePaymentIntent(payment.stripe_payment_intent, amountCents);
 
-    // 5. Update payment record
-    await supabase
-      .from('payments')
-      .update({
+    // 7. Update payment + ride atomically via service client
+    const now = new Date().toISOString();
+
+    await Promise.all([
+      svc.from('payments').update({
         status: 'captured',
         amount: finalAmount,
-        captured_at: new Date().toISOString(),
-      })
-      .eq('id', payment.id);
+        captured_at: now,
+      }).eq('id', payment.id),
 
-    // 6. Update ride with final fare
-    await supabase
-      .from('rides')
-      .update({
+      svc.from('rides').update({
         final_fare: finalAmount,
         status: 'completed',
-        trip_completed_at: new Date().toISOString(),
-      })
-      .eq('id', body.rideId);
+        trip_completed_at: now,
+      }).eq('id', body.rideId),
+    ]);
+
+    // 8. Log event
+    await svc.from('ride_events').insert({
+      ride_id: body.rideId,
+      event_type: 'payment_captured',
+      actor: 'system',
+      metadata: {
+        payment_intent_id: result.id,
+        estimated_fare: ride.estimated_fare,
+        final_fare: finalAmount,
+        adjusted: body.finalFare !== undefined,
+      },
+    });
 
     return NextResponse.json({
       captured: true,
@@ -89,7 +117,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error('POST /api/payments/capture failed:', err);
-    const msg = err instanceof Error ? err.message : 'Capture failed';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: 'Payment capture failed. Please try again.' }, { status: 500 });
   }
 }

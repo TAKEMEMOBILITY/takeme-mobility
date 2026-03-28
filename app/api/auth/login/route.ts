@@ -1,36 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { email, password } = body;
+// ═══════════════════════════════════════════════════════════════════════════
+// Auth is handled client-side via Supabase Auth (@/lib/auth/context.tsx).
+// This route exists only to prevent 404s if something hits /api/auth/login.
+// No server-side auth logic here — Supabase manages sessions via cookies.
+// ═══════════════════════════════════════════════════════════════════════════
 
-    // TODO: Implement actual authentication logic
-    // This is a placeholder for demonstration
-
-    if (!email || !password) {
-      return NextResponse.json(
-        { error: 'Email and password are required' },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: true,
-        user: {
-          id: '1',
-          email,
-          name: 'User',
-        },
-        token: 'fake-jwt-token',
-      },
-      { status: 200 }
-    );
-  } catch {
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
+export async function POST() {
+  return NextResponse.json(
+    { error: 'Use the client-side auth flow. This endpoint is not used.' },
+    { status: 410 },
+  );
 }

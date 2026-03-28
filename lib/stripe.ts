@@ -18,15 +18,21 @@ async function stripeRequest(
   path: string,
   params: Record<string, string>,
   method: 'POST' | 'GET' = 'POST',
+  idempotencyKey?: string,
 ): Promise<Record<string, unknown>> {
   const key = getSecretKey();
 
+  const headers: Record<string, string> = {
+    'Authorization': `Bearer ${key}`,
+    'Content-Type': 'application/x-www-form-urlencoded',
+  };
+  if (idempotencyKey) {
+    headers['Idempotency-Key'] = idempotencyKey;
+  }
+
   const res = await fetch(`${STRIPE_API}${path}`, {
     method,
-    headers: {
-      'Authorization': `Bearer ${key}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
+    headers,
     body: method === 'POST' ? new URLSearchParams(params).toString() : undefined,
   });
 
@@ -117,7 +123,9 @@ export async function createPaymentIntent(
     body['confirm'] = 'true';
   }
 
-  const data = await stripeRequest('/payment_intents', body);
+  // Idempotency key: ride-specific, prevents duplicate intents on retry
+  const idempotencyKey = `pi_${params.rideId}_${params.amount}`;
+  const data = await stripeRequest('/payment_intents', body, 'POST', idempotencyKey);
   return {
     id: data.id as string,
     clientSecret: data.client_secret as string,
@@ -136,6 +144,18 @@ export async function capturePaymentIntent(
     params['amount_to_capture'] = String(amountToCapture);
   }
   const data = await stripeRequest(`/payment_intents/${paymentIntentId}/capture`, params);
+  return { id: data.id as string, status: data.status as string };
+}
+
+// ── Cancel PaymentIntent ─────────────────────────────────────────────────
+
+export async function cancelPaymentIntent(
+  paymentIntentId: string,
+  reason?: string,
+): Promise<{ id: string; status: string }> {
+  const params: Record<string, string> = {};
+  if (reason) params['cancellation_reason'] = reason;
+  const data = await stripeRequest(`/payment_intents/${paymentIntentId}/cancel`, params);
   return { id: data.id as string, status: data.status as string };
 }
 
