@@ -30,10 +30,10 @@ const PILLARS = [
 const CITIES = ['New York', 'London', 'Zurich', 'Berlin', 'Paris', 'Tokyo', 'Singapore', 'Dubai'];
 
 // Hero — street-level, wet pavement, headlight reflections, dark and cinematic
-// Hero — dark car, near-black environment, headlights visible, zero clutter
-const HERO_IMG = 'https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=2400&q=90&auto=format&fit=crop';
-// Secondary — black car in motion, urban night, motion blur
-const SECONDARY_IMG = 'https://images.unsplash.com/photo-1549317661-bd32c8ce0afa?w=1920&q=85&auto=format&fit=crop';
+// Hero — premium sedan on city street at night, glass buildings, urban cinematic
+const HERO_IMG = 'https://images.unsplash.com/photo-1685556636541-2904f9e7ef21?w=2400&q=90&auto=format&fit=crop';
+// Secondary — black car in motion, Manhattan, motion blur, neon reflections
+const SECONDARY_IMG = 'https://images.unsplash.com/photo-1727529488498-a498ef64e81b?w=1920&q=85&auto=format&fit=crop';
 
 // ── Hooks ─────────────────────────────────────────────────────────────────
 
@@ -150,7 +150,7 @@ export default function HomePage() {
             fill
             priority
             sizes="100vw"
-            className="object-cover object-[center_40%] animate-cinematic-zoom"
+            className="object-cover object-center animate-cinematic-zoom"
             unoptimized
           />
         </div>
