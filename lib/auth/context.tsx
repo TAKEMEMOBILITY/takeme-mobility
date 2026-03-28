@@ -14,7 +14,16 @@ interface AuthContextType {
   signOut: () => Promise<{ error: AuthError | null }>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// Default value — used when context is missing. Never throws.
+const defaultAuth: AuthContextType = {
+  user: null,
+  loading: false,
+  signUp: async () => ({ data: null, error: null }),
+  signIn: async () => ({ data: null, error: null }),
+  signOut: async () => ({ error: null }),
+};
+
+const AuthContext = createContext<AuthContextType>(defaultAuth);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const auth = useAuthHook();
@@ -26,10 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+export function useAuth(): AuthContextType {
+  return useContext(AuthContext);
 }
