@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { findOrCreateCustomer, createPaymentIntent } from '@/lib/stripe';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/rides/create
@@ -130,7 +131,56 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 5. Return ride
+    // 5. Set up payment — authorize (hold funds) immediately
+    let clientSecret: string | null = null;
+    let paymentIntentId: string | null = null;
+
+    try {
+      // Ensure Stripe customer
+      const { data: rider } = await supabase
+        .from('riders')
+        .select('stripe_customer_id, full_name, email')
+        .eq('id', user.id)
+        .single();
+
+      let customerId = rider?.stripe_customer_id;
+      if (!customerId) {
+        customerId = await findOrCreateCustomer(
+          user.email ?? rider?.email ?? '',
+          rider?.full_name ?? undefined,
+          user.id,
+        );
+        await supabase.from('riders').update({ stripe_customer_id: customerId }).eq('id', user.id);
+      }
+
+      // Create PaymentIntent with manual capture
+      const amountCents = Math.round(body.totalFare * 100);
+      const intent = await createPaymentIntent({
+        amount: amountCents,
+        currency: body.currency.toLowerCase(),
+        customerId,
+        rideId: rideData.id,
+        description: `TakeMe ${body.vehicleClass}: ${body.pickupAddress} → ${body.dropoffAddress}`,
+      });
+
+      clientSecret = intent.clientSecret;
+      paymentIntentId = intent.id;
+
+      // Write payment record
+      await supabase.from('payments').insert({
+        ride_id: rideData.id,
+        rider_id: user.id,
+        stripe_payment_intent: intent.id,
+        amount: body.totalFare,
+        currency: body.currency,
+        status: 'pending',
+      });
+    } catch (payErr) {
+      // Payment setup failure is non-fatal — ride is created, payment can retry
+      console.warn('Payment setup failed (ride still created):', payErr);
+    }
+
+    // 6. Return ride + payment
     return NextResponse.json({
       ride: {
         id: rideData.id,
@@ -140,6 +190,10 @@ export async function POST(request: NextRequest) {
         requestedAt: rideData.requested_at,
         quoteId,
       },
+      payment: clientSecret ? {
+        clientSecret,
+        paymentIntentId,
+      } : null,
     }, { status: 201 });
   } catch (err) {
     console.error('POST /api/rides/create failed:', err);

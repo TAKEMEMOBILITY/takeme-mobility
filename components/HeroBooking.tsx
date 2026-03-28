@@ -3,9 +3,13 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleMap, Marker, DirectionsRenderer, Autocomplete } from '@react-google-maps/api';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useGoogleMaps } from './GoogleMapsProvider';
 import { useAuth } from '@/lib/auth/context';
 import type { QuoteResult } from '@/lib/pricing';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '');
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -26,6 +30,7 @@ interface CreatedRide {
   status: string;
   estimatedFare: number;
   currency: string;
+  clientSecret: string | null;
 }
 
 type VehicleClass = 'economy' | 'comfort' | 'premium';
@@ -62,6 +67,49 @@ function pinSvg(fill: string): string {
   `);
 }
 
+// ── Inline payment form (used inside confirmed card) ─────────────────────
+
+function InlinePaymentForm({ onSuccess, onError }: {
+  onSuccess: () => void;
+  onError: (msg: string) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setProcessing(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: { return_url: window.location.href },
+      redirect: 'if_required',
+    });
+
+    if (error) {
+      onError(error.message ?? 'Payment failed');
+      setProcessing(false);
+    } else {
+      onSuccess();
+    }
+  }, [stripe, elements, onSuccess, onError]);
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      <button
+        type="submit"
+        disabled={!stripe || !elements || processing}
+        className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245] disabled:opacity-40"
+      >
+        {processing ? 'Processing...' : 'Pay now'}
+      </button>
+    </form>
+  );
+}
+
 // ── Component ────────────────────────────────────────────────────────────
 
 export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
@@ -85,6 +133,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const [booking, setBooking] = useState(false);
   const [createdRide, setCreatedRide] = useState<CreatedRide | null>(null);
   const [bookingError, setBookingError] = useState('');
+  const [paymentDone, setPaymentDone] = useState(false);
+  const [paymentError, setPaymentError] = useState('');
 
   // Map state
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
@@ -171,7 +221,10 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         throw new Error(data.error || 'Booking failed');
       }
 
-      setCreatedRide(data.ride);
+      setCreatedRide({
+        ...data.ride,
+        clientSecret: data.payment?.clientSecret ?? null,
+      });
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Could not book ride. Please try again.';
       setBookingError(msg);
@@ -277,20 +330,33 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
 
         {/* Confirmed card */}
         <div className="p-5">
+          {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#34C759]/10">
-              <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-              </svg>
+            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
+              paymentDone ? 'bg-[#34C759]/10' : 'bg-[#F5F5F7]'
+            }`}>
+              {paymentDone ? (
+                <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                </svg>
+              ) : (
+                <svg className="h-5 w-5 text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+                </svg>
+              )}
             </div>
             <div>
-              <p className="text-[16px] font-semibold text-[#1D1D1F]">Ride confirmed</p>
-              <p className="text-[13px] text-[#86868B]">Searching for a nearby driver</p>
+              <p className="text-[16px] font-semibold text-[#1D1D1F]">
+                {paymentDone ? 'Ride confirmed' : 'Complete payment'}
+              </p>
+              <p className="text-[13px] text-[#86868B]">
+                {paymentDone ? 'Searching for a nearby driver' : `$${createdRide.estimatedFare.toFixed(2)} · ${route?.distanceKm} km`}
+              </p>
             </div>
           </div>
 
           {/* Trip summary */}
-          <div className="space-y-2">
+          <div className="space-y-2 mb-4">
             <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">
               <span className="h-2 w-2 shrink-0 rounded-full bg-[#34C759]" />
               <span className="truncate text-[14px] text-[#1D1D1F]">{pickup?.address}</span>
@@ -301,22 +367,61 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             </div>
           </div>
 
-          <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F5F5F7] px-4 py-3">
-            <div className="flex items-center gap-4">
-              <span className="text-[14px] text-[#86868B]">{route?.distanceKm} km</span>
-              <span className="text-[14px] text-[#86868B]">{route?.durationMin} min</span>
+          {/* Payment error */}
+          {paymentError && (
+            <div className="mb-4 flex items-center gap-2.5 rounded-xl bg-[#FFF5F5] px-4 py-3">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[#FF3B30]" />
+              <p className="text-[13px] font-medium text-[#1D1D1F]">{paymentError}</p>
             </div>
-            <span className="text-[18px] font-bold tabular-nums text-[#1D1D1F]">
-              ${createdRide.estimatedFare.toFixed(2)}
-            </span>
-          </div>
+          )}
 
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="mt-3 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
-          >
-            Track your ride
-          </button>
+          {/* Payment form or success */}
+          {paymentDone ? (
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="mt-1 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+            >
+              Track your ride
+            </button>
+          ) : createdRide.clientSecret ? (
+            <Elements
+              stripe={stripePromise}
+              options={{
+                clientSecret: createdRide.clientSecret,
+                appearance: {
+                  theme: 'stripe',
+                  variables: {
+                    colorPrimary: '#1D1D1F',
+                    colorBackground: '#F5F5F7',
+                    colorText: '#1D1D1F',
+                    colorTextSecondary: '#6E6E73',
+                    colorDanger: '#FF3B30',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    borderRadius: '12px',
+                    spacingUnit: '4px',
+                  },
+                  rules: {
+                    '.Input': { border: '1px solid #E8E8ED', boxShadow: 'none', padding: '12px 14px', fontSize: '15px' },
+                    '.Input:focus': { border: '1px solid #1D1D1F', boxShadow: '0 0 0 1px #1D1D1F' },
+                    '.Label': { fontSize: '13px', fontWeight: '500', color: '#6E6E73', marginBottom: '6px' },
+                  },
+                },
+              }}
+            >
+              <InlinePaymentForm
+                onSuccess={() => { setPaymentDone(true); setPaymentError(''); }}
+                onError={(msg) => setPaymentError(msg)}
+              />
+            </Elements>
+          ) : (
+            /* No clientSecret — payment setup failed, allow proceeding anyway */
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+            >
+              Continue to dashboard
+            </button>
+          )}
         </div>
       </div>
     );
