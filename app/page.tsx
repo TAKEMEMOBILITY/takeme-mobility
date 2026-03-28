@@ -121,27 +121,20 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-6">
             {loading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-            ) : user ? (
-              <Link
-                href="/dashboard"
-                className="rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-ink transition-all duration-150 hover:bg-white/90 active:scale-[0.97]"
-              >
-                Open App
-              </Link>
             ) : (
               <>
                 <Link
-                  href="/auth/login"
-                  className="hidden text-[14px] font-medium text-white/60 transition-colors hover:text-white sm:block"
+                  href={user ? '/dashboard' : '/auth/login'}
+                  className="text-[14px] font-medium text-white/60 transition-colors hover:text-white"
                 >
                   Sign in
                 </Link>
                 <Link
-                  href="/auth/signup"
-                  className="rounded-full bg-white px-5 py-2.5 text-[14px] font-semibold text-ink transition-all duration-150 hover:bg-white/90 active:scale-[0.97]"
+                  href={user ? '/dashboard' : '/auth/signup'}
+                  className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-[14px] font-semibold text-white transition-all duration-150 hover:border-white/35 hover:bg-white/10 active:scale-[0.97]"
                 >
                   Get started
                 </Link>
