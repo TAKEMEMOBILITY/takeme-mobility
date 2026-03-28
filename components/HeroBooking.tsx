@@ -3,15 +3,27 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { GoogleMap, Marker, DirectionsRenderer, Autocomplete } from '@react-google-maps/api';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useGoogleMaps } from './GoogleMapsProvider';
 import { useAuth } from '@/lib/auth/context';
 import RideTracker from './RideTracker';
 import type { QuoteResult } from '@/lib/pricing';
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
-const stripePromise = stripeKey ? loadStripe(stripeKey) : Promise.resolve(null);
+// NEVER call loadStripe with empty key — it crashes the Stripe SDK
+const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+let stripePromise: Promise<Stripe | null> | null = null;
+function getStripe(): Promise<Stripe | null> {
+  if (!STRIPE_KEY) return Promise.resolve(null);
+  if (!stripePromise) {
+    try {
+      stripePromise = loadStripe(STRIPE_KEY);
+    } catch {
+      stripePromise = Promise.resolve(null);
+    }
+  }
+  return stripePromise;
+}
 
 // ── Types ────────────────────────────────────────────────────────────────
 
@@ -296,27 +308,26 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
 
   // ── Render: Ride confirmed — payment then live tracking ──────────────
   if (createdRide) {
-    // After payment: show live ride tracker
-    if (paymentDone || !createdRide.clientSecret) {
-      return (
-        <RideTracker
-          rideId={createdRide.id}
-          onClose={() => {
-            setCreatedRide(null);
-            setPaymentDone(false);
-            setPickup(null);
-            setDropoff(null);
-            setPickupText('');
-            setDropoffText('');
-            setQuotes([]);
-            setRoute(null);
-            setDirections(null);
-          }}
-        />
-      );
+    const resetBooking = () => {
+      setCreatedRide(null);
+      setPaymentDone(false);
+      setPickup(null);
+      setDropoff(null);
+      setPickupText('');
+      setDropoffText('');
+      setQuotes([]);
+      setRoute(null);
+      setDirections(null);
+    };
+
+    // After payment or no payment needed: show live ride tracker
+    if (paymentDone || !createdRide.clientSecret || !STRIPE_KEY) {
+      return <RideTracker rideId={createdRide.id} onClose={resetBooking} />;
     }
 
-    // Before payment: show Stripe form
+    // Before payment: show Stripe form (only if Stripe is available)
+    const stripe = getStripe();
+
     return (
       <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="p-5">
@@ -334,7 +345,6 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             </div>
           </div>
 
-          {/* Trip summary */}
           <div className="space-y-2 mb-4">
             <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">
               <span className="h-2 w-2 shrink-0 rounded-full bg-[#34C759]" />
@@ -353,35 +363,44 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             </div>
           )}
 
-          <Elements
-            stripe={stripePromise}
-            options={{
-              clientSecret: createdRide.clientSecret,
-              appearance: {
-                theme: 'stripe',
-                variables: {
-                  colorPrimary: '#1D1D1F',
-                  colorBackground: '#F5F5F7',
-                  colorText: '#1D1D1F',
-                  colorTextSecondary: '#6E6E73',
-                  colorDanger: '#FF3B30',
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
-                  borderRadius: '12px',
-                  spacingUnit: '4px',
+          {stripe ? (
+            <Elements
+              stripe={stripe}
+              options={{
+                clientSecret: createdRide.clientSecret,
+                appearance: {
+                  theme: 'stripe',
+                  variables: {
+                    colorPrimary: '#1D1D1F',
+                    colorBackground: '#F5F5F7',
+                    colorText: '#1D1D1F',
+                    colorTextSecondary: '#6E6E73',
+                    colorDanger: '#FF3B30',
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                    borderRadius: '12px',
+                    spacingUnit: '4px',
+                  },
+                  rules: {
+                    '.Input': { border: '1px solid #E8E8ED', boxShadow: 'none', padding: '12px 14px', fontSize: '15px' },
+                    '.Input:focus': { border: '1px solid #1D1D1F', boxShadow: '0 0 0 1px #1D1D1F' },
+                    '.Label': { fontSize: '13px', fontWeight: '500', color: '#6E6E73', marginBottom: '6px' },
+                  },
                 },
-                rules: {
-                  '.Input': { border: '1px solid #E8E8ED', boxShadow: 'none', padding: '12px 14px', fontSize: '15px' },
-                  '.Input:focus': { border: '1px solid #1D1D1F', boxShadow: '0 0 0 1px #1D1D1F' },
-                  '.Label': { fontSize: '13px', fontWeight: '500', color: '#6E6E73', marginBottom: '6px' },
-                },
-              },
-            }}
-          >
-            <InlinePaymentForm
-              onSuccess={() => { setPaymentDone(true); setPaymentError(''); }}
-              onError={(msg) => setPaymentError(msg)}
-            />
-          </Elements>
+              }}
+            >
+              <InlinePaymentForm
+                onSuccess={() => { setPaymentDone(true); setPaymentError(''); }}
+                onError={(msg) => setPaymentError(msg)}
+              />
+            </Elements>
+          ) : (
+            <button
+              onClick={() => setPaymentDone(true)}
+              className="flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+            >
+              Continue
+            </button>
+          )}
         </div>
       </div>
     );

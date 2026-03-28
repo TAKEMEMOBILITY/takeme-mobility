@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe, type Stripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -9,8 +9,19 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 
-const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
-const stripePromise = stripeKey ? loadStripe(stripeKey) : Promise.resolve(null);
+const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || '';
+let stripePromise: Promise<Stripe | null> | null = null;
+function getStripe(): Promise<Stripe | null> | null {
+  if (!STRIPE_KEY) return null;
+  if (!stripePromise) {
+    try {
+      stripePromise = loadStripe(STRIPE_KEY);
+    } catch {
+      return null;
+    }
+  }
+  return stripePromise;
+}
 
 // ---- Types ----------------------------------------------------------------
 
@@ -219,6 +230,23 @@ export default function PaymentModal(props: PaymentModalProps) {
     </div>
   );
 
+  const stripe = getStripe();
+
+  if (!stripe) {
+    return shell(
+      <div className="flex flex-col items-center py-4">
+        <p className="text-sm font-semibold text-ink">Payments unavailable</p>
+        <p className="mt-1 text-xs text-ink-tertiary">Payment system is not configured.</p>
+        <button
+          onClick={props.onDismiss}
+          className="mt-5 w-full rounded-xl bg-surface-secondary py-3.5 text-[15px] font-semibold text-ink transition-colors hover:bg-surface-tertiary"
+        >
+          Close
+        </button>
+      </div>,
+    );
+  }
+
   if (loadError) {
     return shell(
       <div className="flex flex-col items-center py-4">
@@ -250,7 +278,7 @@ export default function PaymentModal(props: PaymentModalProps) {
 
   return shell(
     <Elements
-      stripe={stripePromise}
+      stripe={stripe}
       options={{
         clientSecret,
         appearance: {
