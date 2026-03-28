@@ -85,6 +85,19 @@ body {
 .animate-fade-in-scale { animation: fade-in-scale 250ms ease-out both; }
 .animate-slide-up      { animation: slide-up 350ms cubic-bezier(0.16, 1, 0.3, 1) both; }
 
+/* Cinematic slow zoom — used on hero images to create life without motion */
+@keyframes cinematic-zoom {
+  from { transform: scale(1.03); }
+  to   { transform: scale(1.08); }
+}
+.animate-cinematic-zoom {
+  animation: cinematic-zoom 25s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-cinematic-zoom { animation: none; transform: scale(1.03); }
+}
+
 /* Live indicator ring — used on active trip status dots */
 .pulse-ring::before {
   content: '';

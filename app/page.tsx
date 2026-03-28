@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import Image from 'next/image';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/lib/auth/context';
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -28,82 +29,11 @@ const PILLARS = [
 
 const CITIES = ['New York', 'London', 'Zurich', 'Berlin', 'Paris', 'Tokyo', 'Singapore', 'Dubai'];
 
-// ── CinematicVideo ────────────────────────────────────────────────────────
-// Handles autoplay, reduced-motion, loading states, and graceful fallback.
-// The overlay is controlled entirely by the parent via children.
-
-function CinematicVideo({
-  src,
-  children,
-  lazy = false,
-}: {
-  src: string;
-  children: React.ReactNode;
-  lazy?: boolean;
-}) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [loaded, setLoaded] = useState(false);
-  const [shouldLoad, setShouldLoad] = useState(!lazy);
-
-  // Lazy loading — start loading when section enters viewport
-  useEffect(() => {
-    if (!lazy || shouldLoad) return;
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setShouldLoad(true); observer.disconnect(); } },
-      { rootMargin: '200px' },
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [lazy, shouldLoad]);
-
-  // Playback control
-  useEffect(() => {
-    if (!shouldLoad) return;
-    const video = videoRef.current;
-    if (!video) return;
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      video.currentTime = 2;
-      setLoaded(true);
-      return;
-    }
-
-    const onReady = () => setLoaded(true);
-    video.addEventListener('canplaythrough', onReady);
-    video.play().catch(() => { video.currentTime = 2; setLoaded(true); });
-    return () => video.removeEventListener('canplaythrough', onReady);
-  }, [shouldLoad]);
-
-  return (
-    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
-      {shouldLoad && (
-        <video
-          ref={videoRef}
-          src={src}
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload={lazy ? 'metadata' : 'auto'}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2s] ease-out ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
-        />
-      )}
-      {/* Overlay layers — composited by the parent */}
-      {children}
-      {/* Loading fallback — dissolves away */}
-      <div className={`absolute inset-0 bg-[#08080a] transition-opacity duration-[2s] ease-out ${
-        loaded ? 'pointer-events-none opacity-0' : 'opacity-100'
-      }`} />
-    </div>
-  );
-}
+// Hero image — Unsplash: cinematic city with motion blur, dark tones
+// Free for commercial use, no attribution required
+const HERO_IMAGE = 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=2400&q=85&auto=format&fit=crop';
+// Secondary — abstract city at dusk, glass and light
+const SECONDARY_IMAGE = 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1920&q=85&auto=format&fit=crop';
 
 // ── Scroll-aware navbar ───────────────────────────────────────────────────
 
@@ -130,9 +60,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#08080a]">
 
-      {/* ═══ NAVIGATION ═══════════════════════════════════════════════════
-          Transparent by default. Gains backdrop-blur on scroll.
-          ═════════════════════════════════════════════════════════════════ */}
+      {/* ═══ NAVIGATION ═══════════════════════════════════════════════════ */}
       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
         scrolled ? 'bg-[#08080a]/80 backdrop-blur-2xl' : ''
       }`}>
@@ -176,24 +104,32 @@ export default function HomePage() {
       </nav>
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════
-          Full viewport. Video behind. Content centered vertically with
-          slight bottom offset. Left-aligned. Left-to-right directional
-          gradient protects text while keeping the right side of the
-          video visible. Subtle slow zoom on the video.
+          Full viewport. Cinematic image with slow zoom animation.
+          Left-to-right gradient keeps text readable on the left
+          while the image breathes on the right.
+          The zoom (1.03 → 1.08 over 25s) creates life.
           ═════════════════════════════════════════════════════════════════ */}
-      <section className="relative flex min-h-[100svh] items-center">
-        <CinematicVideo src="/videos/takeme.mp4">
-          {/* Left-heavy directional gradient — text lives on the left,
-              video breathes on the right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
-          {/* Bottom anchor — grounds the composition */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          {/* Top vignette — cinematic framing */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
-          {/* Cool tone shift */}
-          <div className="absolute inset-0 bg-blue-950/[0.06]" />
-        </CinematicVideo>
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
+        {/* Background image with cinematic zoom */}
+        <div className="absolute inset-0">
+          <Image
+            src={HERO_IMAGE}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover animate-cinematic-zoom"
+            unoptimized
+          />
+        </div>
 
+        {/* Overlay system — 4 layers for depth and readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#08080a]/80 via-[#08080a]/40 to-[#08080a]/15" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#08080a]/60 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#08080a]/35 to-transparent" />
+        <div className="absolute inset-0 bg-blue-950/[0.05]" />
+
+        {/* Content */}
         <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
           <div className="max-w-xl">
             <h1 className="text-[clamp(2.75rem,6.5vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.035em] text-white">
@@ -257,11 +193,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ BREATHING SPACE ══════════════════════════════════════════════
-          The transition between videos. Pure black. A single quiet
-          statement. This creates the Apple "pause" moment — the user
-          processes what they saw before the next visual arrives.
-          ═════════════════════════════════════════════════════════════════ */}
+      {/* ═══ BREATHING SPACE ══════════════════════════════════════════════ */}
       <section className="bg-[#08080a] py-32 md:py-44">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
           <div className="mx-auto max-w-2xl text-center">
@@ -274,18 +206,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ SECOND VIDEO — Inset cinematic section ═══════════════════════
-          Not edge-to-edge. Contained within the content grid with rounded
-          corners. This creates a "window" into the brand world rather than
-          another full-bleed hero. The constraint makes it feel intentional.
-          ═════════════════════════════════════════════════════════════════ */}
+      {/* ═══ SECONDARY IMAGE — Inset cinematic section ════════════════════ */}
       <section className="bg-[#08080a] pb-32 md:pb-44">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <div className="relative flex min-h-[65vh] items-center justify-center overflow-hidden rounded-2xl md:min-h-[80vh] md:rounded-3xl">
-            <CinematicVideo src="/videos/takeme2.mp4" lazy>
-              <div className="absolute inset-0 bg-black/40" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
-            </CinematicVideo>
+          <div className="relative flex min-h-[55vh] items-center justify-center overflow-hidden rounded-2xl md:min-h-[70vh] md:rounded-3xl">
+            <Image
+              src={SECONDARY_IMAGE}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="(max-width: 1280px) 100vw, 1280px"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-black/45" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
 
             <div className="relative z-10 px-6 text-center">
               <h2 className="text-[clamp(1.75rem,5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
@@ -300,9 +234,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ TRANSITION TO LIGHT ══════════════════════════════════════════
-          Gradient from dark to the light content sections.
-          ═════════════════════════════════════════════════════════════════ */}
+      {/* ═══ TRANSITION TO LIGHT ══════════════════════════════════════════ */}
       <div className="h-24 bg-gradient-to-b from-[#08080a] to-surface md:h-32" />
 
       {/* ═══ PILLARS ══════════════════════════════════════════════════════ */}
