@@ -186,7 +186,7 @@ export default function DriverPage() {
           table: 'rides',
           filter: `assigned_driver_id=eq.${profile.id}`,
         },
-        async (payload) => {
+        async (payload: { eventType: string }) => {
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const updatedRide = await fetchRide();
             if (updatedRide) {

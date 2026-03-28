@@ -212,7 +212,7 @@ export function useActiveRide(rideId: string | null): UseActiveRideReturn {
           table: 'rides',
           filter: `id=eq.${rideId}`,
         },
-        async (payload) => {
+        async (payload: { new: Record<string, unknown>; eventType: string }) => {
           const row = payload.new;
           const mapped = mapRow(row);
           setRide(mapped);
