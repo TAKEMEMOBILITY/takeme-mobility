@@ -1,17 +1,17 @@
-﻿'use client';
+'use client';
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { z } from 'zod';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/context';
 import { createClient } from '@/lib/supabase/client';
-import { fetchWithRetry, withRetry } from '@/lib/utils';
-import { Location, RideOption, Ride, Route, locationSchema, routeSchema, rideSchema } from '@/types';
+import { withRetry } from '@/lib/utils';
+import { Location, RideOption, Ride, Route, routeSchema, rideSchema } from '@/types';
 import Map from '@/components/Map';
 import LocationInput from '@/components/LocationInput';
 import { GoogleMapsProvider } from '@/components/GoogleMapsProvider';
 import { useTripEngine } from '@/lib/useTripEngine';
 import PaymentModal from '@/components/PaymentModal';
+import { useGeolocation, type GeoStatus } from '@/lib/useGeolocation';
 
 type LocaleOption = {
   code: string;
@@ -35,12 +35,75 @@ const RideStatusBadge: Record<Ride['status'], string> = {
   cancelled: 'bg-surface-secondary text-ink-tertiary',
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// User-safe messages — NEVER expose technical errors
+// ═══════════════════════════════════════════════════════════════════════════
+
+const USER_MESSAGES = {
+  // Location
+  locationFallback: 'Using your approximate location. You can set a precise pickup below.',
+  locationDenied: 'Location access is off. Set your pickup location manually.',
+
+  // Route
+  routeUnavailable: 'This route isn\'t available right now. Try a different destination.',
+
+  // Booking
+  selectBothLocations: 'Set your pickup and destination to continue.',
+  selectValidRoute: 'We need a valid route to calculate your fare.',
+  sessionExpired: 'Your session has ended. Signing you back in.',
+
+  // General
+  tryAgain: 'Something didn\'t work. Please try again.',
+} as const;
+
+// ── Location banner component ────────────────────────────────────────────
+
+function LocationBanner({ geoStatus, onRequestPermission }: {
+  geoStatus: GeoStatus;
+  onRequestPermission: () => void;
+}) {
+  if (geoStatus === 'denied') {
+    return (
+      <div className="mb-3 flex items-center justify-between gap-3 rounded-xl bg-surface-secondary px-4 py-3 animate-fade-in">
+        <div className="flex items-center gap-2.5">
+          <svg className="h-4 w-4 shrink-0 text-ink-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
+          </svg>
+          <p className="text-[13px] text-ink-secondary">{USER_MESSAGES.locationDenied}</p>
+        </div>
+        <button
+          onClick={onRequestPermission}
+          className="shrink-0 text-[12px] font-semibold text-accent transition-opacity hover:opacity-70"
+        >
+          Enable
+        </button>
+      </div>
+    );
+  }
+
+  if (geoStatus === 'unavailable') {
+    return (
+      <div className="mb-3 flex items-center gap-2.5 rounded-xl bg-surface-secondary px-4 py-3 animate-fade-in">
+        <svg className="h-4 w-4 shrink-0 text-ink-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
+        </svg>
+        <p className="text-[13px] text-ink-secondary">{USER_MESSAGES.locationFallback}</p>
+      </div>
+    );
+  }
+
+  return null;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+
 export default function DashboardPage() {
   const [rides, setRides] = useState<Ride[]>([]);
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [stats, setStats] = useState({ totalRides: 0, totalSpent: 0, rating: 5.0 });
-  const [currentLocation, setCurrentLocation] = useState<Location | null>(null);
   const [pickup, setPickup] = useState('');
   const [dropoff, setDropoff] = useState('');
   const [pickupLocation, setPickupLocation] = useState<Location | null>(null);
@@ -51,7 +114,8 @@ export default function DashboardPage() {
   const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [userMessage, setUserMessage] = useState('');
+  const [userMessageType, setUserMessageType] = useState<'info' | 'warning'>('info');
   const [routeError, setRouteError] = useState('');
   const [locale, setLocale] = useState<LocaleOption>(localeOptions[0]);
   const [showPayment, setShowPayment] = useState(false);
@@ -61,6 +125,32 @@ export default function DashboardPage() {
   const router = useRouter();
   const supabase = createClient();
   const { snapshot: tripSnapshot, setPickup: engineSetPickup, setDropoff: engineSetDropoff } = useTripEngine();
+
+  // ── Geolocation — production hook ──────────────────────────────────
+  const { position: geoPosition, status: geoStatus, requestPermission } = useGeolocation();
+
+  // Sync geolocation to pickup when position resolves
+  useEffect(() => {
+    if (!geoPosition) return;
+    // Only auto-set if user hasn't manually entered a pickup
+    if (pickupLocation) return;
+
+    const location: Location = {
+      lat: geoPosition.lat,
+      lng: geoPosition.lng,
+      address: geoPosition.address,
+    };
+
+    setPickupLocation(location);
+    setPickup(location.address);
+    engineSetPickup(location);
+  }, [geoPosition, pickupLocation, engineSetPickup]);
+
+  // Derive currentLocation for the map from geo hook
+  const currentLocation = useMemo(() => {
+    if (!geoPosition) return null;
+    return { lat: geoPosition.lat, lng: geoPosition.lng, address: geoPosition.address };
+  }, [geoPosition]);
 
   const rideTypes: RideOption[] = useMemo(
     () => [
@@ -78,15 +168,23 @@ export default function DashboardPage() {
     return Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
   }, []);
 
+  // ── Show user-safe message (auto-dismiss) ─────────────────────────
+  const showMessage = useCallback((msg: string, type: 'info' | 'warning' = 'info', durationMs = 5000) => {
+    setUserMessage(msg);
+    setUserMessageType(type);
+    if (durationMs > 0) {
+      setTimeout(() => setUserMessage(''), durationMs);
+    }
+  }, []);
+
   const handleSignOut = useCallback(async () => {
     try {
       await logOut();
       router.push('/auth/login');
-    } catch (error) {
-      setErrorMessage('Unable to sign out at this time. Please try again.');
-      console.error('Sign out failed:', error);
+    } catch {
+      showMessage(USER_MESSAGES.tryAgain, 'warning');
     }
-  }, [logOut, router]);
+  }, [logOut, router, showMessage]);
 
   const fetchRides = useCallback(async () => {
     if (!user) return;
@@ -95,7 +193,6 @@ export default function DashboardPage() {
     try {
       const { data, error } = await supabase.from('ride_requests').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       if (error) {
-        // Table may not exist yet — not a fatal error
         console.warn('Could not fetch rides:', error.message);
         setRides([]);
         setStats({ totalRides: 0, totalSpent: 0, rating: 4.9 });
@@ -110,7 +207,7 @@ export default function DashboardPage() {
 
       const parsed = rideSchema.array().safeParse(data);
       if (!parsed.success) {
-        console.warn('Ride data validation mismatch (showing raw count):', parsed.error.issues[0]?.message);
+        console.warn('Ride data validation mismatch:', parsed.error.issues[0]?.message);
         setRides([]);
         setStats({ totalRides: data.length, totalSpent: 0, rating: 4.9 });
         return;
@@ -131,81 +228,9 @@ export default function DashboardPage() {
     }
   }, [supabase, user]);
 
-  const getCurrentLocation = useCallback(() => {
-    if (typeof navigator === 'undefined' || !navigator.geolocation) {
-      setErrorMessage('Geolocation not supported; using default location.');
-      const defaultLocation: Location = { lat: 40.7128, lng: -74.0060, address: 'New York, NY' };
-      setCurrentLocation(defaultLocation);
-      setPickupLocation(defaultLocation);
-      engineSetPickup(defaultLocation);
-      setPickup(defaultLocation.address);
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude, longitude } = position.coords;
-        if (!isValidCoordinate(latitude, longitude)) {
-          setErrorMessage('Invalid coordinates received from device; using fallback location.');
-          const defaultLocation: Location = { lat: 40.7128, lng: -74.0060, address: 'New York, NY' };
-          setCurrentLocation(defaultLocation);
-          setPickupLocation(defaultLocation);
-          engineSetPickup(defaultLocation);
-          setPickup(defaultLocation.address);
-          return;
-        }
-
-        setErrorMessage('');
-        const fallbackLatLng = `${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-        const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}`;
-
-        try {
-          const response = await fetchWithRetry(geocodeUrl, undefined, 10000, 3);
-          const geoData = await response.json();
-          const geoSchema = z.object({
-            results: z.array(z.object({ formatted_address: z.string().optional()})).optional(),
-          });
-
-          const parsedGeo = geoSchema.safeParse(geoData);
-          const address = parsedGeo.success ? parsedGeo.data.results?.[0]?.formatted_address || fallbackLatLng : fallbackLatLng;
-
-          const location: Location = { lat: latitude, lng: longitude, address };
-
-          const locationValidation = locationSchema.safeParse(location);
-          if (!locationValidation.success) {
-            throw new Error(`Invalid location data from geocode: ${locationValidation.error.message}`);
-          }
-
-          setCurrentLocation(location);
-          setPickup(location.address);
-          setPickupLocation(location);
-          engineSetPickup(location);
-        } catch (err) {
-          console.error('Geolocation reverse geocode failed:', err);
-          setErrorMessage('Could not reverse geocode location; using raw coordinates.');
-          const location: Location = { lat: latitude, lng: longitude, address: fallbackLatLng };
-          setCurrentLocation(location);
-          setPickup(location.address);
-          setPickupLocation(location);
-          engineSetPickup(location);
-        }
-      },
-      (error) => {
-        console.error('Geolocation failed:', error);
-        setErrorMessage('Permission denied for GPS; defaulting to New York');
-        const defaultLocation: Location = { lat: 40.7128, lng: -74.0060, address: 'New York, NY' };
-        setCurrentLocation(defaultLocation);
-        setPickup(defaultLocation.address);
-        setPickupLocation(defaultLocation);
-        engineSetPickup(defaultLocation);
-      },
-      { enableHighAccuracy: true, maximumAge: 600000, timeout: 10000 }
-    );
-  }, [isValidCoordinate, engineSetPickup]);
-
   const calculateDistanceAndPrice = useCallback(
     async (origin: Location, destination: Location) => {
-      setErrorMessage('');
+      setUserMessage('');
       setRouteError('');
       if (!origin || !destination) {
         setDistance(null);
@@ -215,7 +240,7 @@ export default function DashboardPage() {
       }
 
       if (!isValidCoordinate(origin.lat, origin.lng) || !isValidCoordinate(destination.lat, destination.lng)) {
-        setErrorMessage('Invalid pickup or dropoff coordinates.');
+        showMessage(USER_MESSAGES.selectBothLocations, 'info');
         setDistance(null);
         setDuration(null);
         setEstimatedPrice(null);
@@ -236,7 +261,7 @@ export default function DashboardPage() {
                 if (status === google.maps.DirectionsStatus.OK && response) {
                   resolve(response);
                 } else {
-                  reject(new Error(`Directions request failed: ${status}`));
+                  reject(new Error(status));
                 }
               }
             );
@@ -245,14 +270,14 @@ export default function DashboardPage() {
 
         const result = await withRetry(getRouteResult, 3, 500);
         const leg = result.routes?.[0]?.legs?.[0];
-        if (!leg) throw new Error('No route data from Google');
+        if (!leg) throw new Error('No route data');
 
         const distanceKm = (leg.distance?.value ?? 0) / 1000;
         const durationMin = Math.ceil((leg.duration?.value ?? 0) / 60);
         const polyline = result.routes?.[0]?.overview_polyline;
 
         if (distanceKm <= 0 || durationMin <= 0) {
-          throw new Error('Route result invalid: zero distance or duration');
+          throw new Error('Invalid route metrics');
         }
 
         const routeData: Route = {
@@ -272,20 +297,20 @@ export default function DashboardPage() {
         const fare = basePrices[selectedRideType] + distanceKm * perKmPrices[selectedRideType];
         setEstimatedPrice(Number(fare.toFixed(2)));
       } catch (err) {
-        setRouteError('Route check failed. Please try a different route or continue with pickup/dropoff manual entry.');
-        setErrorMessage('Could not calculate route. Please choose other locations or try again.');
+        console.error('Route calculation failed:', err);
+        setRouteError(USER_MESSAGES.routeUnavailable);
         setDistance(null);
         setDuration(null);
         setEstimatedPrice(null);
-        console.error('Error calculating distance:', err);
       }
-    },    [isValidCoordinate, selectedRideType]
+    },
+    [isValidCoordinate, selectedRideType, showMessage]
   );
 
   const handlePickupSelect = useCallback(
     (place: google.maps.places.PlaceResult) => {
       if (!place.geometry?.location || !place.formatted_address) {
-        setErrorMessage('Invalid pickup place.');
+        showMessage(USER_MESSAGES.selectBothLocations, 'info');
         return;
       }
       const location: Location = {
@@ -298,13 +323,13 @@ export default function DashboardPage() {
       engineSetPickup(location);
       if (dropoffLocation) calculateDistanceAndPrice(location, dropoffLocation);
     },
-    [calculateDistanceAndPrice, dropoffLocation, engineSetPickup]
+    [calculateDistanceAndPrice, dropoffLocation, engineSetPickup, showMessage]
   );
 
   const handleDropoffSelect = useCallback(
     (place: google.maps.places.PlaceResult) => {
       if (!place.geometry?.location || !place.formatted_address) {
-        setErrorMessage('Invalid dropoff place.');
+        showMessage(USER_MESSAGES.selectBothLocations, 'info');
         return;
       }
       const location: Location = {
@@ -317,39 +342,34 @@ export default function DashboardPage() {
       engineSetDropoff(location);
       if (pickupLocation) calculateDistanceAndPrice(pickupLocation, location);
     },
-    [calculateDistanceAndPrice, pickupLocation, engineSetDropoff]
+    [calculateDistanceAndPrice, pickupLocation, engineSetDropoff, showMessage]
   );
 
   const handleRequestRide = useCallback(async () => {
     if (!user) {
-      setErrorMessage('User session expired. Please log in again.');
+      showMessage(USER_MESSAGES.sessionExpired, 'warning');
       router.push('/auth/login');
       return;
     }
 
     if (!pickupLocation || !dropoffLocation) {
-      setErrorMessage('Please select both pickup and destination.');
+      showMessage(USER_MESSAGES.selectBothLocations, 'info');
       return;
     }
 
     if (distance === null || duration === null || estimatedPrice === null || distance <= 0) {
-      setErrorMessage('Please select a valid route before booking.');
+      showMessage(USER_MESSAGES.selectValidRoute, 'info');
       return;
     }
 
     setBookingLoading(true);
-    setErrorMessage('');
+    setUserMessage('');
 
-    // 1. Start the trip simulation immediately — this is the user-facing action
-    //    The engine already has pickup/dropoff from location selection.
-    //    Show confirmation so the user sees the trip is live.
     setBookingSuccess(true);
     setConfirmationMessage(`Ride booked: ${distanceFormatter.format(distance)} km, ${duration} min, ${currencyFormatter.format(estimatedPrice)}`);
     setTimeout(() => setBookingSuccess(false), 4500);
     setBookingLoading(false);
 
-    // 2. Persist to database in the background — non-blocking
-    //    If Supabase is down or the table doesn't exist, the trip still runs.
     try {
       await supabase.from('ride_requests').insert({
         user_id: user.id,
@@ -361,17 +381,13 @@ export default function DashboardPage() {
         status: 'pending',
       });
     } catch (err) {
-      // DB write failed — log but don't block the trip
       console.warn('Background DB write failed (trip still running):', err);
     }
-  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, router, distanceFormatter, currencyFormatter, supabase]);
+  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, router, distanceFormatter, currencyFormatter, supabase, showMessage]);
 
   const handleCancelRide = useCallback(
     async (rideId: string) => {
-      if (!rideId || !user) {
-        setErrorMessage('Invalid cancel request.');
-        return;
-      }
+      if (!rideId || !user) return;
 
       try {
         await withRetry(async () => {
@@ -380,12 +396,11 @@ export default function DashboardPage() {
         }, 3, 500);
 
         await fetchRides();
-      } catch (err) {
-        setErrorMessage('Unable to cancel ride.');
-        console.error('Error cancelling ride:', err);
+      } catch {
+        showMessage(USER_MESSAGES.tryAgain, 'warning');
       }
     },
-    [supabase, user, fetchRides]
+    [supabase, user, fetchRides, showMessage]
   );
 
   useEffect(() => {
@@ -395,8 +410,7 @@ export default function DashboardPage() {
       return;
     }
     fetchRides();
-    getCurrentLocation();
-  }, [authLoading, user, fetchRides, getCurrentLocation, router]);
+  }, [authLoading, user, fetchRides, router]);
 
   useEffect(() => {
     if (pickupLocation && dropoffLocation) {
@@ -514,17 +528,25 @@ export default function DashboardPage() {
           {/* ── Booking panel ───────────────────────────────────────────── */}
           <aside className="absolute inset-x-4 bottom-4 z-20 mx-auto w-auto max-w-lg rounded-2xl border border-white/20 bg-white/85 p-5 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-2xl sm:inset-x-6 animate-fade-in">
 
-            {/* Errors */}
-            {errorMessage && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-danger/8 px-4 py-3 animate-fade-in">
-                <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-danger" />
-                <p className="text-sm font-medium text-ink">{errorMessage}</p>
+            {/* User-safe messages — calm, non-technical */}
+            {userMessage && (
+              <div className={`mb-4 flex items-start gap-2.5 rounded-xl px-4 py-3 animate-fade-in ${
+                userMessageType === 'warning'
+                  ? 'bg-warning/8'
+                  : 'bg-surface-secondary'
+              }`}>
+                <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
+                  userMessageType === 'warning' ? 'bg-warning' : 'bg-ink-tertiary'
+                }`} />
+                <p className="text-sm font-medium text-ink">{userMessage}</p>
               </div>
             )}
+
+            {/* Route-level guidance */}
             {routeError && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-warning/10 px-4 py-3 animate-fade-in">
-                <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-warning" />
-                <p className="text-sm font-medium text-ink">{routeError}</p>
+              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-surface-secondary px-4 py-3 animate-fade-in">
+                <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-ink-tertiary" />
+                <p className="text-sm font-medium text-ink-secondary">{routeError}</p>
               </div>
             )}
 
@@ -570,6 +592,9 @@ export default function DashboardPage() {
             ) : (
               <>
                 {/* ── Booking mode ─────────────────────────────────────────── */}
+
+                {/* Location status banner — permission or fallback */}
+                <LocationBanner geoStatus={geoStatus} onRequestPermission={requestPermission} />
 
                 {/* Location inputs */}
                 <div className="space-y-2">

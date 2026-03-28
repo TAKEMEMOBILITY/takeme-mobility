@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { GoogleMap, Marker, DirectionsRenderer } from '@react-google-maps/api';
-import { useGoogleMaps } from './GoogleMapsProvider';
+import { useGoogleMaps, type MapLoadStatus } from './GoogleMapsProvider';
 import type { TripSnapshot, TripPhase } from '@/lib/tripEngine';
 
 const defaultCenter = { lat: 40.7128, lng: -74.006 };
@@ -47,12 +47,6 @@ function bearingDeg(from: { lat: number; lng: number }, to: { lat: number; lng: 
 }
 
 // ── Vehicle SVG builders ──────────────────────────────────────────────────
-//
-// Design philosophy: Waymo-level presence. The vehicle is not a marker —
-// it's a product rendered on the map. Real automotive proportions based on
-// a Lucid Air / Mercedes EQS profile. 3D depth via linear gradients on
-// body panels. Glass has reflection. Headlights have beam cones with
-// gaussian-like falloff. Ground shadow uses layered ellipses for realism.
 
 function vehicleSvg(opts: {
   headlightIntensity: number;
@@ -64,13 +58,11 @@ function vehicleSvg(opts: {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
 <svg viewBox="0 0 48 88" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <!-- Body paint — vertical gradient simulating overhead light on matte black -->
     <linearGradient id="paint" x1="24" y1="8" x2="24" y2="72" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#252528"/>
       <stop offset="35%" stop-color="#151517"/>
       <stop offset="100%" stop-color="#101012"/>
     </linearGradient>
-    <!-- Body side highlight — subtle edge reflection -->
     <linearGradient id="sideL" x1="10" y1="0" x2="16" y2="0" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#3A3A3E" stop-opacity="0.6"/>
       <stop offset="100%" stop-color="#151517" stop-opacity="0"/>
@@ -79,25 +71,21 @@ function vehicleSvg(opts: {
       <stop offset="0%" stop-color="#3A3A3E" stop-opacity="0.6"/>
       <stop offset="100%" stop-color="#151517" stop-opacity="0"/>
     </linearGradient>
-    <!-- Glass — top-to-bottom reflection gradient -->
     <linearGradient id="glass" x1="24" y1="20" x2="24" y2="34" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#4A4A52"/>
       <stop offset="40%" stop-color="#28282C"/>
       <stop offset="100%" stop-color="#1E1E22"/>
     </linearGradient>
-    <!-- Headlight beam — left -->
     <radialGradient id="beamL" cx="16" cy="2" r="14" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="${0.7 * hl}"/>
       <stop offset="40%" stop-color="#E8F0FF" stop-opacity="${0.25 * hl}"/>
       <stop offset="100%" stop-color="#E8F0FF" stop-opacity="0"/>
     </radialGradient>
-    <!-- Headlight beam — right -->
     <radialGradient id="beamR" cx="32" cy="2" r="14" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#FFFFFF" stop-opacity="${0.7 * hl}"/>
       <stop offset="40%" stop-color="#E8F0FF" stop-opacity="${0.25 * hl}"/>
       <stop offset="100%" stop-color="#E8F0FF" stop-opacity="0"/>
     </radialGradient>
-    <!-- Ground shadow — layered for softness -->
     <radialGradient id="sh1" cx="24" cy="50" r="26" gradientUnits="userSpaceOnUse">
       <stop offset="0%" stop-color="#000" stop-opacity="${0.18 * sh}"/>
       <stop offset="70%" stop-color="#000" stop-opacity="${0.06 * sh}"/>
@@ -109,18 +97,14 @@ function vehicleSvg(opts: {
     </radialGradient>
   </defs>
 
-  <!-- Ground shadow — two layers for realistic soft contact shadow -->
   <ellipse cx="24" cy="50" rx="22" ry="34" fill="url(#sh1)"/>
   <ellipse cx="24" cy="46" rx="16" ry="24" fill="url(#sh2)"/>
 
-  <!-- Headlight beams — projected forward -->
   ${hl > 0.05 ? `
     <ellipse cx="16" cy="0" rx="8" ry="12" fill="url(#beamL)"/>
     <ellipse cx="32" cy="0" rx="8" ry="12" fill="url(#beamR)"/>
   ` : ''}
 
-  <!-- ═══ CAR BODY ═══ -->
-  <!-- Main body — EV sedan silhouette, tapered nose, wide haunches -->
   <path d="
     M 16 14
     C 16 10, 20 7, 24 7
@@ -137,18 +121,12 @@ function vehicleSvg(opts: {
     Z
   " fill="url(#paint)"/>
 
-  <!-- Side body highlights — catches light at edges -->
   <path d="M 14 22 L 14 56 C 14 60, 15 63, 16 64 L 16 20 Z" fill="url(#sideL)"/>
   <path d="M 34 22 L 34 56 C 34 60, 33 63, 32 64 L 32 20 Z" fill="url(#sideR)"/>
 
-  <!-- Hood panel line -->
   <line x1="18" y1="15" x2="30" y2="15" stroke="#2A2A2E" stroke-width="0.5" opacity="0.5"/>
-
-  <!-- Trunk panel line -->
   <line x1="18" y1="60" x2="30" y2="60" stroke="#1A1A1C" stroke-width="0.5" opacity="0.5"/>
 
-  <!-- ═══ CABIN / ROOF ═══ -->
-  <!-- Roof panel — slightly raised, darker than body -->
   <path d="
     M 18 24
     C 18 21, 21 19, 24 19
@@ -159,7 +137,6 @@ function vehicleSvg(opts: {
     Z
   " fill="#0E0E10"/>
 
-  <!-- Windshield — glass with sky reflection gradient -->
   <path d="
     M 18.5 19.5
     C 18.5 17, 21 15.5, 24 15.5
@@ -170,13 +147,11 @@ function vehicleSvg(opts: {
     Z
   " fill="url(#glass)" opacity="0.85"/>
 
-  <!-- Windshield highlight — faint reflection streak -->
   <path d="
     M 20 17 C 20 16.5, 22 16, 24 16 C 26 16, 28 16.5, 28 17
     L 27 18 C 26 17.5, 25 17.3, 24 17.3 C 23 17.3, 22 17.5, 21 18 Z
   " fill="white" opacity="0.08"/>
 
-  <!-- Rear window — smaller, darker -->
   <path d="
     M 19.5 48
     C 19.5 47, 21.5 46, 24 46
@@ -187,12 +162,9 @@ function vehicleSvg(opts: {
     Z
   " fill="#1C1C20" opacity="0.7"/>
 
-  <!-- ═══ LIGHTING ═══ -->
-  <!-- Headlights — DRL-style thin LED strips -->
   <rect x="16" y="13" width="5" height="1.2" rx="0.6" fill="white" opacity="${0.55 + 0.45 * hl}"/>
   <rect x="27" y="13" width="5" height="1.2" rx="0.6" fill="white" opacity="${0.55 + 0.45 * hl}"/>
 
-  <!-- Headlight inner glow — warm white when active -->
   ${hl > 0.2 ? `
     <rect x="17" y="13.1" width="3" height="1" rx="0.5" fill="white" opacity="${0.3 * hl}">
       <animate attributeName="opacity" values="${0.25 * hl};${0.35 * hl};${0.25 * hl}" dur="3s" repeatCount="indefinite"/>
@@ -202,35 +174,27 @@ function vehicleSvg(opts: {
     </rect>
   ` : ''}
 
-  <!-- Taillights — full-width LED bar (modern EV style) -->
   <rect x="16" y="63.5" width="16" height="1.2" rx="0.6" fill="#FF453A" opacity="0.5"/>
   <rect x="18" y="63.7" width="12" height="0.8" rx="0.4" fill="#FF6B6B" opacity="0.25"/>
 
-  <!-- ═══ DETAILS ═══ -->
-  <!-- Side mirrors -->
   <ellipse cx="12.5" cy="24" rx="2" ry="1.2" fill="#1A1A1C"/>
   <ellipse cx="35.5" cy="24" rx="2" ry="1.2" fill="#1A1A1C"/>
 
-  <!-- Front wheel arches — dark recesses -->
   <path d="M 13.5 18 C 12 18, 12 22, 13.5 22" fill="#0A0A0C" opacity="0.5"/>
   <path d="M 34.5 18 C 36 18, 36 22, 34.5 22" fill="#0A0A0C" opacity="0.5"/>
 
-  <!-- Rear wheel arches -->
   <path d="M 13.5 54 C 12 54, 12 58, 13.5 58" fill="#0A0A0C" opacity="0.5"/>
   <path d="M 34.5 54 C 36 54, 36 58, 34.5 58" fill="#0A0A0C" opacity="0.5"/>
 
-  <!-- Wheel faces — dark alloy -->
   <circle cx="13" cy="20" r="1.8" fill="#0C0C0E" opacity="0.7"/>
   <circle cx="35" cy="20" r="1.8" fill="#0C0C0E" opacity="0.7"/>
   <circle cx="13" cy="56" r="1.8" fill="#0C0C0E" opacity="0.7"/>
   <circle cx="35" cy="56" r="1.8" fill="#0C0C0E" opacity="0.7"/>
 
-  <!-- Center body line — faint spine -->
   <line x1="24" y1="16" x2="24" y2="62" stroke="#1E1E22" stroke-width="0.3" opacity="0.3"/>
 </svg>`);
 }
 
-// Fleet vehicle — same silhouette, desaturated, no detail, ghostly
 function fleetVehicleSvg(): string {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
 <svg viewBox="0 0 48 88" xmlns="http://www.w3.org/2000/svg" opacity="0.3">
@@ -254,7 +218,6 @@ function fleetVehicleSvg(): string {
 </svg>`);
 }
 
-// Pickup/dropoff pin
 function pinSvg(fill: string): string {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
     <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
@@ -265,7 +228,6 @@ function pinSvg(fill: string): string {
   `);
 }
 
-// User location
 function userSvg(): string {
   return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
     <svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
@@ -274,6 +236,89 @@ function userSvg(): string {
       <circle cx="14" cy="14" r="2.5" fill="white"/>
     </svg>
   `);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UX State Components — Premium, calm, zero technical language
+// ═══════════════════════════════════════════════════════════════════════════
+
+function MapLoadingState({ status, attempt, maxAttempts }: {
+  status: MapLoadStatus;
+  attempt: number;
+  maxAttempts: number;
+}) {
+  const isRetrying = status === 'retrying';
+
+  return (
+    <div className="flex h-full w-full items-center justify-center rounded-2xl bg-surface-secondary">
+      <div className="flex flex-col items-center gap-4 animate-fade-in">
+        {/* Animated map placeholder — subtle grid pattern */}
+        <div className="relative h-12 w-12">
+          <div className="absolute inset-0 rounded-xl bg-surface-tertiary" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="h-5 w-5 animate-spin rounded-full border-[2px] border-border border-t-ink" />
+          </div>
+        </div>
+
+        <div className="text-center">
+          <p className="text-[14px] font-semibold text-ink">
+            {isRetrying ? 'Reconnecting' : 'Preparing your map'}
+          </p>
+          <p className="mt-1 text-[12px] text-ink-tertiary">
+            {isRetrying
+              ? `Attempt ${attempt} of ${maxAttempts}`
+              : 'This takes just a moment'
+            }
+          </p>
+        </div>
+
+        {/* Subtle progress indication for retries */}
+        {isRetrying && (
+          <div className="flex gap-1.5">
+            {Array.from({ length: maxAttempts }).map((_, i) => (
+              <div
+                key={i}
+                className={`h-1 w-6 rounded-full transition-colors duration-500 ${
+                  i < attempt ? 'bg-ink-tertiary' : 'bg-border'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function MapDegradedState({ onRetry }: { onRetry: () => void }) {
+  return (
+    <div className="flex h-full w-full items-center justify-center rounded-2xl bg-surface-secondary">
+      <div className="flex max-w-xs flex-col items-center gap-5 px-6 text-center animate-fade-in">
+        {/* Calm icon — not an error symbol */}
+        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-tertiary">
+          <svg className="h-6 w-6 text-ink-tertiary" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+          </svg>
+        </div>
+
+        <div>
+          <p className="text-[15px] font-semibold text-ink">
+            Map temporarily unavailable
+          </p>
+          <p className="mt-2 text-[13px] leading-relaxed text-ink-secondary">
+            You can still book rides by entering your pickup and destination below. We'll keep trying in the background.
+          </p>
+        </div>
+
+        <button
+          onClick={onRetry}
+          className="rounded-xl bg-surface-tertiary px-5 py-2.5 text-[13px] font-semibold text-ink transition-colors hover:bg-border active:scale-[0.98]"
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
 }
 
 // ── Component ─────────────────────────────────────────────────────────────
@@ -295,7 +340,7 @@ export default function Map({
   onRouteError,
   tripSnapshot,
 }: MapProps) {
-  const { isLoaded, loadError } = useGoogleMaps();
+  const { isLoaded, status, retry, attempt, maxAttempts } = useGoogleMaps();
 
   const [directions, setDirections] = useState<google.maps.DirectionsResult | null>(null);
   const [routeError, setRouteError] = useState('');
@@ -303,7 +348,6 @@ export default function Map({
   const onRouteErrorRef = useRef(onRouteError);
   onRouteErrorRef.current = onRouteError;
 
-  // Track previous assigned driver position for bearing calculation
   const prevDriverPos = useRef<{ lat: number; lng: number } | null>(null);
   const driverBearing = useRef<number>(0);
 
@@ -355,10 +399,10 @@ export default function Map({
           }
         } else {
           setDirections(null);
-          const msg = `Directions request failed: ${status}`;
+          // User-safe message — no status codes
+          const msg = 'Route not available for these locations. Try a different destination.';
           setRouteError(msg);
           onRouteErrorRef.current?.(msg);
-          console.error('[Map]', msg);
         }
       },
     );
@@ -393,7 +437,6 @@ export default function Map({
     if (prev) {
       const dlat = assignedDriverPosition.lat - prev.lat;
       const dlng = assignedDriverPosition.lng - prev.lng;
-      // Only update bearing if the car actually moved (avoid jitter at rest)
       if (Math.abs(dlat) > 0.000001 || Math.abs(dlng) > 0.000001) {
         driverBearing.current = bearingDeg(prev, assignedDriverPosition);
       }
@@ -407,25 +450,14 @@ export default function Map({
   const headlightIntensity = phase === 'arriving' ? 0.8 : phase === 'on_trip' ? 0.5 : phase === 'arrived' ? 0.3 : 0;
   const shadowOpacity = isActive ? 1 : 0.6;
 
-  // ── Render guards ───────────────────────────────────────────────────
+  // ── Render guards — Premium UX states ───────────────────────────────
 
-  if (loadError) {
-    return (
-      <div className="flex h-full w-full items-center justify-center rounded-2xl bg-surface-secondary">
-        <div className="text-center">
-          <p className="text-sm font-medium text-ink">Unable to load map</p>
-          <p className="mt-1 text-xs text-ink-tertiary">{loadError.message}</p>
-        </div>
-      </div>
-    );
+  if (status === 'degraded') {
+    return <MapDegradedState onRetry={retry} />;
   }
 
   if (!isLoaded) {
-    return (
-      <div className="flex h-full w-full items-center justify-center rounded-2xl bg-surface-secondary">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-border border-t-ink" />
-      </div>
-    );
+    return <MapLoadingState status={status} attempt={attempt} maxAttempts={maxAttempts} />;
   }
 
   // ── JSX ─────────────────────────────────────────────────────────────
@@ -473,7 +505,7 @@ export default function Map({
         />
       )}
 
-      {/* Fleet vehicles — ghostly, same silhouette, no detail */}
+      {/* Fleet vehicles */}
       {fleet
         .filter((d) => d.id !== trip?.driverId)
         .map((driver) => (
@@ -489,7 +521,7 @@ export default function Map({
           />
         ))}
 
-      {/* Assigned vehicle — production-grade, rotated, lit, grounded */}
+      {/* Assigned vehicle */}
       {assignedDriverPosition && trip && isActive && (
         <Marker
           key={trip.driverId}
@@ -523,7 +555,7 @@ export default function Map({
         );
       })()}
 
-      {/* Route error */}
+      {/* Route error — user-safe language */}
       {routeError && (
         <div className={`absolute ${isActive ? 'left-4 top-14' : 'left-4 top-4'} z-50 rounded-full border border-white/30 bg-white/80 px-4 py-2 shadow-lg backdrop-blur-xl`}>
           <span className="text-xs font-medium text-ink-secondary">{routeError}</span>
