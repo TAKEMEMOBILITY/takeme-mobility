@@ -5,31 +5,26 @@ import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
 
-// Lazy-load heavy components that depend on Google Maps / Stripe
-// This prevents the page from crashing if those SDKs fail to initialize
-const GoogleMapsProvider = dynamic(
-  () => import('@/components/GoogleMapsProvider').then(m => ({ default: m.GoogleMapsProvider })),
-  { ssr: false },
-);
-const HeroBooking = dynamic(
-  () => import('@/components/HeroBooking'),
-  { ssr: false, loading: () => <HeroBookingShell /> },
-);
-
-function HeroBookingShell() {
-  return (
-    <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
-      <div className="h-[280px] bg-[#F2F2F7] flex items-center justify-center">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
+// Lazy-load the booking card — it depends on Google Maps + Stripe.
+// Loaded client-only to avoid hydration mismatch and SDK crashes.
+const HeroBookingLazy = dynamic(
+  () => import('@/components/HeroBookingWrapper'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="h-[280px] bg-[#F2F2F7] flex items-center justify-center">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
+        </div>
+        <div className="p-5 space-y-3">
+          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
+          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
+          <div className="h-10 rounded-xl bg-[#F5F5F7]" />
+        </div>
       </div>
-      <div className="p-5 space-y-3">
-        <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-        <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-        <div className="h-10 rounded-xl bg-[#F5F5F7]" />
-      </div>
-    </div>
-  );
-}
+    ),
+  },
+);
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -133,7 +128,6 @@ export default function HomePage() {
   const signInHref = user ? '/dashboard' : '/auth/login';
 
   return (
-    <GoogleMapsProvider>
     <div className="min-h-screen bg-white">
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
@@ -249,7 +243,7 @@ export default function HomePage() {
 
             {/* ── Right: Live Product UI ─────────────────────────────── */}
             <div className="animate-fade-in stagger-2">
-              <HeroBooking ctaHref={ctaHref} />
+              <HeroBookingLazy ctaHref={ctaHref} />
             </div>
           </div>
         </div>
@@ -439,6 +433,5 @@ export default function HomePage() {
         </div>
       </footer>
     </div>
-    </GoogleMapsProvider>
   );
 }
