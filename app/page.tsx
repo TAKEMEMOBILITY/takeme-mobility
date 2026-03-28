@@ -144,6 +144,47 @@ export default function HomePage() {
               How it works
             </Link>
           </div>
+
+          {/* App download badges */}
+          <div className="mt-14">
+            <p className="text-[12px] font-medium uppercase tracking-[0.15em] text-white/30">
+              Download the app
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              {/* App Store badge */}
+              <a
+                href="#"
+                aria-label="Download on the App Store"
+                className="group flex h-[44px] items-center gap-2.5 rounded-[10px] border border-white/15 bg-white/5 px-4 transition-all duration-150 hover:border-white/30 hover:bg-white/10 active:scale-[0.97]"
+              >
+                <svg className="h-[22px] w-[22px] text-white" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                </svg>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-medium leading-none text-white/50">Download on the</span>
+                  <span className="mt-0.5 text-[14px] font-semibold leading-none text-white">App Store</span>
+                </div>
+              </a>
+
+              {/* Google Play badge */}
+              <a
+                href="#"
+                aria-label="Get it on Google Play"
+                className="group flex h-[44px] items-center gap-2.5 rounded-[10px] border border-white/15 bg-white/5 px-4 transition-all duration-150 hover:border-white/30 hover:bg-white/10 active:scale-[0.97]"
+              >
+                <svg className="h-[20px] w-[20px]" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4"/>
+                  <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335"/>
+                  <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04"/>
+                  <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853"/>
+                </svg>
+                <div className="flex flex-col">
+                  <span className="text-[9px] font-medium leading-none text-white/50">Get it on</span>
+                  <span className="mt-0.5 text-[14px] font-semibold leading-none text-white">Google Play</span>
+                </div>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
