@@ -7,6 +7,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { useGoogleMaps } from './GoogleMapsProvider';
 import { useAuth } from '@/lib/auth/context';
+import RideTracker from './RideTracker';
 import type { QuoteResult } from '@/lib/pricing';
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '');
@@ -292,65 +293,42 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const hasRoute = pickup && dropoff && route && quotes.length > 0;
   const defaultCenter = { lat: 40.7128, lng: -74.006 };
 
-  // ── Render: Ride confirmed state ───────────────────────────────────
+  // ── Render: Ride confirmed — payment then live tracking ──────────────
   if (createdRide) {
+    // After payment: show live ride tracker
+    if (paymentDone || !createdRide.clientSecret) {
+      return (
+        <RideTracker
+          rideId={createdRide.id}
+          onClose={() => {
+            setCreatedRide(null);
+            setPaymentDone(false);
+            setPickup(null);
+            setDropoff(null);
+            setPickupText('');
+            setDropoffText('');
+            setQuotes([]);
+            setRoute(null);
+            setDirections(null);
+          }}
+        />
+      );
+    }
+
+    // Before payment: show Stripe form
     return (
       <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
-        {/* Map stays visible */}
-        <div className="relative h-[280px] bg-[#F2F2F7] overflow-hidden">
-          {isLoaded && (
-            <GoogleMap
-              mapContainerStyle={{ width: '100%', height: '100%' }}
-              center={pickup || defaultCenter}
-              zoom={12}
-              onLoad={(map) => { mapRef.current = map; }}
-              options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
-            >
-              {pickup && (
-                <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
-              )}
-              {dropoff && (
-                <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />
-              )}
-              {directions && (
-                <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />
-              )}
-            </GoogleMap>
-          )}
-
-          {/* Status badge */}
-          <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34C759] opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34C759]" />
-            </span>
-            <span className="text-[12px] font-semibold text-[#1D1D1F]">Finding your driver</span>
-          </div>
-        </div>
-
-        {/* Confirmed card */}
         <div className="p-5">
-          {/* Header */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className={`flex h-10 w-10 items-center justify-center rounded-full ${
-              paymentDone ? 'bg-[#34C759]/10' : 'bg-[#F5F5F7]'
-            }`}>
-              {paymentDone ? (
-                <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                </svg>
-              ) : (
-                <svg className="h-5 w-5 text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
-                </svg>
-              )}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F5F5F7]">
+              <svg className="h-5 w-5 text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+              </svg>
             </div>
             <div>
-              <p className="text-[16px] font-semibold text-[#1D1D1F]">
-                {paymentDone ? 'Ride confirmed' : 'Complete payment'}
-              </p>
+              <p className="text-[16px] font-semibold text-[#1D1D1F]">Complete payment</p>
               <p className="text-[13px] text-[#86868B]">
-                {paymentDone ? 'Searching for a nearby driver' : `$${createdRide.estimatedFare.toFixed(2)} · ${route?.distanceKm} km`}
+                ${createdRide.estimatedFare.toFixed(2)} · {route?.distanceKm} km · {route?.durationMin} min
               </p>
             </div>
           </div>
@@ -367,7 +345,6 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             </div>
           </div>
 
-          {/* Payment error */}
           {paymentError && (
             <div className="mb-4 flex items-center gap-2.5 rounded-xl bg-[#FFF5F5] px-4 py-3">
               <span className="h-2 w-2 shrink-0 rounded-full bg-[#FF3B30]" />
@@ -375,53 +352,35 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             </div>
           )}
 
-          {/* Payment form or success */}
-          {paymentDone ? (
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="mt-1 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
-            >
-              Track your ride
-            </button>
-          ) : createdRide.clientSecret ? (
-            <Elements
-              stripe={stripePromise}
-              options={{
-                clientSecret: createdRide.clientSecret,
-                appearance: {
-                  theme: 'stripe',
-                  variables: {
-                    colorPrimary: '#1D1D1F',
-                    colorBackground: '#F5F5F7',
-                    colorText: '#1D1D1F',
-                    colorTextSecondary: '#6E6E73',
-                    colorDanger: '#FF3B30',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                    borderRadius: '12px',
-                    spacingUnit: '4px',
-                  },
-                  rules: {
-                    '.Input': { border: '1px solid #E8E8ED', boxShadow: 'none', padding: '12px 14px', fontSize: '15px' },
-                    '.Input:focus': { border: '1px solid #1D1D1F', boxShadow: '0 0 0 1px #1D1D1F' },
-                    '.Label': { fontSize: '13px', fontWeight: '500', color: '#6E6E73', marginBottom: '6px' },
-                  },
+          <Elements
+            stripe={stripePromise}
+            options={{
+              clientSecret: createdRide.clientSecret,
+              appearance: {
+                theme: 'stripe',
+                variables: {
+                  colorPrimary: '#1D1D1F',
+                  colorBackground: '#F5F5F7',
+                  colorText: '#1D1D1F',
+                  colorTextSecondary: '#6E6E73',
+                  colorDanger: '#FF3B30',
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  borderRadius: '12px',
+                  spacingUnit: '4px',
                 },
-              }}
-            >
-              <InlinePaymentForm
-                onSuccess={() => { setPaymentDone(true); setPaymentError(''); }}
-                onError={(msg) => setPaymentError(msg)}
-              />
-            </Elements>
-          ) : (
-            /* No clientSecret — payment setup failed, allow proceeding anyway */
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
-            >
-              Continue to dashboard
-            </button>
-          )}
+                rules: {
+                  '.Input': { border: '1px solid #E8E8ED', boxShadow: 'none', padding: '12px 14px', fontSize: '15px' },
+                  '.Input:focus': { border: '1px solid #1D1D1F', boxShadow: '0 0 0 1px #1D1D1F' },
+                  '.Label': { fontSize: '13px', fontWeight: '500', color: '#6E6E73', marginBottom: '6px' },
+                },
+              },
+            }}
+          >
+            <InlinePaymentForm
+              onSuccess={() => { setPaymentDone(true); setPaymentError(''); }}
+              onError={(msg) => setPaymentError(msg)}
+            />
+          </Elements>
         </div>
       </div>
     );
