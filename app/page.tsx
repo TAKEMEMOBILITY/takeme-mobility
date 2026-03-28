@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/lib/auth/context';
 
 // ── Data ──────────────────────────────────────────────────────────────────
@@ -12,110 +12,140 @@ const PILLARS = [
   {
     number: '01',
     title: 'Built for trust',
-    description: 'Real-time vehicle tracking, verified drivers, and trip sharing. Every ride is monitored to the highest global safety standards.',
+    description: 'Real-time vehicle tracking, verified drivers, and trip sharing. Every ride monitored to the highest global safety standards.',
   },
   {
     number: '02',
     title: 'Precision reliability',
-    description: 'AI-optimized routing, accurate ETAs, and consistent availability. The same quality of service in every city we operate.',
+    description: 'AI-optimized routing, accurate ETAs, and consistent availability. The same quality in every city we operate.',
   },
   {
     number: '03',
     title: 'Effortless experience',
-    description: 'Set your destination. A premium vehicle arrives. Pay seamlessly when you arrive. Nothing else to think about.',
+    description: 'Set your destination. A premium vehicle arrives. Pay seamlessly on arrival. Nothing else to think about.',
   },
 ];
 
 const CITIES = ['New York', 'London', 'Zurich', 'Berlin', 'Paris', 'Tokyo', 'Singapore', 'Dubai'];
 
-const STATS = [
-  { value: '12', unit: ' Cities', label: 'and growing' },
-  { value: '99.8', unit: '%', label: 'On-time arrival' },
-  { value: '4.9', unit: '/5', label: 'Rider rating' },
-];
-
-// ── CinematicVideo — handles loading, reduced-motion, and overlay ─────────
+// ── CinematicVideo ────────────────────────────────────────────────────────
+// Handles autoplay, reduced-motion, loading states, and graceful fallback.
+// The overlay is controlled entirely by the parent via children.
 
 function CinematicVideo({
   src,
-  overlay,
-  scale = false,
+  children,
+  lazy = false,
 }: {
   src: string;
-  overlay: React.ReactNode;
-  scale?: boolean;
+  children: React.ReactNode;
+  lazy?: boolean;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [loaded, setLoaded] = useState(false);
+  const [shouldLoad, setShouldLoad] = useState(!lazy);
 
+  // Lazy loading — start loading when section enters viewport
   useEffect(() => {
+    if (!lazy || shouldLoad) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setShouldLoad(true); observer.disconnect(); } },
+      { rootMargin: '200px' },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [lazy, shouldLoad]);
+
+  // Playback control
+  useEffect(() => {
+    if (!shouldLoad) return;
     const video = videoRef.current;
     if (!video) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
-      video.currentTime = 1; // Show a representative frame, not black
+      video.currentTime = 2;
       setLoaded(true);
       return;
     }
 
     const onReady = () => setLoaded(true);
-    video.addEventListener('canplay', onReady);
-    video.play().catch(() => {
-      video.currentTime = 1;
-      setLoaded(true);
-    });
-
-    return () => video.removeEventListener('canplay', onReady);
-  }, []);
+    video.addEventListener('canplaythrough', onReady);
+    video.play().catch(() => { video.currentTime = 2; setLoaded(true); });
+    return () => video.removeEventListener('canplaythrough', onReady);
+  }, [shouldLoad]);
 
   return (
-    <div className="absolute inset-0 overflow-hidden">
-      {/* Video element */}
-      <video
-        ref={videoRef}
-        src={src}
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        className={`h-full w-full object-cover transition-opacity duration-[1.5s] ease-out ${
-          loaded ? 'opacity-100' : 'opacity-0'
-        } ${scale ? 'scale-105' : ''}`}
-      />
-      {/* Composited overlay layers — provided by the parent for full control */}
-      {overlay}
-      {/* Pre-load solid black — dissolves away when video is ready */}
-      <div
-        className={`absolute inset-0 bg-[#0a0a0b] transition-opacity duration-[1.5s] ease-out ${
-          loaded ? 'opacity-0 pointer-events-none' : 'opacity-100'
-        }`}
-      />
+    <div ref={containerRef} className="absolute inset-0 overflow-hidden">
+      {shouldLoad && (
+        <video
+          ref={videoRef}
+          src={src}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload={lazy ? 'metadata' : 'auto'}
+          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[2s] ease-out ${
+            loaded ? 'opacity-100' : 'opacity-0'
+          }`}
+        />
+      )}
+      {/* Overlay layers — composited by the parent */}
+      {children}
+      {/* Loading fallback — dissolves away */}
+      <div className={`absolute inset-0 bg-[#08080a] transition-opacity duration-[2s] ease-out ${
+        loaded ? 'pointer-events-none opacity-0' : 'opacity-100'
+      }`} />
     </div>
   );
+}
+
+// ── Scroll-aware navbar ───────────────────────────────────────────────────
+
+function useScrolled(threshold = 20) {
+  const [scrolled, setScrolled] = useState(false);
+  const handleScroll = useCallback(() => {
+    setScrolled(window.scrollY > threshold);
+  }, [threshold]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
+
+  return scrolled;
 }
 
 // ── Page ──────────────────────────────────────────────────────────────────
 
 export default function HomePage() {
   const { user, loading } = useAuth();
+  const scrolled = useScrolled();
 
   return (
-    <div className="min-h-screen bg-surface text-ink">
+    <div className="min-h-screen bg-[#08080a]">
 
-      {/* ═══ NAVIGATION ═══════════════════════════════════════════════════ */}
-      <nav className="fixed top-0 z-50 w-full">
+      {/* ═══ NAVIGATION ═══════════════════════════════════════════════════
+          Transparent by default. Gains backdrop-blur on scroll.
+          ═════════════════════════════════════════════════════════════════ */}
+      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
+        scrolled ? 'bg-[#08080a]/80 backdrop-blur-2xl' : ''
+      }`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[20px] font-bold tracking-tight text-white">
-            TakeMe<span className="font-normal text-white/50">&nbsp;Mobility</span>
+          <Link href="/" className="text-[19px] font-semibold tracking-tight text-white/90">
+            TakeMe
           </Link>
 
-          <div className="hidden items-center gap-8 lg:flex">
+          <div className="hidden items-center gap-9 lg:flex">
             {NAV_ITEMS.map((item) => (
               <span
                 key={item}
-                className="cursor-pointer text-[14px] font-medium text-white/60 transition-colors hover:text-white"
+                className="cursor-pointer text-[13px] font-medium text-white/40 transition-colors duration-300 hover:text-white/80"
               >
                 {item}
               </span>
@@ -124,18 +154,18 @@ export default function HomePage() {
 
           <div className="flex items-center gap-6">
             {loading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+              <div className="h-3.5 w-3.5 animate-spin rounded-full border-[1.5px] border-white/20 border-t-white/70" />
             ) : (
               <>
                 <Link
                   href={user ? '/dashboard' : '/auth/login'}
-                  className="text-[14px] font-medium text-white/60 transition-colors hover:text-white"
+                  className="text-[13px] font-medium text-white/40 transition-colors duration-300 hover:text-white/80"
                 >
                   Sign in
                 </Link>
                 <Link
                   href={user ? '/dashboard' : '/auth/signup'}
-                  className="rounded-full border border-white/20 bg-white/5 px-5 py-2.5 text-[14px] font-semibold text-white transition-all duration-150 hover:border-white/35 hover:bg-white/10 active:scale-[0.97]"
+                  className="rounded-full border border-white/[0.12] px-5 py-2 text-[13px] font-semibold text-white/80 transition-all duration-300 hover:border-white/25 hover:text-white active:scale-[0.97]"
                 >
                   Get started
                 </Link>
@@ -146,182 +176,184 @@ export default function HomePage() {
       </nav>
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════
-          Full viewport. Video behind. Content at the bottom third.
-          Multi-layer overlay: bottom gradient for text, top vignette for
-          cinema feel, center kept clear so the video reads.
+          Full viewport. Video behind. Content centered vertically with
+          slight bottom offset. Left-aligned. Left-to-right directional
+          gradient protects text while keeping the right side of the
+          video visible. Subtle slow zoom on the video.
           ═════════════════════════════════════════════════════════════════ */}
-      <section className="relative flex min-h-[100svh] items-end bg-[#0a0a0b]">
-        <CinematicVideo
-          src="/videos/takeme.mp4"
-          scale
-          overlay={
-            <>
-              {/* Bottom anchor — heavy, protects text */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-              {/* Top vignette — subtle, cinematic framing */}
-              <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
-              {/* Slight desaturation for a colder, more premium tone */}
-              <div className="absolute inset-0 bg-blue-950/10" />
-            </>
-          }
-        />
+      <section className="relative flex min-h-[100svh] items-center">
+        <CinematicVideo src="/videos/takeme.mp4">
+          {/* Left-heavy directional gradient — text lives on the left,
+              video breathes on the right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/35 to-black/10" />
+          {/* Bottom anchor — grounds the composition */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+          {/* Top vignette — cinematic framing */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent" />
+          {/* Cool tone shift */}
+          <div className="absolute inset-0 bg-blue-950/[0.06]" />
+        </CinematicVideo>
 
-        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 md:pb-28 lg:px-10">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-white/35">
-            Premium Global Mobility
-          </p>
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-6 lg:px-10">
+          <div className="max-w-xl">
+            <h1 className="text-[clamp(2.75rem,6.5vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.035em] text-white">
+              Move without
+              <br />
+              friction.
+            </h1>
 
-          <h1 className="mt-5 max-w-2xl text-[clamp(2.75rem,7vw,6rem)] font-bold leading-[0.95] tracking-[-0.02em] text-white">
-            Move without
-            <br />
-            friction.
-          </h1>
+            <p className="mt-7 max-w-sm text-[15px] leading-[1.8] text-white/40">
+              Premium mobility, designed for clarity and control.
+              One standard of service, every city.
+            </p>
 
-          <p className="mt-6 max-w-md text-[16px] leading-[1.7] text-white/50">
-            Premium transportation that works the way you expect.
-            One tap, one standard, every city.
-          </p>
-
-          <div className="mt-10 flex flex-wrap items-center gap-4">
-            <Link
-              href={user ? '/dashboard' : '/auth/signup'}
-              className="rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-ink transition-all duration-150 hover:bg-white/90 active:scale-[0.97]"
-            >
-              {user ? 'Open App' : 'Start riding'}
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="rounded-full border border-white/15 px-8 py-4 text-[15px] font-semibold text-white/60 transition-all duration-150 hover:border-white/30 hover:text-white"
-            >
-              How it works
-            </Link>
-          </div>
-
-          {/* App store badges — quiet, below the fold line */}
-          <div className="mt-14 flex items-center gap-3">
-            <a
-              href="#"
-              aria-label="Download on the App Store"
-              className="flex h-[42px] items-center gap-2.5 rounded-[10px] border border-white/10 bg-white/[0.03] px-4 transition-all duration-150 hover:border-white/20 hover:bg-white/[0.07] active:scale-[0.97]"
-            >
-              <svg className="h-[20px] w-[20px] text-white" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
-              </svg>
-              <div className="flex flex-col">
-                <span className="text-[9px] font-medium leading-none text-white/35">Download on the</span>
-                <span className="mt-0.5 text-[13px] font-semibold leading-none text-white/80">App Store</span>
-              </div>
-            </a>
-            <a
-              href="#"
-              aria-label="Get it on Google Play"
-              className="flex h-[42px] items-center gap-2.5 rounded-[10px] border border-white/10 bg-white/[0.03] px-4 transition-all duration-150 hover:border-white/20 hover:bg-white/[0.07] active:scale-[0.97]"
-            >
-              <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24">
-                <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4"/>
-                <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335"/>
-                <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04"/>
-                <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853"/>
-              </svg>
-              <div className="flex flex-col">
-                <span className="text-[9px] font-medium leading-none text-white/35">Get it on</span>
-                <span className="mt-0.5 text-[13px] font-semibold leading-none text-white/80">Google Play</span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ STATS ════════════════════════════════════════════════════════ */}
-      <section className="border-b border-border">
-        <div className="mx-auto grid max-w-7xl grid-cols-3 divide-x divide-border px-6 lg:px-10">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="py-12 text-center md:py-16">
-              <p className="text-3xl font-bold tabular-nums text-ink md:text-4xl">
-                {stat.value}<span className="text-lg font-medium text-ink-tertiary md:text-xl">{stat.unit}</span>
-              </p>
-              <p className="mt-1.5 text-[13px] text-ink-tertiary">{stat.label}</p>
+            <div className="mt-10 flex items-center gap-4">
+              <Link
+                href={user ? '/dashboard' : '/auth/signup'}
+                className="rounded-full bg-[#f0f0f3] px-7 py-3.5 text-[14px] font-semibold text-[#08080a] transition-opacity duration-300 hover:opacity-85 active:scale-[0.97]"
+              >
+                Get started
+              </Link>
+              <Link
+                href="#how-it-works"
+                className="rounded-full border border-white/[0.12] px-7 py-3.5 text-[14px] font-semibold text-white/50 transition-all duration-300 hover:border-white/25 hover:text-white/80"
+              >
+                How it works
+              </Link>
             </div>
-          ))}
+
+            {/* App store badges */}
+            <div className="mt-16 flex items-center gap-3">
+              {[
+                { label: 'App Store', sub: 'Download on the', icon: (
+                  <svg className="h-[18px] w-[18px] text-white/70" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/>
+                  </svg>
+                )},
+                { label: 'Google Play', sub: 'Get it on', icon: (
+                  <svg className="h-[16px] w-[16px]" viewBox="0 0 24 24">
+                    <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4"/>
+                    <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335"/>
+                    <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04"/>
+                    <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853"/>
+                  </svg>
+                )},
+              ].map((badge) => (
+                <a
+                  key={badge.label}
+                  href="#"
+                  aria-label={badge.label}
+                  className="flex h-[40px] items-center gap-2 rounded-lg border border-white/[0.08] px-3.5 transition-all duration-300 hover:border-white/[0.18] active:scale-[0.97]"
+                >
+                  {badge.icon}
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-medium leading-none text-white/25">{badge.sub}</span>
+                    <span className="mt-px text-[12px] font-semibold leading-none text-white/60">{badge.label}</span>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
+
+      {/* ═══ BREATHING SPACE ══════════════════════════════════════════════
+          The transition between videos. Pure black. A single quiet
+          statement. This creates the Apple "pause" moment — the user
+          processes what they saw before the next visual arrives.
+          ═════════════════════════════════════════════════════════════════ */}
+      <section className="bg-[#08080a] py-32 md:py-44">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-[clamp(1.25rem,3vw,1.75rem)] font-normal leading-[1.5] tracking-[-0.01em] text-white/30">
+              We built TakeMe for people who believe transportation
+              should be invisible — perfectly reliable, effortlessly premium,
+              the same in every city.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ SECOND VIDEO — Inset cinematic section ═══════════════════════
+          Not edge-to-edge. Contained within the content grid with rounded
+          corners. This creates a "window" into the brand world rather than
+          another full-bleed hero. The constraint makes it feel intentional.
+          ═════════════════════════════════════════════════════════════════ */}
+      <section className="bg-[#08080a] pb-32 md:pb-44">
+        <div className="mx-auto max-w-7xl px-6 lg:px-10">
+          <div className="relative flex min-h-[65vh] items-center justify-center overflow-hidden rounded-2xl md:min-h-[80vh] md:rounded-3xl">
+            <CinematicVideo src="/videos/takeme2.mp4" lazy>
+              <div className="absolute inset-0 bg-black/40" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+            </CinematicVideo>
+
+            <div className="relative z-10 px-6 text-center">
+              <h2 className="text-[clamp(1.75rem,5vw,3.5rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
+                Arrive with certainty.
+              </h2>
+              <p className="mx-auto mt-5 max-w-xs text-[14px] leading-[1.8] text-white/35">
+                The same vehicle, the same standard,
+                in every city we serve.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ TRANSITION TO LIGHT ══════════════════════════════════════════
+          Gradient from dark to the light content sections.
+          ═════════════════════════════════════════════════════════════════ */}
+      <div className="h-24 bg-gradient-to-b from-[#08080a] to-surface md:h-32" />
 
       {/* ═══ PILLARS ══════════════════════════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
-          Why TakeMe
-        </p>
-        <h2 className="mt-4 max-w-2xl text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-tight text-ink">
-          Transportation built on<br className="hidden md:block" />
-          a higher standard.
-        </h2>
-
-        <div className="mt-20 grid gap-16 md:grid-cols-3 md:gap-12">
-          {PILLARS.map((pillar) => (
-            <div key={pillar.number} className="group">
-              <span className="text-[12px] font-semibold tabular-nums text-ink-tertiary">{pillar.number}</span>
-              <div className="mt-4 mb-5 h-px w-10 bg-border transition-all duration-500 group-hover:w-20 group-hover:bg-ink" />
-              <h3 className="text-[18px] font-semibold text-ink">{pillar.title}</h3>
-              <p className="mt-3 text-[15px] leading-[1.75] text-ink-secondary">
-                {pillar.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══ CINEMATIC BREAK — Second video ═══════════════════════════════
-          Placed before "How it Works" to create a visual reset.
-          The pacing pattern: light section → video → light section.
-          This is the "product film moment" — one statement, no CTA.
-          ═════════════════════════════════════════════════════════════════ */}
-      <section className="relative flex min-h-[60vh] items-center justify-center bg-[#0a0a0b] md:min-h-[75vh]">
-        <CinematicVideo
-          src="/videos/takeme2.mp4"
-          overlay={
-            <>
-              <div className="absolute inset-0 bg-black/50" />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              <div className="absolute inset-0 bg-blue-950/8" />
-            </>
-          }
-        />
-
-        <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
-          <h2 className="text-[clamp(1.5rem,4.5vw,3rem)] font-bold leading-[1.1] tracking-tight text-white">
-            Same vehicle. Same service.
-            <br className="hidden sm:block" />
-            Every city in the world.
-          </h2>
-          <p className="mx-auto mt-5 max-w-sm text-[15px] leading-[1.7] text-white/40">
-            We don&apos;t localize quality. Whether you&apos;re in Zurich
-            or Singapore, the experience is identical.
+      <section className="bg-surface">
+        <div className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
+            Why TakeMe
           </p>
+          <h2 className="mt-4 max-w-2xl text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.02em] text-ink">
+            Transportation built on
+            <br className="hidden md:block" />
+            a higher standard.
+          </h2>
+
+          <div className="mt-20 grid gap-16 md:grid-cols-3 md:gap-10">
+            {PILLARS.map((pillar) => (
+              <div key={pillar.number} className="group">
+                <span className="text-[11px] font-semibold tabular-nums text-ink-tertiary">{pillar.number}</span>
+                <div className="mt-4 mb-5 h-px w-8 bg-border transition-all duration-500 group-hover:w-16 group-hover:bg-ink-secondary" />
+                <h3 className="text-[17px] font-semibold text-ink">{pillar.title}</h3>
+                <p className="mt-3 text-[14px] leading-[1.8] text-ink-secondary">
+                  {pillar.description}
+                </p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ═══ HOW IT WORKS ═════════════════════════════════════════════════ */}
       <section id="how-it-works" className="bg-surface-secondary">
         <div className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
             How it works
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-tight text-ink">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.02em] text-ink">
             Three steps. Zero complexity.
           </h2>
 
-          <div className="mt-20 grid gap-14 md:grid-cols-3 md:gap-12">
+          <div className="mt-20 grid gap-14 md:grid-cols-3 md:gap-10">
             {[
               { step: 'Set your destination', detail: 'Enter where you want to go. See the route, fare, and estimated time instantly.' },
               { step: 'Your vehicle arrives', detail: 'Track a premium vehicle in real time as it comes directly to you.' },
               { step: 'Arrive and pay', detail: 'Ride comfortably. Payment completes automatically when you arrive.' },
             ].map((item, i) => (
               <div key={i}>
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-ink text-[13px] font-bold tabular-nums text-white">
+                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ink text-[12px] font-bold tabular-nums text-white">
                   {i + 1}
                 </div>
-                <h3 className="mt-5 text-[17px] font-semibold text-ink">{item.step}</h3>
-                <p className="mt-2 text-[15px] leading-[1.7] text-ink-secondary">{item.detail}</p>
+                <h3 className="mt-5 text-[16px] font-semibold text-ink">{item.step}</h3>
+                <p className="mt-2 text-[14px] leading-[1.8] text-ink-secondary">{item.detail}</p>
               </div>
             ))}
           </div>
@@ -329,59 +361,61 @@ export default function HomePage() {
       </section>
 
       {/* ═══ CITIES ═══════════════════════════════════════════════════════ */}
-      <section className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
-        <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
-          <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
-              Coverage
-            </p>
-            <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-tight text-ink">
-              One standard.<br />
-              Every city.
-            </h2>
-          </div>
-          <p className="max-w-sm text-[15px] leading-[1.7] text-ink-secondary">
-            The same premium experience whether you&apos;re in Manhattan or Mayfair.
-            More cities launching every quarter.
-          </p>
-        </div>
-
-        <div className="mt-14 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {CITIES.map((city) => (
-            <div
-              key={city}
-              className="group flex items-center justify-between rounded-xl bg-surface-secondary px-5 py-4 transition-colors hover:bg-surface-tertiary"
-            >
-              <span className="text-[15px] font-medium text-ink">{city}</span>
-              <span className="text-ink-tertiary transition-transform duration-200 group-hover:translate-x-0.5">&rarr;</span>
+      <section className="bg-surface">
+        <div className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
+          <div className="flex flex-col items-start justify-between gap-8 md:flex-row md:items-end">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-ink-tertiary">
+                Coverage
+              </p>
+              <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.02em] text-ink">
+                One standard.<br />
+                Every city.
+              </h2>
             </div>
-          ))}
+            <p className="max-w-sm text-[14px] leading-[1.8] text-ink-secondary">
+              The same premium experience whether you&apos;re in Manhattan or Mayfair.
+              More cities launching every quarter.
+            </p>
+          </div>
+
+          <div className="mt-14 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+            {CITIES.map((city) => (
+              <div
+                key={city}
+                className="group flex items-center justify-between rounded-xl bg-surface-secondary px-5 py-4 transition-colors duration-300 hover:bg-surface-tertiary"
+              >
+                <span className="text-[14px] font-medium text-ink">{city}</span>
+                <span className="text-ink-tertiary transition-transform duration-300 group-hover:translate-x-0.5">&rarr;</span>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ═══ FINAL CTA ════════════════════════════════════════════════════ */}
-      <section className="bg-ink">
+      <section className="bg-[#08080a]">
         <div className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
-          <div className="max-w-2xl">
-            <h2 className="text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.1] tracking-tight text-white">
+          <div className="max-w-xl">
+            <h2 className="text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.02em] text-white">
               Your city, seamlessly
               <br />
               connected.
             </h2>
-            <p className="mt-6 max-w-lg text-[16px] leading-[1.7] text-white/45">
+            <p className="mt-6 max-w-md text-[15px] leading-[1.8] text-white/35">
               Join the mobility platform built for people who
               expect more from getting around.
             </p>
-            <div className="mt-12 flex flex-wrap items-center gap-4">
+            <div className="mt-12 flex items-center gap-4">
               <Link
                 href={user ? '/dashboard' : '/auth/signup'}
-                className="rounded-full bg-white px-8 py-4 text-[15px] font-semibold text-ink transition-all duration-150 hover:bg-white/90 active:scale-[0.97]"
+                className="rounded-full bg-[#f0f0f3] px-7 py-3.5 text-[14px] font-semibold text-[#08080a] transition-opacity duration-300 hover:opacity-85 active:scale-[0.97]"
               >
                 {user ? 'Go to Dashboard' : 'Create your account'}
               </Link>
               <Link
                 href="/auth/login"
-                className="rounded-full border border-white/15 px-8 py-4 text-[15px] font-semibold text-white/50 transition-all duration-150 hover:border-white/30 hover:text-white"
+                className="rounded-full border border-white/[0.12] px-7 py-3.5 text-[14px] font-semibold text-white/40 transition-all duration-300 hover:border-white/25 hover:text-white/70"
               >
                 Sign in
               </Link>
@@ -391,51 +425,41 @@ export default function HomePage() {
       </section>
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-border bg-surface">
+      <footer className="border-t border-white/[0.06] bg-[#08080a]">
         <div className="mx-auto max-w-7xl px-6 py-12 lg:px-10">
           <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
             <div>
-              <span className="text-[16px] font-bold text-ink">TakeMe Mobility</span>
-              <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-ink-tertiary">
+              <span className="text-[15px] font-semibold text-white/80">TakeMe Mobility</span>
+              <p className="mt-2 max-w-xs text-[13px] leading-relaxed text-white/25">
                 Premium global transportation. One standard of service, everywhere.
               </p>
             </div>
 
-            <div className="flex gap-16">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-ink-tertiary">Product</p>
-                <div className="mt-4 flex flex-col gap-3">
-                  {['Rides', 'Business', 'Cities', 'Pricing'].map((item) => (
-                    <span key={item} className="cursor-pointer text-[14px] text-ink-secondary transition-colors hover:text-ink">{item}</span>
-                  ))}
+            <div className="flex gap-14">
+              {[
+                { title: 'Product', items: ['Rides', 'Business', 'Cities', 'Pricing'] },
+                { title: 'Company', items: ['About', 'Careers', 'Safety', 'Contact'] },
+                { title: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
+              ].map((col) => (
+                <div key={col.title}>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/20">{col.title}</p>
+                  <div className="mt-4 flex flex-col gap-3">
+                    {col.items.map((item) => (
+                      <span key={item} className="cursor-pointer text-[13px] text-white/30 transition-colors duration-300 hover:text-white/60">{item}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-ink-tertiary">Company</p>
-                <div className="mt-4 flex flex-col gap-3">
-                  {['About', 'Careers', 'Safety', 'Contact'].map((item) => (
-                    <span key={item} className="cursor-pointer text-[14px] text-ink-secondary transition-colors hover:text-ink">{item}</span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-ink-tertiary">Legal</p>
-                <div className="mt-4 flex flex-col gap-3">
-                  {['Privacy', 'Terms', 'Cookies'].map((item) => (
-                    <span key={item} className="cursor-pointer text-[14px] text-ink-secondary transition-colors hover:text-ink">{item}</span>
-                  ))}
-                </div>
-              </div>
+              ))}
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-border pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-ink-tertiary">
-              &copy; {new Date().getFullYear()} TakeMe Mobility Inc. All rights reserved.
+          <div className="mt-12 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 md:flex-row md:items-center">
+            <p className="text-[12px] text-white/20">
+              &copy; {new Date().getFullYear()} TakeMe Mobility Inc.
             </p>
             <div className="flex gap-6">
               {['Twitter', 'LinkedIn', 'Instagram'].map((social) => (
-                <span key={social} className="cursor-pointer text-[13px] text-ink-tertiary transition-colors hover:text-ink">{social}</span>
+                <span key={social} className="cursor-pointer text-[12px] text-white/20 transition-colors duration-300 hover:text-white/50">{social}</span>
               ))}
             </div>
           </div>
