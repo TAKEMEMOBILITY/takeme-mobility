@@ -273,24 +273,32 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ FINAL CTA ════════════════════════════════════════════════════ */}
+      {/* ═══ CLOSING — Brand statement ═══════════════════════════════════
+          Typography-only. Centered. Maximum restraint.
+          The page ends the way it began: confident and quiet.
+          ═════════════════════════════════════════════════════════════════ */}
       <section className="bg-[#060608]">
-        <div className="mx-auto max-w-7xl px-6 py-28 md:py-40 lg:px-10">
-          <div className="max-w-xl">
-            <h2 className="text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.15] tracking-[-0.02em] text-white">
-              Your city, seamlessly<br />connected.
-            </h2>
-            <p className="mt-6 max-w-md text-[15px] leading-[1.8] text-white/30">
-              Join the mobility platform built for people who expect more from getting around.
-            </p>
-            <div className="mt-12 flex items-center gap-4">
-              <Link href={user ? '/dashboard' : '/auth/signup'} className="rounded-full bg-[#ebebef] px-7 py-3.5 text-[14px] font-semibold text-[#060608] transition-opacity duration-300 hover:opacity-80 active:scale-[0.97]">
-                {user ? 'Go to Dashboard' : 'Create your account'}
-              </Link>
-              <Link href="/auth/login" className="rounded-full border border-white/[0.1] px-7 py-3.5 text-[14px] font-semibold text-white/35 transition-all duration-300 hover:border-white/20 hover:text-white/65">
-                Sign in
-              </Link>
-            </div>
+        <div className="flex min-h-[70vh] flex-col items-center justify-center px-6 py-32 md:py-44">
+          <h2 className="text-center text-[clamp(3rem,8vw,7rem)] font-bold leading-[0.9] tracking-[-0.04em] text-white">
+            Pay. Ride. Go.
+          </h2>
+          <p className="mt-6 text-[15px] font-normal tracking-[-0.01em] text-white/25">
+            With TakeMe.
+          </p>
+
+          <div className="mt-14 flex items-center gap-4">
+            <Link
+              href={user ? '/dashboard' : '/auth/signup'}
+              className="rounded-full bg-[#ebebef] px-7 py-3.5 text-[14px] font-semibold text-[#060608] transition-opacity duration-300 hover:opacity-80 active:scale-[0.97]"
+            >
+              Get started
+            </Link>
+            <Link
+              href="#how-it-works"
+              className="rounded-full border border-white/[0.1] px-7 py-3.5 text-[14px] font-semibold text-white/35 transition-all duration-300 hover:border-white/20 hover:text-white/65"
+            >
+              How it works
+            </Link>
           </div>
         </div>
       </section>
