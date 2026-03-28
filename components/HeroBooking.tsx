@@ -10,7 +10,8 @@ import { useAuth } from '@/lib/auth/context';
 import RideTracker from './RideTracker';
 import type { QuoteResult } from '@/lib/pricing';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '');
+const stripeKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
+const stripePromise = stripeKey ? loadStripe(stripeKey) : Promise.resolve(null);
 
 // ── Types ────────────────────────────────────────────────────────────────
 
