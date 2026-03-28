@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ride - Premium Rideshare",
-  description: "Book rides with confidence",
+  title: "TakeMe Mobility — Premium Global Transportation",
+  description: "Premium rides, transparent pricing, and world-class reliability. Available in the cities that matter most.",
 };
 
 export default function RootLayout({
