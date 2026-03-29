@@ -5,15 +5,33 @@ import { createServiceClient } from '@/lib/supabase/service';
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/webhooks/stripe
 //
-// Handles Stripe webhook events. Uses the service role key to bypass RLS.
+// Handles ALL Stripe webhook events — payments + Issuing.
 //
-// Events handled:
-//   payment_intent.amount_capturable_updated — authorization successful
-//   payment_intent.succeeded                 — capture complete
-//   payment_intent.payment_failed            — payment failed
-//   charge.refunded                          — refund processed
-//   charge.dispute.created                   — dispute opened
+// Payment events:
+//   payment_intent.amount_capturable_updated
+//   payment_intent.succeeded
+//   payment_intent.payment_failed
+//   charge.refunded / charge.dispute.created
+//
+// TAKEME Card (Issuing) events:
+//   issuing_card.shipped / issuing_card.delivered
+//   issuing_authorization.request
+//   issuing_transaction.created
 // ═══════════════════════════════════════════════════════════════════════════
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function logIssuingEvent(supabase: any, eventType: string, stripeId: string, userId: string | undefined, data: unknown) {
+  try {
+    await supabase.from('issuing_events').insert({
+      event_type: eventType,
+      stripe_id: stripeId,
+      user_id: userId ?? null,
+      data: data ?? {},
+    });
+  } catch (err) {
+    console.warn('[Webhook] Event log failed:', err);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -171,6 +189,173 @@ export async function POST(request: NextRequest) {
         }
 
         console.warn('[Stripe Webhook] DISPUTE created:', obj.id);
+        break;
+      }
+
+      // ════════════════════════════════════════════════════════════════
+      // TAKEME CARD — Stripe Issuing events
+      // ════════════════════════════════════════════════════════════════
+
+      // ── Physical card shipped ───────────────────────────────────────
+      case 'issuing_card.shipped': {
+        const cardId = obj.id as string;
+        const userId = (obj.metadata as Record<string, string>)?.user_id;
+
+        console.log(`[Webhook] Card shipped: ${cardId}`);
+
+        await supabase
+          .from('driver_cards')
+          .update({ shipping_status: 'shipped' })
+          .eq('stripe_physical_card_id', cardId);
+
+        // Also update takeme_cards if exists
+        await supabase
+          .from('takeme_cards')
+          .update({ physical_status: 'shipping' })
+          .eq('stripe_card_id', cardId);
+
+        await logIssuingEvent(supabase, 'card_shipped', cardId, userId, obj);
+        break;
+      }
+
+      // ── Physical card delivered ─────────────────────────────────────
+      case 'issuing_card.delivered': {
+        const cardId = obj.id as string;
+        const userId = (obj.metadata as Record<string, string>)?.user_id;
+
+        console.log(`[Webhook] Card delivered: ${cardId}`);
+
+        await supabase
+          .from('driver_cards')
+          .update({ shipping_status: 'delivered', card_status: 'active' })
+          .eq('stripe_physical_card_id', cardId);
+
+        await supabase
+          .from('takeme_cards')
+          .update({ physical_status: 'delivered', physical_delivered_at: new Date().toISOString() })
+          .eq('stripe_card_id', cardId);
+
+        await logIssuingEvent(supabase, 'card_delivered', cardId, userId, obj);
+        break;
+      }
+
+      // ── Authorization request (real-time spending) ──────────────────
+      case 'issuing_authorization.request': {
+        const authId = obj.id as string;
+        const cardId = obj.card as string ?? (obj.card as Record<string, unknown>)?.id as string;
+        const amount = obj.amount as number ?? 0;
+        const merchantName = (obj.merchant_data as Record<string, unknown>)?.name as string ?? 'Unknown';
+        const merchantCategory = (obj.merchant_data as Record<string, unknown>)?.category as string ?? '';
+        const userId = (obj.metadata as Record<string, string>)?.user_id;
+
+        console.log(`[Webhook] Auth request: $${(amount / 100).toFixed(2)} at ${merchantName}`);
+
+        // Log the authorization
+        await logIssuingEvent(supabase, 'authorization_request', authId, userId, {
+          card_id: cardId,
+          amount_cents: amount,
+          merchant: merchantName,
+          category: merchantCategory,
+        });
+
+        // Track in card_transactions
+        if (userId) {
+          const { data: card } = await supabase
+            .from('takeme_cards')
+            .select('id')
+            .eq('stripe_card_id', cardId)
+            .maybeSingle();
+
+          if (card) {
+            await supabase.from('card_transactions').insert({
+              card_id: card.id,
+              user_id: userId,
+              type: 'charge',
+              amount: amount / 100,
+              description: merchantName,
+              category: merchantCategory,
+              status: 'pending',
+            });
+          }
+        }
+
+        break;
+      }
+
+      // ── Transaction created (finalized spend) ───────────────────────
+      case 'issuing_transaction.created': {
+        const txnId = obj.id as string;
+        const cardId = obj.card as string ?? (obj.card as Record<string, unknown>)?.id as string;
+        const amount = Math.abs(obj.amount as number ?? 0);
+        const merchantName = (obj.merchant_data as Record<string, unknown>)?.name as string ?? 'Unknown';
+        const merchantCategory = (obj.merchant_data as Record<string, unknown>)?.category as string ?? '';
+        const userId = (obj.metadata as Record<string, string>)?.user_id;
+
+        console.log(`[Webhook] Transaction: $${(amount / 100).toFixed(2)} at ${merchantName}`);
+
+        // Find the card in our DB
+        const { data: card } = await supabase
+          .from('takeme_cards')
+          .select('id, balance, total_cashback, cashback_rate_ev, cashback_rate_gas, cashback_rate_other')
+          .eq('stripe_card_id', cardId)
+          .maybeSingle();
+
+        if (card && userId) {
+          const amountDollars = amount / 100;
+
+          // Calculate cashback
+          let cashbackRate = Number(card.cashback_rate_other) / 100;
+          if (merchantCategory.includes('electric') || merchantCategory.includes('fuel_electric')) {
+            cashbackRate = Number(card.cashback_rate_ev) / 100;
+          } else if (merchantCategory.includes('fuel') || merchantCategory.includes('gas')) {
+            cashbackRate = Number(card.cashback_rate_gas) / 100;
+          }
+          const cashback = Math.round(amountDollars * cashbackRate * 100) / 100;
+
+          // Update card balance and cashback
+          await supabase
+            .from('takeme_cards')
+            .update({
+              balance: Number(card.balance) - amountDollars,
+              total_cashback: Number(card.total_cashback) + cashback,
+            })
+            .eq('id', card.id);
+
+          // Update driver_balances card_balance
+          await supabase.rpc('decrement_card_balance', { p_driver_id: userId, p_amount: amountDollars });
+
+          // Store finalized transaction
+          await supabase.from('card_transactions').insert({
+            card_id: card.id,
+            user_id: userId,
+            type: 'charge',
+            amount: amountDollars,
+            description: merchantName,
+            category: merchantCategory,
+            status: 'completed',
+          });
+
+          // Store cashback as separate transaction
+          if (cashback > 0) {
+            await supabase.from('card_transactions').insert({
+              card_id: card.id,
+              user_id: userId,
+              type: 'cashback',
+              amount: cashback,
+              description: `${(cashbackRate * 100).toFixed(0)}% cashback: ${merchantName}`,
+              category: 'cashback_reward',
+              status: 'completed',
+            });
+          }
+        }
+
+        await logIssuingEvent(supabase, 'transaction_created', txnId, userId, {
+          card_id: cardId,
+          amount_cents: amount,
+          merchant: merchantName,
+          category: merchantCategory,
+        });
+
         break;
       }
 
