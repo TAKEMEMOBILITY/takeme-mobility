@@ -10,7 +10,17 @@ import { useAuth } from '@/lib/auth/context';
 
 // Sample data — replace with real API calls
 const EARNINGS = { today: 142.50, week: 867.30, month: 3240.00, pending: 412.80, lastPayout: '2026-03-25' };
-const CARD = { active: true, balance: 412.80, lastCashout: '2026-03-28', number: '•••• 4829' };
+const CARD = {
+  active: true,
+  balance: 412.80,
+  lastCashout: '2026-03-28',
+  number: '•••• 4829',
+  virtualReady: true,
+  physicalStatus: 'shipping' as 'none' | 'ordered' | 'shipping' | 'delivered',
+  cashbackRate: 3,
+  totalCashback: 47.20,
+  walletAdded: true,
+};
 const STATS = { tripsToday: 6, tripsWeek: 34, rating: 4.92, acceptance: 96 };
 const REWARDS = { tripsThisMonth: 87, target: 150, reward: '$200 Sephora Gift Card', status: 'in_progress' as const };
 
@@ -149,19 +159,81 @@ export default function DriverDashboard() {
             </div>
 
             {/* TAKEME Card */}
-            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1D1F] to-[#2C2C2E]">
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1D1F] via-[#252527] to-[#2C2C2E]">
               {/* Card visual */}
               <div className="relative px-6 pt-6 pb-5">
-                <div className="absolute right-5 top-5 flex items-center gap-1.5">
-                  <div className="h-5 w-5 rounded-full bg-[#FF3B30] opacity-80" />
-                  <div className="-ml-2 h-5 w-5 rounded-full bg-[#FF9500] opacity-80" />
+                {/* Logo */}
+                <div className="absolute right-5 top-5 flex items-center gap-1">
+                  <div className="h-6 w-6 rounded-full bg-[#FF3B30] opacity-80" />
+                  <div className="-ml-2.5 h-6 w-6 rounded-full bg-[#FF9500] opacity-80" />
                 </div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/30">TAKEME</p>
-                <p className="mt-0.5 text-[16px] font-semibold text-white">Debit Card</p>
-                <p className="mt-4 text-[18px] font-medium tracking-[0.15em] text-white/60">{CARD.number}</p>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-[28px] font-bold tabular-nums text-white">${CARD.balance.toFixed(2)}</span>
-                  <span className="text-[12px] text-white/40">available</span>
+
+                <div className="flex items-center gap-2">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">TAKEME</p>
+                  {CARD.virtualReady && (
+                    <span className="rounded-full bg-[#34C759]/20 px-2 py-[1px] text-[8px] font-bold uppercase text-[#34C759]">Virtual active</span>
+                  )}
+                </div>
+                <p className="mt-0.5 text-[17px] font-semibold text-white">Debit Card</p>
+
+                <p className="mt-5 text-[20px] font-medium tracking-[0.2em] text-white/50">{CARD.number}</p>
+
+                <div className="mt-5 flex items-end justify-between">
+                  <div>
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-white/25">Balance</p>
+                    <p className="mt-0.5 text-[30px] font-bold tabular-nums leading-none text-white">${CARD.balance.toFixed(2)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-semibold uppercase tracking-wider text-white/25">Cashback earned</p>
+                    <p className="mt-0.5 text-[16px] font-bold tabular-nums text-[#34C759]">${CARD.totalCashback.toFixed(2)}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card status bar */}
+              <div className="border-t border-white/8 bg-white/[0.03] px-6 py-3">
+                <div className="flex items-center justify-between">
+                  {/* Wallet status */}
+                  <div className="flex items-center gap-2">
+                    <svg className="h-4 w-4 text-white/40" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 0 0 6 3.75v16.5a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 20.25V3.75a2.25 2.25 0 0 0-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
+                    </svg>
+                    <span className="text-[11px] font-medium text-white/40">
+                      {CARD.walletAdded ? 'Added to Apple Pay' : 'Add to wallet'}
+                    </span>
+                  </div>
+
+                  {/* Physical card status */}
+                  <div className="flex items-center gap-1.5">
+                    <span className={`h-1.5 w-1.5 rounded-full ${
+                      CARD.physicalStatus === 'delivered' ? 'bg-[#34C759]'
+                      : CARD.physicalStatus === 'shipping' ? 'bg-[#FF9500]'
+                      : 'bg-white/20'
+                    }`} />
+                    <span className="text-[11px] font-medium text-white/40">
+                      {CARD.physicalStatus === 'delivered' ? 'Physical card active'
+                      : CARD.physicalStatus === 'shipping' ? 'Card shipping'
+                      : CARD.physicalStatus === 'ordered' ? 'Card ordered'
+                      : 'Order physical card'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Cashback rates */}
+              <div className="border-t border-white/8 px-6 py-3">
+                <div className="flex items-center gap-4">
+                  {[
+                    { label: 'EV charging', rate: '5%', color: '#34C759' },
+                    { label: 'Gas', rate: '3%', color: '#FF9500' },
+                    { label: 'Everything else', rate: '1%', color: '#0071E3' },
+                  ].map(cb => (
+                    <div key={cb.label} className="flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 rounded-full" style={{ background: cb.color }} />
+                      <span className="text-[10px] text-white/30">{cb.label}</span>
+                      <span className="text-[10px] font-bold text-white/60">{cb.rate}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -171,8 +243,12 @@ export default function DriverDashboard() {
                   Instant cash out
                 </button>
                 <div className="w-[1px] bg-white/10" />
-                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/60 transition-colors hover:bg-white/5">
+                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/50 transition-colors hover:bg-white/5">
                   Transactions
+                </button>
+                <div className="w-[1px] bg-white/10" />
+                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/50 transition-colors hover:bg-white/5">
+                  Freeze card
                 </button>
               </div>
             </div>
