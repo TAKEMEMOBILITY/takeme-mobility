@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS bookings (
   duration_minutes    INTEGER NOT NULL,
 
   -- Ride
-  vehicle_type        TEXT NOT NULL CHECK (vehicle_type IN ('economy', 'comfort', 'premium')),
+  vehicle_type        TEXT NOT NULL CHECK (vehicle_type IN ('electric', 'comfort_electric', 'premium_electric', 'suv_electric', 'women_rider')),
   price               NUMERIC(10,2) NOT NULL,
   currency            TEXT DEFAULT 'USD',
 

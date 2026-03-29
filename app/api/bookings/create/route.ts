@@ -22,7 +22,7 @@ const requestSchema = z.object({
   destinationLng: z.number().min(-180).max(180),
   distanceKm: z.number().positive(),
   durationMin: z.number().int().positive(),
-  vehicleType: z.enum(['economy', 'comfort', 'premium']),
+  vehicleType: z.enum(['electric', 'comfort_electric', 'premium_electric', 'suv_electric', 'women_rider']),
 });
 
 export async function POST(request: NextRequest) {

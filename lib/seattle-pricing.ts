@@ -3,12 +3,12 @@
 // Pure function. No SDK dependencies. Usable client-side and server-side.
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type VehicleClass = 'economy' | 'comfort' | 'premium';
+export type VehicleClass = 'electric' | 'comfort_electric' | 'premium_electric' | 'suv_electric' | 'women_rider';
 
 export interface TierConfig {
   id: VehicleClass;
   name: string;
-  icon: string;
+  subtitle: string;
   baseFare: number;
   perMileRate: number;
   perMinuteRate: number;
@@ -16,15 +16,17 @@ export interface TierConfig {
 }
 
 export const SEATTLE_TIERS: TierConfig[] = [
-  { id: 'economy',  name: 'Economy',  icon: '🚗', baseFare: 4.00,  perMileRate: 1.90, perMinuteRate: 0.25, minFare: 8.00 },
-  { id: 'comfort',  name: 'Comfort',  icon: '🚙', baseFare: 6.00,  perMileRate: 2.80, perMinuteRate: 0.35, minFare: 12.00 },
-  { id: 'premium',  name: 'Premium',  icon: '🚘', baseFare: 10.00, perMileRate: 4.20, perMinuteRate: 0.50, minFare: 18.00 },
+  { id: 'electric',          name: 'Electric',          subtitle: 'Eco-friendly',       baseFare: 4.00,  perMileRate: 1.90, perMinuteRate: 0.25, minFare: 8.00 },
+  { id: 'comfort_electric',  name: 'Comfort Electric',  subtitle: 'Extra space',        baseFare: 6.00,  perMileRate: 2.80, perMinuteRate: 0.35, minFare: 12.00 },
+  { id: 'premium_electric',  name: 'Premium Electric',  subtitle: 'Luxury EV',          baseFare: 10.00, perMileRate: 4.20, perMinuteRate: 0.50, minFare: 18.00 },
+  { id: 'suv_electric',      name: 'SUV Electric',      subtitle: 'Group & luggage',    baseFare: 12.00, perMileRate: 4.80, perMinuteRate: 0.55, minFare: 22.00 },
+  { id: 'women_rider',       name: 'Women Rider',       subtitle: 'Women drivers only', baseFare: 5.00,  perMileRate: 2.20, perMinuteRate: 0.30, minFare: 10.00 },
 ];
 
 export interface FareResult {
   vehicleClass: VehicleClass;
   tierName: string;
-  icon: string;
+  subtitle: string;
   baseFare: number;
   distanceFare: number;
   timeFare: number;
@@ -49,7 +51,7 @@ export function calculateFare(
   return {
     vehicleClass: tier.id,
     tierName: tier.name,
-    icon: tier.icon,
+    subtitle: tier.subtitle,
     baseFare: tier.baseFare,
     distanceFare,
     timeFare,

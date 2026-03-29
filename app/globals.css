@@ -140,6 +140,10 @@ body {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
 
+/* Hide scrollbar for vehicle selector */
+.scrollbar-none::-webkit-scrollbar { display: none; }
+.scrollbar-none { -ms-overflow-style: none; scrollbar-width: none; }
+
 /* ── Lock to light mode ────────────────────────────────────────────── */
 
 @media (prefers-color-scheme: dark) {
