@@ -1,40 +1,46 @@
 'use client';
 
-import React, { createContext, useContext, ReactNode } from 'react';
-import type { AuthError, User } from '@supabase/supabase-js';
-import { useAuth as useAuthHook } from '@/lib/supabase/hooks';
+import React, { createContext, useContext, useState, type ReactNode } from 'react';
 
-type AuthResult = Promise<{ data: { user: User | null } | null; error: AuthError | null }>;
+// ═══════════════════════════════════════════════════════════════════════════
+// AuthContext — hardcoded stub. Zero Supabase. Zero SDK.
+// This isolates whether the crash is from Supabase client init.
+// ═══════════════════════════════════════════════════════════════════════════
 
 interface AuthContextType {
-  user: User | null;
+  user: { id: string; email?: string } | null;
   loading: boolean;
-  signUp: (email: string, password: string, fullName: string) => AuthResult;
-  signIn: (email: string, password: string) => AuthResult;
-  signOut: () => Promise<{ error: AuthError | null }>;
+  signUp: (...args: unknown[]) => Promise<{ data: null; error: { message: string } | null }>;
+  signIn: (...args: unknown[]) => Promise<{ data: null; error: { message: string } | null }>;
+  signOut: () => Promise<{ error: { message: string } | null }>;
 }
 
-// Default value — used when context is missing. Never throws.
-const defaultAuth: AuthContextType = {
+const noop = async (..._args: unknown[]) => ({ data: null, error: null as { message: string } | null });
+
+const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: false,
-  signUp: async () => ({ data: null, error: null }),
-  signIn: async () => ({ data: null, error: null }),
+  signUp: noop,
+  signIn: noop,
   signOut: async () => ({ error: null }),
-};
-
-const AuthContext = createContext<AuthContextType>(defaultAuth);
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const auth = useAuthHook();
+  const [loading] = useState(false);
 
   return (
-    <AuthContext.Provider value={auth}>
+    <AuthContext.Provider value={{
+      user: null,
+      loading,
+      signUp: noop,
+      signIn: noop,
+      signOut: async () => ({ error: null as { message: string } | null }),
+    }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth(): AuthContextType {
+export function useAuth() {
   return useContext(AuthContext);
 }
