@@ -66,6 +66,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // ── Directions for map ─────────────────────────────────────────────
   useEffect(() => {
     if (!pickup || !dropoff || !isLoaded) { setDirections(null); return; }
+    // Guard: verify google.maps constructors actually exist
+    if (typeof google === 'undefined' || !google.maps?.DirectionsService) return;
     try {
       new google.maps.DirectionsService().route(
         {
@@ -81,7 +83,9 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           }
         },
       );
-    } catch {}
+    } catch (err) {
+      console.error('[HeroBooking] Directions failed:', err);
+    }
   }, [pickup, dropoff, isLoaded]);
 
   // ── Place handlers ─────────────────────────────────────────────────
@@ -138,6 +142,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // to google.maps.* when the script hasn't loaded
   const renderMap = () => {
     if (!isLoaded) return null;
+    // Guard: constructors must exist before rendering
+    if (typeof google === 'undefined' || !google.maps?.Map) return null;
     try {
       const { GoogleMap, Marker, DirectionsRenderer } = require('@react-google-maps/api');
       const pinSvg = (fill: string) => 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(

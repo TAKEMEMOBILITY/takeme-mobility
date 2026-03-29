@@ -1,37 +1,20 @@
 'use client';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// GoogleMapsProvider — Production-grade map loader
-//
-// Resilience layers:
-//   1. API key validation before loading
-//   2. Automatic retry with exponential backoff (3 attempts)
-//   3. Timeout protection (15s)
-//   4. Graceful degradation — app works without maps
-//   5. Zero technical errors exposed to UI
-// ═══════════════════════════════════════════════════════════════════════════
-
 import { createContext, useContext, useState, useEffect, useRef, useCallback, type ReactNode } from 'react';
 
-const LIBRARIES: ('places' | 'geometry')[] = ['places', 'geometry'];
+const LIBRARIES = ['places', 'geometry'];
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 2000;
 const LOAD_TIMEOUT_MS = 15000;
 
-// ── Status machine ───────────────────────────────────────────────────────
-export type MapLoadStatus =
-  | 'initializing'   // Pre-flight checks
-  | 'loading'        // Script loading in progress
-  | 'retrying'       // Failed, retrying automatically
-  | 'ready'          // Fully operational
-  | 'degraded';      // All retries exhausted — app works without maps
+export type MapLoadStatus = 'initializing' | 'loading' | 'retrying' | 'ready' | 'degraded';
 
 interface GoogleMapsContextValue {
   isLoaded: boolean;
   loadError: Error | undefined;
   status: MapLoadStatus;
-  retry: () => void;       // Manual retry for user-initiated recovery
-  attempt: number;         // Current attempt number (for UI messaging)
+  retry: () => void;
+  attempt: number;
   maxAttempts: number;
 }
 
@@ -44,45 +27,62 @@ const GoogleMapsContext = createContext<GoogleMapsContextValue>({
   maxAttempts: MAX_RETRIES,
 });
 
-// ── Script loader with retry ─────────────────────────────────────────────
+// ── Script loader ────────────────────────────────────────────────────────
+// Uses a global callback instead of script.onload + loading=async.
+// The callback fires AFTER the API is fully initialized, not just when
+// the script file is downloaded. This prevents "google.maps.Map is not
+// a constructor" errors.
+
+let callbackId = 0;
 
 function loadGoogleMapsScript(apiKey: string, libraries: string[]): Promise<void> {
   return new Promise((resolve, reject) => {
-    // Already loaded
-    if (typeof google !== 'undefined' && google.maps) {
+    // Already fully loaded — verify a constructor works
+    if (typeof google !== 'undefined' && google.maps && google.maps.Map) {
       resolve();
       return;
     }
 
-    // Already a script tag in flight — wait for it
+    // Already a script in flight — wait for callback
     const existing = document.querySelector('script[src*="maps.googleapis.com"]');
     if (existing) {
-      existing.addEventListener('load', () => resolve());
-      existing.addEventListener('error', () => reject(new Error('MAP_SCRIPT_BLOCKED')));
+      // Poll until google.maps.Map exists (script may have loaded but not initialized)
+      const poll = setInterval(() => {
+        if (typeof google !== 'undefined' && google.maps && google.maps.Map) {
+          clearInterval(poll);
+          resolve();
+        }
+      }, 100);
+      setTimeout(() => { clearInterval(poll); reject(new Error('MAP_INIT_TIMEOUT')); }, LOAD_TIMEOUT_MS);
       return;
     }
 
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=${libraries.join(',')}&loading=async`;
-    script.async = true;
-    script.defer = true;
-
-    const timeout = setTimeout(() => {
-      script.remove();
-      reject(new Error('MAP_LOAD_TIMEOUT'));
-    }, LOAD_TIMEOUT_MS);
-
-    script.onload = () => {
+    // Create a unique global callback name
+    const cbName = `__takeme_maps_cb_${++callbackId}`;
+    (window as unknown as Record<string, unknown>)[cbName] = () => {
+      delete (window as unknown as Record<string, unknown>)[cbName];
       clearTimeout(timeout);
-      // Verify the API actually initialized (catches invalid key scenario)
-      if (typeof google !== 'undefined' && google.maps) {
+      // Final verification
+      if (typeof google !== 'undefined' && google.maps && google.maps.Map) {
         resolve();
       } else {
         reject(new Error('MAP_INIT_FAILED'));
       }
     };
 
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=${libraries.join(',')}&callback=${cbName}`;
+    script.async = true;
+    script.defer = true;
+
+    const timeout = setTimeout(() => {
+      delete (window as unknown as Record<string, unknown>)[cbName];
+      script.remove();
+      reject(new Error('MAP_LOAD_TIMEOUT'));
+    }, LOAD_TIMEOUT_MS);
+
     script.onerror = () => {
+      delete (window as unknown as Record<string, unknown>)[cbName];
       clearTimeout(timeout);
       script.remove();
       reject(new Error('MAP_SCRIPT_ERROR'));
@@ -107,7 +107,6 @@ export function GoogleMapsProvider({ children }: { children: ReactNode }) {
     if (!mountedRef.current || loadingRef.current) return;
     loadingRef.current = true;
 
-    // Pre-flight: API key validation
     if (!apiKey || apiKey.length < 10) {
       setStatus('degraded');
       setLoadError(new Error('MAP_KEY_MISSING'));
@@ -126,18 +125,14 @@ export function GoogleMapsProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       if (!mountedRef.current) return;
-
       const error = err instanceof Error ? err : new Error('MAP_UNKNOWN_ERROR');
       setLoadError(error);
 
       if (currentAttempt < MAX_RETRIES) {
-        // Exponential backoff: 2s, 4s, 8s
         const delay = RETRY_BASE_MS * Math.pow(2, currentAttempt - 1);
         loadingRef.current = false;
         setTimeout(() => {
-          if (mountedRef.current) {
-            attemptLoad(currentAttempt + 1);
-          }
+          if (mountedRef.current) attemptLoad(currentAttempt + 1);
         }, delay);
       } else {
         setStatus('degraded');
@@ -147,9 +142,7 @@ export function GoogleMapsProvider({ children }: { children: ReactNode }) {
     }
   }, [apiKey]);
 
-  // Manual retry — resets the entire cycle
   const retry = useCallback(() => {
-    // Remove any existing failed script tags to allow fresh load
     document.querySelectorAll('script[src*="maps.googleapis.com"]').forEach(s => s.remove());
     setLoadError(undefined);
     loadingRef.current = false;

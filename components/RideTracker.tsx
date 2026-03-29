@@ -133,13 +133,16 @@ export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
   // Fit bounds when ride loads or driver moves
   useEffect(() => {
     if (!mapRef.current || !ride) return;
-    const bounds = new google.maps.LatLngBounds();
-    bounds.extend({ lat: ride.pickupLat, lng: ride.pickupLng });
-    bounds.extend({ lat: ride.dropoffLat, lng: ride.dropoffLng });
-    if (driverPosition) {
-      bounds.extend({ lat: driverPosition.lat, lng: driverPosition.lng });
-    }
-    mapRef.current.fitBounds(bounds, { top: 60, bottom: 60, left: 40, right: 40 });
+    if (typeof google === 'undefined' || !google.maps?.LatLngBounds) return;
+    try {
+      const bounds = new google.maps.LatLngBounds();
+      bounds.extend({ lat: ride.pickupLat, lng: ride.pickupLng });
+      bounds.extend({ lat: ride.dropoffLat, lng: ride.dropoffLng });
+      if (driverPosition) {
+        bounds.extend({ lat: driverPosition.lat, lng: driverPosition.lng });
+      }
+      mapRef.current.fitBounds(bounds, { top: 60, bottom: 60, left: 40, right: 40 });
+    } catch {}
   }, [ride, driverPosition]);
 
   if (loading) {
@@ -166,36 +169,26 @@ export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
 
       {/* ── Map ──────────────────────────────────────────────── */}
       <div className="relative h-[320px] bg-[#F2F2F7]">
-        {isLoaded && (
+        {isLoaded && typeof google !== 'undefined' && google.maps?.Map && (
           <GoogleMap
             mapContainerStyle={{ width: '100%', height: '100%' }}
             center={{ lat: ride.pickupLat, lng: ride.pickupLng }}
             zoom={13}
-            onLoad={(map) => { mapRef.current = map; }}
+            onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
             options={{ styles: MAP_STYLES, disableDefaultUI: true, zoomControl: true, clickableIcons: false }}
           >
-            {/* Pickup */}
             <Marker
               position={{ lat: ride.pickupLat, lng: ride.pickupLng }}
-              icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }}
+              icon={google.maps.Size ? { url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) } : undefined}
             />
-
-            {/* Dropoff */}
             <Marker
               position={{ lat: ride.dropoffLat, lng: ride.dropoffLng }}
-              icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }}
+              icon={google.maps.Size ? { url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) } : undefined}
             />
-
-            {/* Driver position */}
             {driverPosition && !isTerminal && (
               <Marker
                 position={{ lat: driverPosition.lat, lng: driverPosition.lng }}
-                icon={{
-                  url: driverSvg(),
-                  scaledSize: new google.maps.Size(32, 32),
-                  anchor: new google.maps.Point(16, 16),
-                  rotation: driverPosition.heading ?? 0,
-                }}
+                icon={google.maps.Size ? { url: driverSvg(), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16), rotation: driverPosition.heading ?? 0 } : undefined}
                 zIndex={100}
               />
             )}
