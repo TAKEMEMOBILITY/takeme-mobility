@@ -1,91 +1,222 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/lib/auth/context';
+import { Suspense } from 'react';
 
-export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+// ═══════════════════════════════════════════════════════════════════════════
+// Phone OTP Auth — unified sign-in / sign-up
+// Enter phone → receive code → verify → signed in
+// ═══════════════════════════════════════════════════════════════════════════
+
+function formatPhone(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return `(${digits}`;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+}
+
+function toE164(raw: string): string {
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+  return `+${digits}`;
+}
+
+function PhoneAuth() {
+  const { user, sendOtp, verifyOtp } = useAuth();
+  const router = useRouter();
+  const params = useSearchParams();
+  const redirect = params.get('redirect') || '/';
+
+  const [step, setStep] = useState<'phone' | 'code'>('phone');
+  const [phone, setPhone] = useState('');
+  const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { signIn } = useAuth();
-  const router = useRouter();
+  const [cooldown, setCooldown] = useState(0);
+  const codeInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // If already signed in, redirect
+  useEffect(() => {
+    if (user) router.replace(redirect);
+  }, [user, router, redirect]);
+
+  // Cooldown timer for resend
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const t = setInterval(() => setCooldown(c => Math.max(0, c - 1)), 1000);
+    return () => clearInterval(t);
+  }, [cooldown]);
+
+  // Auto-focus code input
+  useEffect(() => {
+    if (step === 'code') codeInputRef.current?.focus();
+  }, [step]);
+
+  const handleSendCode = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      setError('Enter a valid 10-digit phone number.');
+      return;
+    }
+
     setLoading(true);
     setError('');
+    const { error: err } = await sendOtp(toE164(phone));
+    setLoading(false);
 
-    try {
-      const { error } = await signIn(email, password);
-      if (error) setError(error.message);
-      else router.push('/dashboard');
-    } catch {
-      setError('An unexpected error occurred.');
-    } finally {
-      setLoading(false);
+    if (err) {
+      setError(err);
+    } else {
+      setStep('code');
+      setCooldown(60);
     }
-  };
+  }, [phone, sendOtp]);
+
+  const handleVerifyCode = useCallback(async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (code.length < 6) {
+      setError('Enter the 6-digit code.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    const { error: err } = await verifyOtp(toE164(phone), code);
+    setLoading(false);
+
+    if (err) {
+      setError(err);
+    } else {
+      router.replace(redirect);
+    }
+  }, [code, phone, verifyOtp, router, redirect]);
+
+  const handleResend = useCallback(async () => {
+    if (cooldown > 0) return;
+    setLoading(true);
+    setError('');
+    const { error: err } = await sendOtp(toE164(phone));
+    setLoading(false);
+    if (err) setError(err);
+    else setCooldown(60);
+  }, [cooldown, phone, sendOtp]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-5">
+    <div className="flex min-h-screen items-center justify-center bg-white px-5">
       <div className="w-full max-w-sm">
         {/* Brand */}
         <div className="mb-10 text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-ink">Ride</h1>
-          <p className="mt-2 text-sm text-ink-secondary">Sign in to continue</p>
+          <Link href="/" className="text-[22px] tracking-[0.01em] text-[#1D1D1F]">
+            <span className="font-semibold">TakeMe</span>
+            <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
+          </Link>
+          <p className="mt-3 text-[15px] text-[#86868B]">
+            {step === 'phone' ? 'Enter your phone number to continue' : 'Enter the code we sent you'}
+          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="flex items-start gap-2.5 rounded-xl bg-danger/8 px-4 py-3">
-              <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-danger" />
-              <p className="text-sm font-medium text-ink">{error}</p>
+        {/* Error */}
+        {error && (
+          <div className="mb-4 flex items-center gap-2.5 rounded-xl bg-[#FFF5F5] px-4 py-3">
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#FF3B30]" />
+            <p className="text-[13px] text-[#1D1D1F]">{error}</p>
+          </div>
+        )}
+
+        {/* ── Phone step ────────────────────────────────────── */}
+        {step === 'phone' && (
+          <form onSubmit={handleSendCode}>
+            <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
+              <span className="text-[15px] font-medium text-[#86868B]">+1</span>
+              <input
+                type="tel"
+                placeholder="(555) 123-4567"
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                maxLength={14}
+                autoFocus
+                className="w-full bg-transparent text-[17px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
+              />
             </div>
-          )}
 
-          <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-ink-secondary">Email</label>
+            <button
+              type="submit"
+              disabled={loading || phone.replace(/\D/g, '').length < 10}
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245] disabled:opacity-40"
+            >
+              {loading ? 'Sending code...' : 'Send verification code'}
+            </button>
+          </form>
+        )}
+
+        {/* ── Code step ─────────────────────────────────────── */}
+        {step === 'code' && (
+          <form onSubmit={handleVerifyCode}>
+            <p className="mb-3 text-center text-[13px] text-[#86868B]">
+              Sent to <span className="font-semibold text-[#1D1D1F]">+1 {phone}</span>
+            </p>
+
             <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full rounded-xl bg-surface-secondary px-4 py-3 text-[15px] font-medium text-ink placeholder-ink-tertiary outline-none transition-colors focus:bg-surface-tertiary focus:ring-1 focus:ring-ink/10"
+              ref={codeInputRef}
+              type="text"
+              inputMode="numeric"
+              placeholder="000000"
+              value={code}
+              onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+              maxLength={6}
+              className="w-full rounded-xl bg-[#F5F5F7] px-4 py-4 text-center text-[24px] font-bold tracking-[0.3em] text-[#1D1D1F] placeholder-[#D2D2D7] outline-none"
             />
-          </div>
 
-          <div>
-            <label className="mb-1.5 block text-[13px] font-medium text-ink-secondary">Password</label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter your password"
-              className="w-full rounded-xl bg-surface-secondary px-4 py-3 text-[15px] font-medium text-ink placeholder-ink-tertiary outline-none transition-colors focus:bg-surface-tertiary focus:ring-1 focus:ring-ink/10"
-            />
-          </div>
+            <button
+              type="submit"
+              disabled={loading || code.length < 6}
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245] disabled:opacity-40"
+            >
+              {loading ? 'Verifying...' : 'Verify & continue'}
+            </button>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-2 w-full rounded-xl bg-ink py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-ink/90 active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
-          >
-            {loading ? 'Signing in...' : 'Sign In'}
-          </button>
-        </form>
+            <div className="mt-4 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => { setStep('phone'); setCode(''); setError(''); }}
+                className="text-[13px] text-[#86868B] hover:text-[#1D1D1F]"
+              >
+                Change number
+              </button>
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={cooldown > 0 || loading}
+                className="text-[13px] text-[#0071E3] hover:opacity-70 disabled:text-[#A1A1A6]"
+              >
+                {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
+              </button>
+            </div>
+          </form>
+        )}
 
-        <p className="mt-8 text-center text-sm text-ink-tertiary">
-          New here?{' '}
-          <Link href="/auth/signup" className="font-semibold text-ink hover:text-ink/70">
-            Create account
-          </Link>
+        <p className="mt-10 text-center text-[12px] text-[#A1A1A6]">
+          By continuing, you agree to our Terms of Service and Privacy Policy.
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
+      </div>
+    }>
+      <PhoneAuth />
+    </Suspense>
   );
 }

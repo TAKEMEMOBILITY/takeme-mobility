@@ -52,11 +52,20 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
     if (!mapsReady || typeof google === 'undefined' || !google.maps?.places?.Autocomplete) return;
 
     // Pickup
+    // Seattle bias: 50km radius around downtown
+    const seattleBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(47.4, -122.5),  // SW
+      new google.maps.LatLng(47.8, -122.1),  // NE
+    );
+
+    const acOptions = {
+      fields: ['formatted_address', 'geometry'] as string[],
+      bounds: seattleBounds,
+      componentRestrictions: { country: 'us' },
+    };
+
     if (pickupInputRef.current && !pickupAcRef.current) {
-      const ac = new google.maps.places.Autocomplete(pickupInputRef.current, {
-        fields: ['formatted_address', 'geometry'],
-        types: ['address'],
-      });
+      const ac = new google.maps.places.Autocomplete(pickupInputRef.current, acOptions);
       ac.addListener('place_changed', () => {
         const place = ac.getPlace();
         if (place.geometry?.location && place.formatted_address) {
@@ -68,12 +77,8 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
       pickupAcRef.current = ac;
     }
 
-    // Dropoff
     if (dropoffInputRef.current && !dropoffAcRef.current) {
-      const ac = new google.maps.places.Autocomplete(dropoffInputRef.current, {
-        fields: ['formatted_address', 'geometry'],
-        types: ['address'],
-      });
+      const ac = new google.maps.places.Autocomplete(dropoffInputRef.current, acOptions);
       ac.addListener('place_changed', () => {
         const place = ac.getPlace();
         if (place.geometry?.location && place.formatted_address) {
@@ -88,7 +93,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
 
   // ── Confirm ride ───────────────────────────────────────────────────
   const confirmRide = useCallback(async () => {
-    if (!user) { router.push(ctaHref); return; }
+    if (!user) { router.push('/auth/login?redirect=/'); return; }
     if (!pickup || !dropoff || !route || !selectedFare) return;
 
     setBooking(true);
@@ -113,7 +118,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
       const data = await res.json().catch(() => ({})) as { checkoutUrl?: string; error?: string };
 
       if (!res.ok) {
-        if (res.status === 401) { router.push(ctaHref); return; }
+        if (res.status === 401) { router.push('/auth/login?redirect=/'); return; }
         throw new Error(data.error || 'Booking failed');
       }
 
@@ -167,7 +172,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const ctaDisabled = booking || routeLoading || (!!user && !hasRoute);
 
   const ctaAction = () => {
-    if (!user) { router.push(ctaHref); return; }
+    if (!user) { router.push('/auth/login?redirect=/'); return; }
     if (hasRoute) confirmRide();
   };
 
