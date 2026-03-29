@@ -133,6 +133,44 @@ export async function createPaymentIntent(
   };
 }
 
+// ── Checkout Session ─────────────────────────────────────────────────────
+
+export interface CreateCheckoutParams {
+  rideId: string;
+  amount: number;        // in cents
+  currency: string;
+  customerEmail?: string;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+export async function createCheckoutSession(params: CreateCheckoutParams): Promise<{
+  id: string;
+  url: string;
+}> {
+  const body: Record<string, string> = {
+    'mode': 'payment',
+    'line_items[0][price_data][currency]': params.currency.toLowerCase(),
+    'line_items[0][price_data][unit_amount]': String(params.amount),
+    'line_items[0][price_data][product_data][name]': 'TakeMe Ride',
+    'line_items[0][price_data][product_data][description]': `Ride #${params.rideId.slice(0, 8)}`,
+    'line_items[0][quantity]': '1',
+    'metadata[ride_id]': params.rideId,
+    'success_url': params.successUrl,
+    'cancel_url': params.cancelUrl,
+  };
+  if (params.customerEmail) {
+    body['customer_email'] = params.customerEmail;
+  }
+
+  const idempotencyKey = `checkout_${params.rideId}`;
+  const data = await stripeRequest('/checkout/sessions', body, 'POST', idempotencyKey);
+  return {
+    id: data.id as string,
+    url: data.url as string,
+  };
+}
+
 // ── Capture (after ride completes) ───────────────────────────────────────
 
 export async function capturePaymentIntent(

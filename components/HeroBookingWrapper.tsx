@@ -94,39 +94,42 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
     setBooking(true);
     setBookingError('');
     try {
-      const res = await fetch('/api/rides/create', {
+      const res = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           pickupAddress: pickup.address,
           pickupLat: pickup.lat,
           pickupLng: pickup.lng,
-          dropoffAddress: dropoff.address,
-          dropoffLat: dropoff.lat,
-          dropoffLng: dropoff.lng,
+          destinationAddress: dropoff.address,
+          destinationLat: dropoff.lat,
+          destinationLng: dropoff.lng,
           distanceKm: route.distanceKm,
           durationMin: route.durationMin,
-          vehicleClass: selectedTier,
-          baseFare: selectedFare.baseFare,
-          distanceFare: selectedFare.distanceFare,
-          timeFare: selectedFare.timeFare,
-          totalFare: selectedFare.total,
-          surgeMultiplier: 1.0,
-          currency: 'USD',
+          vehicleType: selectedTier,
         }),
       });
+
+      const data = await res.json().catch(() => ({})) as { checkoutUrl?: string; error?: string };
+
       if (!res.ok) {
         if (res.status === 401) { router.push(ctaHref); return; }
-        const data = await res.json().catch(() => ({}));
-        throw new Error((data as { error?: string }).error || 'Booking failed');
+        throw new Error(data.error || 'Booking failed');
       }
+
+      // Redirect to Stripe Checkout
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
       setBooked(true);
     } catch (err) {
       setBookingError(err instanceof Error ? err.message : 'Could not book ride.');
     } finally {
       setBooking(false);
     }
-  }, [user, pickup, dropoff, route, selectedFare, selectedTier, ctaHref, router]);
+  }, [user, pickup, dropoff, route, selectedTier, ctaHref, router]);
 
   // ── Booked confirmation ────────────────────────────────────────────
   if (booked) {
