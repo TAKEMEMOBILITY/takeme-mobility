@@ -1,11 +1,11 @@
 'use client';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// useDirections — calculates route between two points using Google
-// Directions Service. Only runs when google.maps is fully loaded.
+// useDirections — calculates route and returns both parsed stats AND
+// the raw DirectionsResult for rendering on a map.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export interface RouteResult {
   distanceKm: number;
@@ -20,12 +20,14 @@ export function useDirections(
   mapsReady: boolean,
 ) {
   const [route, setRoute] = useState<RouteResult | null>(null);
+  const [directionsResult, setDirectionsResult] = useState<google.maps.DirectionsResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!origin || !destination || !mapsReady) {
       setRoute(null);
+      setDirectionsResult(null);
       return;
     }
 
@@ -45,6 +47,7 @@ export function useDirections(
         (result, status) => {
           setLoading(false);
           if (status === google.maps.DirectionsStatus.OK && result) {
+            setDirectionsResult(result);
             const leg = result.routes?.[0]?.legs?.[0];
             if (leg?.distance && leg?.duration) {
               setRoute({
@@ -55,6 +58,7 @@ export function useDirections(
               });
             }
           } else {
+            setDirectionsResult(null);
             setError('Route not available for these locations.');
           }
         },
@@ -65,5 +69,5 @@ export function useDirections(
     }
   }, [origin?.lat, origin?.lng, destination?.lat, destination?.lng, mapsReady]);
 
-  return { route, loading, error };
+  return { route, directionsResult, loading, error };
 }
