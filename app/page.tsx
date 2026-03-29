@@ -188,31 +188,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Store badges */}
-              <div className="mt-12 flex flex-wrap gap-3 animate-fade-in stagger-4">
-                <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
-                  <svg className="h-6 w-6 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
-                  </svg>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-medium leading-none text-white/50">Download on the</span>
-                    <span className="mt-0.5 text-[16px] font-semibold leading-tight text-white">App Store</span>
-                  </div>
-                </a>
-                <a href="#" className="flex h-[52px] items-center gap-3 rounded-xl bg-[#1D1D1F] px-5 transition-colors duration-200 hover:bg-[#424245]">
-                  <svg className="h-5 w-5" viewBox="0 0 24 24">
-                    <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
-                    <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
-                    <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04" />
-                    <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853" />
-                  </svg>
-                  <div className="flex flex-col">
-                    <span className="text-[10px] font-medium leading-none text-white/50">Get it on</span>
-                    <span className="mt-0.5 text-[16px] font-semibold leading-tight text-white">Google Play</span>
-                  </div>
-                </a>
-              </div>
-
               {/* Driver CTAs */}
               <div className="mt-8 flex items-center gap-5 animate-fade-in stagger-5">
                 <Link href="/driver/apply" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
@@ -317,27 +292,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ CLOSING CTA ══════════════════════════════════════════════════ */}
+      {/* ═══ GET THE APP ═════════════════════════════════════════════════ */}
       <section className="bg-[#F5F5F7]">
         <div
           ref={closing.ref}
-          className={`mx-auto max-w-[1200px] px-6 py-28 md:py-36 lg:px-10 transition-all duration-[1s] ease-out ${
+          className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 transition-all duration-[1s] ease-out ${
             closing.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <div className="flex flex-col items-center text-center">
-            <h2 className="text-[clamp(2.25rem,5vw,4rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F]">
-              Ready when you are.
-            </h2>
-            <p className="mt-5 max-w-md text-[17px] leading-[1.6] text-[#6E6E73]">
-              Download TakeMe. Your first ride is on us.
+          <div className="mx-auto max-w-xl text-center">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+              Get the app
             </p>
+
+            <h2 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
+              Download TakeMe
+            </h2>
+
+            <p className="mt-5 text-[17px] leading-[1.65] text-[#86868B]">
+              Your ride is one tap away. Available on iOS and Android.
+            </p>
+
+            {/* Store buttons */}
+            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+              <a
+                href="#"
+                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#1D1D1F] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#2C2C2E] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+              >
+                <svg className="h-7 w-7 shrink-0 text-white" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
+                </svg>
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] font-medium leading-none text-white/50">Download on the</span>
+                  <span className="mt-1 text-[17px] font-semibold leading-tight text-white">App Store</span>
+                </div>
+              </a>
+              <a
+                href="#"
+                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#1D1D1F] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#2C2C2E] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+              >
+                <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24">
+                  <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
+                  <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
+                  <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04" />
+                  <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853" />
+                </svg>
+                <div className="flex flex-col text-left">
+                  <span className="text-[10px] font-medium leading-none text-white/50">Get it on</span>
+                  <span className="mt-1 text-[17px] font-semibold leading-tight text-white">Google Play</span>
+                </div>
+              </a>
+            </div>
+
+            {/* Rider CTA */}
             <div className="mt-10">
               <Link
                 href={ctaHref}
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                className="inline-flex h-[48px] items-center rounded-[999px] border border-[#D2D2D7] px-7 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-white"
               >
-                Get started
+                Or continue in browser
               </Link>
             </div>
           </div>
