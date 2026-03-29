@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS driver_cards (
 
   -- Status
   card_status             TEXT DEFAULT 'none'
-                          CHECK (card_status IN ('none', 'cardholder_created', 'virtual_ready', 'active', 'frozen', 'cancelled')),
+                          CHECK (card_status IN ('none', 'cardholder_created', 'virtual_ready', 'needs_activation', 'active', 'frozen', 'cancelled')),
   shipping_status         TEXT DEFAULT 'none'
                           CHECK (shipping_status IN ('none', 'pending', 'shipped', 'delivered', 'returned')),
 

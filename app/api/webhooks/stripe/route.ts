@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
 
         await supabase
           .from('driver_cards')
-          .update({ shipping_status: 'delivered', card_status: 'active' })
+          .update({ shipping_status: 'delivered', card_status: 'needs_activation' })
           .eq('stripe_physical_card_id', cardId);
 
         await supabase

@@ -17,7 +17,8 @@ const CARD = {
   lastCashout: '2026-03-28',
   number: '•••• 4829',
   virtualReady: true,
-  physicalStatus: 'shipping' as 'none' | 'ordered' | 'shipping' | 'delivered',
+  physicalStatus: 'delivered' as 'none' | 'ordered' | 'shipping' | 'delivered',
+  needsActivation: true,
   cashbackRate: 3,
   totalCashback: 47.20,
   walletAdded: true,
@@ -46,6 +47,10 @@ export default function DriverDashboard() {
   const [showFund, setShowFund] = useState(false);
   const [fundAmount, setFundAmount] = useState('');
   const [funding, setFunding] = useState(false);
+  const [showActivate, setShowActivate] = useState(false);
+  const [activateLast4, setActivateLast4] = useState('');
+  const [activating, setActivating] = useState(false);
+  const [cardActivated, setCardActivated] = useState(!CARD.needsActivation);
 
   if (loading) {
     return (
@@ -241,6 +246,66 @@ export default function DriverDashboard() {
                 </div>
               </div>
 
+              {/* Activation banner */}
+              {CARD.physicalStatus === 'delivered' && !cardActivated && (
+                <div className="border-t border-white/10 px-6 py-4">
+                  {!showActivate ? (
+                    <button
+                      onClick={() => setShowActivate(true)}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#FF9500] py-3 text-[14px] font-semibold text-white transition-colors hover:bg-[#E68A00]"
+                    >
+                      <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                      </svg>
+                      Activate physical card
+                    </button>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-[13px] text-white/60">Enter the last 4 digits printed on your card</p>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={4}
+                        value={activateLast4}
+                        onChange={(e) => setActivateLast4(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                        placeholder="0000"
+                        className="w-full rounded-xl bg-white/10 px-4 py-3 text-center text-[20px] font-bold tracking-[0.3em] text-white placeholder-white/20 outline-none focus:bg-white/15"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => { setShowActivate(false); setActivateLast4(''); }}
+                          className="flex-1 rounded-xl bg-white/10 py-2.5 text-[13px] font-semibold text-white/60 hover:bg-white/15"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={async () => {
+                            if (activateLast4.length !== 4) return;
+                            setActivating(true);
+                            try {
+                              const res = await fetch('/api/card/activate', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ last4: activateLast4 }),
+                              });
+                              const data = await res.json();
+                              if (!res.ok) { alert(data.error || 'Activation failed'); return; }
+                              setCardActivated(true);
+                              setShowActivate(false);
+                            } catch { alert('Activation failed'); }
+                            finally { setActivating(false); }
+                          }}
+                          disabled={activating || activateLast4.length !== 4}
+                          className="flex-1 rounded-xl bg-[#FF9500] py-2.5 text-[13px] font-semibold text-white hover:bg-[#E68A00] disabled:opacity-40"
+                        >
+                          {activating ? 'Activating...' : 'Confirm'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Primary action */}
               <div className="border-t border-white/10 px-6 py-4">
                 <button className="flex w-full items-center justify-center rounded-xl bg-white py-3 text-[14px] font-semibold text-[#1D1D1F] transition-colors hover:bg-white/90">
@@ -255,7 +320,7 @@ export default function DriverDashboard() {
                 </button>
                 <div className="w-[1px] bg-white/10" />
                 <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
-                  {CARD.physicalStatus === 'delivered' ? 'Manage card' : 'Order physical'}
+                  {CARD.physicalStatus === 'delivered' && !cardActivated ? 'Activate card' : CARD.physicalStatus === 'delivered' ? 'Manage card' : 'Order physical'}
                 </button>
                 <div className="w-[1px] bg-white/10" />
                 <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
