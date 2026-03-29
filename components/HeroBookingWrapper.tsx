@@ -12,6 +12,23 @@ interface LocationState extends LatLng { address: string }
 
 const SEATTLE_CENTER = { lat: 47.6062, lng: -122.3321 };
 
+// ── Airport detection ────────────────────────────────────────────────────
+const AIRPORT_KEYWORDS = ['airport', 'sea-tac', 'seatac', 'int\'l', 'intl', 'SEA ', 'boeing field', 'paine field'];
+
+function isAirportAddress(address: string): boolean {
+  const lower = address.toLowerCase();
+  return AIRPORT_KEYWORDS.some(kw => lower.includes(kw.toLowerCase()));
+}
+
+const AIRLINES = [
+  'Alaska Airlines', 'Delta Air Lines', 'United Airlines', 'American Airlines',
+  'Southwest Airlines', 'JetBlue Airways', 'Spirit Airlines', 'Frontier Airlines',
+  'Hawaiian Airlines', 'Sun Country Airlines', 'Allegiant Air',
+  'Air Canada', 'British Airways', 'Lufthansa', 'Emirates',
+  'Korean Air', 'Japan Airlines', 'ANA', 'Cathay Pacific',
+  'Singapore Airlines', 'Icelandair', 'Condor', 'Other',
+];
+
 const MAP_STYLES = [
   { featureType: 'all', elementType: 'labels.text.fill', stylers: [{ color: '#6E6E73' }] },
   { featureType: 'all', elementType: 'labels.text.stroke', stylers: [{ color: '#FFFFFF' }, { weight: 3 }] },
@@ -39,6 +56,8 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const [booking, setBooking] = useState(false);
   const [booked, setBooked] = useState(false);
   const [bookingError, setBookingError] = useState('');
+  const [selectedAirline, setSelectedAirline] = useState('');
+  const [flightNumber, setFlightNumber] = useState('');
 
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const dropoffInputRef = useRef<HTMLInputElement>(null);
@@ -51,6 +70,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const selectedFare = fares.find(f => f.vehicleClass === selectedTier);
   const distanceMiles = route ? kmToMiles(route.distanceKm) : null;
   const hasRoute = !!(pickup && dropoff && route && fares.length > 0);
+  const isAirportTrip = (pickup && isAirportAddress(pickup.address)) || (dropoff && isAirportAddress(dropoff.address));
 
   // ── Map init ───────────────────────────────────────────────────────
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -202,6 +222,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
           pickupAddress: pickup.address, pickupLat: pickup.lat, pickupLng: pickup.lng,
           destinationAddress: dropoff.address, destinationLat: dropoff.lat, destinationLng: dropoff.lng,
           distanceKm: route.distanceKm, durationMin: route.durationMin, vehicleType: selectedTier,
+          ...(isAirportTrip && selectedAirline ? { airline: selectedAirline, flightNumber: flightNumber || undefined } : {}),
         }),
       });
       const data = await res.json().catch(() => ({})) as { checkoutUrl?: string; error?: string };
@@ -336,6 +357,41 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
             <span className="text-[14px] font-medium text-[#1D1D1F]">Now</span>
           </div>
         </div>
+
+        {/* ── Airport trip: airline info ────────────────────────── */}
+        {isAirportTrip && (
+          <div className="mt-3 overflow-hidden rounded-xl border border-[#0071E3]/20 bg-[#0071E3]/[0.03]">
+            <div className="flex items-center gap-2.5 px-4 py-2.5">
+              <svg className="h-4 w-4 text-[#0071E3]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+              </svg>
+              <span className="text-[12px] font-semibold text-[#0071E3]">Airport ride</span>
+            </div>
+            <div className="border-t border-[#0071E3]/10 px-4 py-3 space-y-2">
+              <div className="relative">
+                <select
+                  value={selectedAirline}
+                  onChange={(e) => setSelectedAirline(e.target.value)}
+                  className="w-full appearance-none rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 pr-8 text-[14px] font-medium text-[#1D1D1F] outline-none focus:border-[#0071E3] transition-colors"
+                >
+                  <option value="">Select airline</option>
+                  {AIRLINES.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+                <svg className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                </svg>
+              </div>
+              <input
+                type="text"
+                placeholder="Flight number (optional)"
+                value={flightNumber}
+                onChange={(e) => setFlightNumber(e.target.value.toUpperCase())}
+                maxLength={10}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#0071E3] transition-colors"
+              />
+            </div>
+          </div>
+        )}
 
         {/* Vehicle selector — horizontal scroll on mobile */}
         <div className="mt-4 -mx-5 px-5">
