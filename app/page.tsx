@@ -1,28 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
-
-const HeroBookingLazy = dynamic(
-  () => import('@/components/HeroBookingWrapper'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
-        <div className="h-[280px] bg-[#F2F2F7] flex items-center justify-center">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
-        </div>
-        <div className="p-5 space-y-3">
-          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-          <div className="h-12 rounded-xl bg-[#F5F5F7]" />
-          <div className="h-10 rounded-xl bg-[#F5F5F7]" />
-        </div>
-      </div>
-    ),
-  },
-);
+import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -241,7 +222,7 @@ export default function HomePage() {
 
             {/* ── Right: Live Product UI ─────────────────────────────── */}
             <div className="animate-fade-in stagger-2">
-              <HeroBookingLazy ctaHref={ctaHref} />
+              <HeroBookingWrapper ctaHref={ctaHref} />
             </div>
           </div>
         </div>
