@@ -28,6 +28,8 @@ const ALERTS = [
 export default function DriverDashboard() {
   const { user, loading } = useAuth();
   const [driverStatus, setDriverStatus] = useState<'online' | 'offline' | 'review'>('offline');
+  const [acceptsPets, setAcceptsPets] = useState(false);
+  const [maxPetSize, setMaxPetSize] = useState<'small' | 'medium' | 'large'>('large');
 
   if (loading) {
     return (
@@ -288,6 +290,43 @@ export default function DriverDashboard() {
               </button>
             </div>
 
+            {/* Pet rides */}
+            <div className="rounded-2xl bg-white p-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[16px]">🐾</span>
+                  <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Pet Rides</h2>
+                </div>
+                <button
+                  onClick={() => setAcceptsPets(!acceptsPets)}
+                  className={`relative h-7 w-12 rounded-full transition-colors duration-200 ${acceptsPets ? 'bg-[#FF9500]' : 'bg-[#E5E5EA]'}`}
+                >
+                  <div className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${acceptsPets ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                </button>
+              </div>
+              {acceptsPets && (
+                <div className="mt-3 space-y-2">
+                  <p className="text-[12px] text-[#86868B]">You'll receive pet ride requests. Earn +$5–15 per trip.</p>
+                  <div className="flex gap-2">
+                    {(['small', 'medium', 'large'] as const).map(size => (
+                      <button
+                        key={size}
+                        onClick={() => setMaxPetSize(size)}
+                        className={`flex-1 rounded-lg border py-2 text-[12px] font-medium transition-colors ${
+                          maxPetSize === size || (['medium', 'large'].includes(size) && maxPetSize === 'large') || (size === 'medium' && maxPetSize !== 'small')
+                            ? 'border-[#FF9500] bg-[#FF9500]/10 text-[#FF9500]'
+                            : 'border-[#E5E5EA] text-[#86868B]'
+                        }`}
+                      >
+                        {size.charAt(0).toUpperCase() + size.slice(1)}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-[#A1A1A6]">Max size: {maxPetSize}</p>
+                </div>
+              )}
+            </div>
+
             {/* Driver profile status */}
             <div className="rounded-2xl bg-white p-5">
               <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Profile status</h2>
@@ -297,6 +336,7 @@ export default function DriverDashboard() {
                   { label: 'Vehicle', status: 'Active', ok: true },
                   { label: 'Insurance', status: 'Expires soon', ok: false },
                   { label: 'License', status: 'Valid', ok: true },
+                  { label: 'Pet rides', status: acceptsPets ? 'Enabled' : 'Disabled', ok: acceptsPets },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-[13px] text-[#86868B]">{item.label}</span>

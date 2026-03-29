@@ -3,7 +3,7 @@
 // Pure function. No SDK dependencies. Usable client-side and server-side.
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type VehicleClass = 'electric' | 'comfort_electric' | 'premium_electric' | 'suv_electric' | 'women_rider';
+export type VehicleClass = 'electric' | 'comfort_electric' | 'premium_electric' | 'suv_electric' | 'women_rider' | 'pet_ride';
 
 export interface TierConfig {
   id: VehicleClass;
@@ -21,7 +21,12 @@ export const SEATTLE_TIERS: TierConfig[] = [
   { id: 'premium_electric',  name: 'Premium Electric',  subtitle: 'Luxury EV',          baseFare: 10.00, perMileRate: 4.20, perMinuteRate: 0.50, minFare: 18.00 },
   { id: 'suv_electric',      name: 'SUV Electric',      subtitle: 'Group & luggage',    baseFare: 12.00, perMileRate: 4.80, perMinuteRate: 0.55, minFare: 22.00 },
   { id: 'women_rider',       name: 'Women Rider',       subtitle: 'Women drivers only', baseFare: 5.00,  perMileRate: 2.20, perMinuteRate: 0.30, minFare: 10.00 },
+  { id: 'pet_ride',          name: 'Pet Ride',          subtitle: 'Travel with pets',   baseFare: 6.00,  perMileRate: 2.40, perMinuteRate: 0.30, minFare: 12.00 },
 ];
+
+// Pet size surcharges
+export type PetSize = 'small' | 'medium' | 'large';
+export const PET_FEES: Record<PetSize, number> = { small: 5, medium: 10, large: 15 };
 
 export interface FareResult {
   vehicleClass: VehicleClass;
@@ -30,6 +35,7 @@ export interface FareResult {
   baseFare: number;
   distanceFare: number;
   timeFare: number;
+  petFee: number;
   total: number;
   minFareApplied: boolean;
 }
@@ -40,11 +46,13 @@ export function calculateFare(
   tier: TierConfig,
   distanceKm: number,
   durationMin: number,
+  petSize?: PetSize,
 ): FareResult {
   const miles = distanceKm * KM_TO_MILES;
   const distanceFare = round2(miles * tier.perMileRate);
   const timeFare = round2(durationMin * tier.perMinuteRate);
-  const raw = tier.baseFare + distanceFare + timeFare;
+  const petFee = (tier.id === 'pet_ride' && petSize) ? PET_FEES[petSize] : 0;
+  const raw = tier.baseFare + distanceFare + timeFare + petFee;
   const minFareApplied = raw < tier.minFare;
   const total = round2(Math.max(raw, tier.minFare));
 
@@ -55,13 +63,14 @@ export function calculateFare(
     baseFare: tier.baseFare,
     distanceFare,
     timeFare,
+    petFee,
     total,
     minFareApplied,
   };
 }
 
-export function calculateAllFares(distanceKm: number, durationMin: number): FareResult[] {
-  return SEATTLE_TIERS.map(tier => calculateFare(tier, distanceKm, durationMin));
+export function calculateAllFares(distanceKm: number, durationMin: number, petSize?: PetSize): FareResult[] {
+  return SEATTLE_TIERS.map(tier => calculateFare(tier, distanceKm, durationMin, petSize));
 }
 
 export function kmToMiles(km: number): number {

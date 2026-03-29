@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { SEATTLE_TIERS, calculateFare, kmToMiles } from '@/lib/seattle-pricing';
+import { SEATTLE_TIERS, calculateFare, kmToMiles, type PetSize } from '@/lib/seattle-pricing';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/bookings/create
@@ -22,7 +22,7 @@ const requestSchema = z.object({
   destinationLng: z.number().min(-180).max(180),
   distanceKm: z.number().positive(),
   durationMin: z.number().int().positive(),
-  vehicleType: z.enum(['electric', 'comfort_electric', 'premium_electric', 'suv_electric', 'women_rider']),
+  vehicleType: z.enum(['electric', 'comfort_electric', 'premium_electric', 'suv_electric', 'women_rider', 'pet_ride']),
   // Airport
   airline: z.string().optional(),
   flightNumber: z.string().max(10).optional(),
@@ -33,6 +33,10 @@ const requestSchema = z.object({
   driverNotes: z.string().max(500).optional(),
   meetGreet: z.boolean().optional(),
   nameSign: z.boolean().optional(),
+  // Pet
+  petType: z.enum(['dog', 'cat', 'other']).optional(),
+  petSize: z.enum(['small', 'medium', 'large']).optional(),
+  petNotes: z.string().max(200).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -68,7 +72,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid vehicle type.' }, { status: 400 });
     }
 
-    const fare = calculateFare(tier, body.distanceKm, body.durationMin);
+    const fare = calculateFare(tier, body.distanceKm, body.durationMin, body.petSize as PetSize | undefined);
     const distanceMiles = kmToMiles(body.distanceKm);
 
     if (fare.total > 500) {
@@ -103,6 +107,11 @@ export async function POST(request: NextRequest) {
         driver_notes: body.driverNotes ?? null,
         meet_greet: body.meetGreet ?? false,
         name_sign: body.nameSign ?? false,
+        // Pet
+        pet_type: body.petType ?? null,
+        pet_size: body.petSize ?? null,
+        pet_notes: body.petNotes ?? null,
+        pet_fee: fare.petFee,
       })
       .select('id, price')
       .single();

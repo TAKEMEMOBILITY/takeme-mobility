@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/context';
 import { useGoogleMapsLoader } from '@/lib/useGoogleMapsLoader';
 import { useDirections } from '@/lib/useDirections';
-import { SEATTLE_TIERS, calculateAllFares, kmToMiles, type VehicleClass, type FareResult } from '@/lib/seattle-pricing';
+import { SEATTLE_TIERS, calculateAllFares, kmToMiles, PET_FEES, type VehicleClass, type FareResult, type PetSize } from '@/lib/seattle-pricing';
 
 interface LatLng { lat: number; lng: number }
 interface LocationState extends LatLng { address: string }
@@ -59,6 +59,11 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const [selectedAirline, setSelectedAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
 
+  // Pet
+  const [petType, setPetType] = useState<'dog' | 'cat' | 'other' | ''>('');
+  const [petSize, setPetSize] = useState<PetSize>('medium');
+  const [petNotes, setPetNotes] = useState('');
+
   // Passenger selection
   type RideFor = 'me' | 'someone' | 'vip';
   const [rideFor, setRideFor] = useState<RideFor>('me');
@@ -75,7 +80,8 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const mapRef = useRef<google.maps.Map | null>(null);
 
   const { route, directionsResult, loading: routeLoading, error: routeError } = useDirections(pickup, dropoff, mapsReady);
-  const fares: FareResult[] = route ? calculateAllFares(route.distanceKm, route.durationMin) : [];
+  const isPetRide = selectedTier === 'pet_ride';
+  const fares: FareResult[] = route ? calculateAllFares(route.distanceKm, route.durationMin, isPetRide && petType ? petSize : undefined) : [];
   const selectedFare = fares.find(f => f.vehicleClass === selectedTier);
   const distanceMiles = route ? kmToMiles(route.distanceKm) : null;
   const hasRoute = !!(pickup && dropoff && route && fares.length > 0);
@@ -232,6 +238,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
           destinationAddress: dropoff.address, destinationLat: dropoff.lat, destinationLng: dropoff.lng,
           distanceKm: route.distanceKm, durationMin: route.durationMin, vehicleType: selectedTier,
           ...(isAirportTrip && selectedAirline ? { airline: selectedAirline, flightNumber: flightNumber || undefined } : {}),
+          ...(isPetRide && petType ? { petType, petSize, petNotes: petNotes || undefined } : {}),
           ...(rideFor !== 'me' ? {
             rideFor,
             passengerName: passengerName || undefined,
@@ -474,6 +481,68 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
           )}
         </div>
 
+        {/* ── Pet details (when pet_ride selected) ──────────────── */}
+        {isPetRide && (
+          <div className="mt-3 overflow-hidden rounded-xl border border-[#FF9500]/20 bg-[#FF9500]/[0.03]">
+            <div className="flex items-center gap-2.5 px-4 py-2.5">
+              <span className="text-[14px]">🐾</span>
+              <span className="text-[12px] font-semibold text-[#FF9500]">Pet details</span>
+            </div>
+            <div className="border-t border-[#FF9500]/10 px-4 py-3 space-y-2">
+              {/* Pet type */}
+              <div className="flex gap-2">
+                {([['dog', '🐕'], ['cat', '🐱'], ['other', '🐾']] as const).map(([type, emoji]) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setPetType(type)}
+                    className={`flex-1 rounded-lg border py-2 text-center text-[13px] font-medium transition-colors ${
+                      petType === type
+                        ? 'border-[#FF9500] bg-[#FF9500] text-white'
+                        : 'border-[#E5E5EA] text-[#1D1D1F] hover:border-[#C7C7CC]'
+                    }`}
+                  >
+                    {emoji} {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </button>
+                ))}
+              </div>
+
+              {/* Pet size */}
+              {petType && (
+                <div className="flex gap-2">
+                  {(['small', 'medium', 'large'] as const).map(size => (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => setPetSize(size)}
+                      className={`flex-1 rounded-lg border py-2 text-center transition-colors ${
+                        petSize === size
+                          ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white'
+                          : 'border-[#E5E5EA] text-[#86868B] hover:border-[#C7C7CC]'
+                      }`}
+                    >
+                      <p className="text-[12px] font-semibold">{size.charAt(0).toUpperCase() + size.slice(1)}</p>
+                      <p className={`text-[10px] ${petSize === size ? 'text-white/60' : 'text-[#A1A1A6]'}`}>+${PET_FEES[size]}</p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* Pet notes */}
+              {petType && (
+                <input
+                  type="text"
+                  placeholder="Notes (e.g. calm dog, carrier included)"
+                  value={petNotes}
+                  onChange={(e) => setPetNotes(e.target.value)}
+                  maxLength={200}
+                  className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[13px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#FF9500] transition-colors"
+                />
+              )}
+            </div>
+          </div>
+        )}
+
         {/* ── Airport trip: airline info ────────────────────────── */}
         {isAirportTrip && (
           <div className="mt-3 overflow-hidden rounded-xl border border-[#0071E3]/20 bg-[#0071E3]/[0.03]">
@@ -516,13 +585,16 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
               const active = selectedTier === tier.id;
               const fare = fares.find(f => f.vehicleClass === tier.id);
               const isWomen = tier.id === 'women_rider';
+              const isPet = tier.id === 'pet_ride';
               return (
                 <button key={tier.id} onClick={() => setSelectedTier(tier.id)}
                   className={`shrink-0 w-[100px] rounded-xl border px-2 py-3 text-center transition-all duration-150 ${
                     active
                       ? isWomen
                         ? 'border-[#AF52DE] bg-[#AF52DE] text-white shadow-[0_2px_8px_rgba(175,82,222,0.25)]'
-                        : 'border-[#1D1D1F] bg-[#1D1D1F] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
+                        : isPet
+                          ? 'border-[#FF9500] bg-[#FF9500] text-white shadow-[0_2px_8px_rgba(255,149,0,0.25)]'
+                          : 'border-[#1D1D1F] bg-[#1D1D1F] text-white shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
                       : 'border-[#E5E5EA] bg-white text-[#1D1D1F] hover:border-[#C7C7CC]'
                   }`}>
                   <div className="mx-auto flex h-8 w-8 items-center justify-center">
@@ -540,6 +612,9 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
                     )}
                     {tier.id === 'women_rider' && (
                       <svg className={`h-5 w-5 ${active ? 'text-white' : 'text-[#AF52DE]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+                    )}
+                    {tier.id === 'pet_ride' && (
+                      <span className={`text-[18px] ${active ? '' : ''}`}>🐾</span>
                     )}
                   </div>
                   <p className={`mt-1.5 text-[11px] font-semibold leading-tight ${active ? 'text-white' : 'text-[#1D1D1F]'}`}>{tier.name}</p>
