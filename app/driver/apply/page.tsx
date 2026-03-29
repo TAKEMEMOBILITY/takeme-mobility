@@ -215,6 +215,29 @@ export default function DriverApplyPage() {
         <p className="mt-6 text-center text-[12px] text-[#A1A1A6]">
           By applying, you agree to our driver terms and background check policy.
         </p>
+
+        {/* TAKEME Card promo */}
+        <div className="mt-8 overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1D1F] to-[#2C2C2E] p-5">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1">
+              <div className="h-4 w-4 rounded-full bg-[#FF3B30] opacity-80" />
+              <div className="-ml-1.5 h-4 w-4 rounded-full bg-[#FF9500] opacity-80" />
+            </div>
+            <span className="text-[14px] font-semibold text-white">TAKEME Card</span>
+            <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase text-white">Free</span>
+          </div>
+          <p className="mt-3 text-[13px] leading-relaxed text-white/50">
+            Get instant payouts, cashback on EV charging, and exclusive driver rewards — all in one card.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-3">
+            {['Instant payouts', 'Cashback rewards', 'No fees'].map(b => (
+              <span key={b} className="flex items-center gap-1.5 text-[11px] font-medium text-white/60">
+                <svg className="h-3 w-3 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                {b}
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -10,6 +10,7 @@ import { useAuth } from '@/lib/auth/context';
 
 // Sample data — replace with real API calls
 const EARNINGS = { today: 142.50, week: 867.30, month: 3240.00, pending: 412.80, lastPayout: '2026-03-25' };
+const CARD = { active: true, balance: 412.80, lastCashout: '2026-03-28', number: '•••• 4829' };
 const STATS = { tripsToday: 6, tripsWeek: 34, rating: 4.92, acceptance: 96 };
 const REWARDS = { tripsThisMonth: 87, target: 150, reward: '$200 Sephora Gift Card', status: 'in_progress' as const };
 
@@ -30,6 +31,7 @@ export default function DriverDashboard() {
   const [driverStatus, setDriverStatus] = useState<'online' | 'offline' | 'review'>('offline');
   const [acceptsPets, setAcceptsPets] = useState(false);
   const [maxPetSize, setMaxPetSize] = useState<'small' | 'medium' | 'large'>('large');
+  const [payoutMethod, setPayoutMethod] = useState<'takeme_card' | 'bank' | 'debit'>('takeme_card');
 
   if (loading) {
     return (
@@ -143,6 +145,72 @@ export default function DriverDashboard() {
               <div className="mt-4 flex items-center justify-between border-t border-[#F5F5F7] pt-3">
                 <p className="text-[12px] text-[#A1A1A6]">Last payout: {new Date(EARNINGS.lastPayout).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
                 <button className="text-[12px] font-semibold text-[#0071E3]">View details</button>
+              </div>
+            </div>
+
+            {/* TAKEME Card */}
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1D1F] to-[#2C2C2E]">
+              {/* Card visual */}
+              <div className="relative px-6 pt-6 pb-5">
+                <div className="absolute right-5 top-5 flex items-center gap-1.5">
+                  <div className="h-5 w-5 rounded-full bg-[#FF3B30] opacity-80" />
+                  <div className="-ml-2 h-5 w-5 rounded-full bg-[#FF9500] opacity-80" />
+                </div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/30">TAKEME</p>
+                <p className="mt-0.5 text-[16px] font-semibold text-white">Debit Card</p>
+                <p className="mt-4 text-[18px] font-medium tracking-[0.15em] text-white/60">{CARD.number}</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-[28px] font-bold tabular-nums text-white">${CARD.balance.toFixed(2)}</span>
+                  <span className="text-[12px] text-white/40">available</span>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="flex border-t border-white/10">
+                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white transition-colors hover:bg-white/5">
+                  Instant cash out
+                </button>
+                <div className="w-[1px] bg-white/10" />
+                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/60 transition-colors hover:bg-white/5">
+                  Transactions
+                </button>
+              </div>
+            </div>
+
+            {/* Payout method */}
+            <div className="rounded-2xl bg-white p-5">
+              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Payout method</h2>
+              <div className="mt-3 space-y-2">
+                {([
+                  { id: 'takeme_card' as const, label: 'TAKEME Card', desc: 'Instant · Cashback rewards', badge: 'Best', badgeColor: 'bg-[#34C759] text-white' },
+                  { id: 'bank' as const, label: 'Bank account', desc: '1–3 business days', badge: null, badgeColor: '' },
+                  { id: 'debit' as const, label: 'Debit card', desc: 'Within 30 minutes', badge: null, badgeColor: '' },
+                ]).map(opt => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setPayoutMethod(opt.id)}
+                    className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-150 ${
+                      payoutMethod === opt.id
+                        ? 'border-[#1D1D1F] bg-[#1D1D1F]/[0.03]'
+                        : 'border-[#E5E5EA] hover:border-[#C7C7CC]'
+                    }`}
+                  >
+                    <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
+                      payoutMethod === opt.id ? 'border-[#1D1D1F]' : 'border-[#D2D2D7]'
+                    }`}>
+                      {payoutMethod === opt.id && <div className="h-2.5 w-2.5 rounded-full bg-[#1D1D1F]" />}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[14px] font-semibold text-[#1D1D1F]">{opt.label}</span>
+                        {opt.badge && (
+                          <span className={`rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none ${opt.badgeColor}`}>{opt.badge}</span>
+                        )}
+                      </div>
+                      <p className="text-[12px] text-[#86868B]">{opt.desc}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
 
