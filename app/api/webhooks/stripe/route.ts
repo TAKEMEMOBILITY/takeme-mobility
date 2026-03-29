@@ -359,6 +359,50 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      // ════════════════════════════════════════════════════════════════
+      // DRIVER PAYOUTS
+      // ════════════════════════════════════════════════════════════════
+
+      case 'payout.paid': {
+        const payoutId = obj.id as string;
+        console.log(`[Webhook] Payout paid: ${payoutId}`);
+
+        await supabase
+          .from('driver_payouts')
+          .update({ status: 'paid', completed_at: new Date().toISOString() })
+          .eq('stripe_payout_id', payoutId);
+        break;
+      }
+
+      case 'payout.failed': {
+        const payoutId = obj.id as string;
+        const reason = (obj.failure_message as string) ?? 'Payout failed';
+        console.error(`[Webhook] Payout failed: ${payoutId} — ${reason}`);
+
+        // Get payout record to refund the balance
+        const { data: failedPayout } = await supabase
+          .from('driver_payouts')
+          .select('driver_id, amount')
+          .eq('stripe_payout_id', payoutId)
+          .single();
+
+        if (failedPayout) {
+          // Restore funds to wallet
+          await supabase.rpc('add_driver_earning', {
+            p_driver_id: failedPayout.driver_id,
+            p_amount: failedPayout.amount,
+            p_type: 'adjustment',
+            p_description: `Payout failed — funds returned: ${reason}`,
+          });
+        }
+
+        await supabase
+          .from('driver_payouts')
+          .update({ status: 'failed', failure_reason: reason })
+          .eq('stripe_payout_id', payoutId);
+        break;
+      }
+
       default:
         console.log(`[Stripe Webhook] Unhandled event: ${eventType}`);
     }
