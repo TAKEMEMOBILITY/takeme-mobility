@@ -151,8 +151,35 @@ export async function getCardDetails(cardId: string): Promise<{
   };
 }
 
-// ── Fund card (add balance via top-up or test helper) ────────────────────
+// ── Top-up Issuing balance ────────────────────────────────────────────────
+// In production, Stripe Issuing cards draw from the Issuing balance.
+// Top-ups move funds from your Stripe balance → Issuing balance.
 
-export async function fundTestCard(cardId: string, amount: number): Promise<void> {
-  await post('/test_helpers/issuing/cards/' + cardId + '/shipping/deliver', {});
+export async function createTopUp(amountCents: number, description: string): Promise<{
+  id: string;
+  amount: number;
+  status: string;
+}> {
+  const data = await post('/topups', {
+    'amount': String(amountCents),
+    'currency': 'usd',
+    'description': description,
+    'destination_balance': 'issuing',
+  });
+  return {
+    id: data.id as string,
+    amount: data.amount as number,
+    status: data.status as string,
+  };
+}
+
+// ── Test mode: fund a card directly (test helpers only) ──────────────────
+
+export async function testFundCard(amount: number): Promise<{ id: string }> {
+  // In test mode, create a test top-up to the Issuing balance
+  const data = await post('/test_helpers/issuing/fund_balance', {
+    'amount': String(amount),
+    'currency': 'usd',
+  });
+  return { id: data.id as string };
 }

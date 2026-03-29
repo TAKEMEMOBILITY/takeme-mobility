@@ -10,9 +10,10 @@ import { useAuth } from '@/lib/auth/context';
 
 // Sample data — replace with real API calls
 const EARNINGS = { today: 142.50, week: 867.30, month: 3240.00, pending: 412.80, lastPayout: '2026-03-25' };
+const DRIVER_BALANCE = { available: 412.80, cardBalance: 285.50, pending: 142.50, lifetime: 8740.00 };
 const CARD = {
   active: true,
-  balance: 412.80,
+  balance: 285.50,
   lastCashout: '2026-03-28',
   number: '•••• 4829',
   virtualReady: true,
@@ -42,6 +43,9 @@ export default function DriverDashboard() {
   const [acceptsPets, setAcceptsPets] = useState(false);
   const [maxPetSize, setMaxPetSize] = useState<'small' | 'medium' | 'large'>('large');
   const [payoutMethod, setPayoutMethod] = useState<'takeme_card' | 'bank' | 'debit'>('takeme_card');
+  const [showFund, setShowFund] = useState(false);
+  const [fundAmount, setFundAmount] = useState('');
+  const [funding, setFunding] = useState(false);
 
   if (loading) {
     return (
@@ -257,6 +261,98 @@ export default function DriverDashboard() {
                 <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
                   Transactions
                 </button>
+              </div>
+            </div>
+
+            {/* Driver balance */}
+            <div className="rounded-2xl bg-white p-5">
+              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Your balance</h2>
+              <div className="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1A6]">Available</p>
+                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#1D1D1F]">${DRIVER_BALANCE.available.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1A6]">On card</p>
+                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#34C759]">${DRIVER_BALANCE.cardBalance.toFixed(2)}</p>
+                </div>
+              </div>
+
+              {/* Fund card */}
+              {!showFund ? (
+                <button
+                  onClick={() => setShowFund(true)}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E5EA] py-3 text-[14px] font-semibold text-[#1D1D1F] transition-colors hover:bg-[#F5F5F7]"
+                >
+                  <svg className="h-4 w-4 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                  </svg>
+                  Add funds to card
+                </button>
+              ) : (
+                <div className="mt-4 space-y-2">
+                  <div className="flex gap-2">
+                    {[25, 50, 100, 200].map(amt => (
+                      <button
+                        key={amt}
+                        onClick={() => setFundAmount(String(amt))}
+                        className={`flex-1 rounded-lg border py-2 text-[13px] font-semibold transition-colors ${
+                          fundAmount === String(amt)
+                            ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white'
+                            : 'border-[#E5E5EA] text-[#1D1D1F] hover:border-[#C7C7CC]'
+                        }`}
+                      >
+                        ${amt}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 rounded-lg border border-[#E5E5EA] px-3 py-2">
+                    <span className="text-[15px] font-medium text-[#86868B]">$</span>
+                    <input
+                      type="number"
+                      value={fundAmount}
+                      onChange={(e) => setFundAmount(e.target.value)}
+                      placeholder="Custom amount"
+                      min={1}
+                      max={5000}
+                      className="w-full bg-transparent text-[15px] font-medium text-[#1D1D1F] outline-none"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => { setShowFund(false); setFundAmount(''); }}
+                      className="flex-1 rounded-xl border border-[#E5E5EA] py-2.5 text-[13px] font-semibold text-[#86868B] hover:bg-[#F5F5F7]"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={async () => {
+                        if (!fundAmount || Number(fundAmount) <= 0) return;
+                        setFunding(true);
+                        try {
+                          const res = await fetch('/api/card/fund', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ amount: Number(fundAmount) }),
+                          });
+                          const data = await res.json();
+                          if (!res.ok) alert(data.error || 'Transfer failed');
+                          else { setShowFund(false); setFundAmount(''); }
+                        } catch { alert('Transfer failed'); }
+                        finally { setFunding(false); }
+                      }}
+                      disabled={funding || !fundAmount || Number(fundAmount) <= 0}
+                      className="flex-1 rounded-xl bg-[#1D1D1F] py-2.5 text-[13px] font-semibold text-white hover:bg-[#333] disabled:opacity-40"
+                    >
+                      {funding ? 'Transferring...' : `Transfer $${Number(fundAmount || 0).toFixed(2)}`}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-3 flex items-center justify-between border-t border-[#F5F5F7] pt-3">
+                <p className="text-[11px] text-[#A1A1A6]">Pending: ${DRIVER_BALANCE.pending.toFixed(2)}</p>
+                <p className="text-[11px] text-[#A1A1A6]">Lifetime: ${DRIVER_BALANCE.lifetime.toFixed(2)}</p>
               </div>
             </div>
 
