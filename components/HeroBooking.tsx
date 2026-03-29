@@ -138,31 +138,36 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // to google.maps.* when the script hasn't loaded
   const renderMap = () => {
     if (!isLoaded) return null;
-    const { GoogleMap, Marker, DirectionsRenderer } = require('@react-google-maps/api');
-    const pinSvg = (fill: string) => 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
-      `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="10" fill="${fill}" opacity="0.15"/><circle cx="14" cy="14" r="6" fill="${fill}"/><circle cx="14" cy="14" r="2.5" fill="white"/></svg>`
-    );
-    const styles = [
-      { featureType: 'all', elementType: 'labels.text.fill', stylers: [{ color: '#6E6E73' }] },
-      { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#D6E4F0' }] },
-      { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#F0F0F3' }] },
-      { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#FFFFFF' }] },
-      { featureType: 'poi', elementType: 'all', stylers: [{ visibility: 'off' }] },
-      { featureType: 'transit', elementType: 'all', stylers: [{ visibility: 'off' }] },
-    ];
-    return (
-      <GoogleMap
-        mapContainerStyle={{ width: '100%', height: '100%' }}
-        center={pickup || { lat: 40.7128, lng: -74.006 }}
-        zoom={12}
-        onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
-        options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
-      >
-        {pickup && <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
-        {dropoff && <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
-        {directions && <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />}
-      </GoogleMap>
-    );
+    try {
+      const { GoogleMap, Marker, DirectionsRenderer } = require('@react-google-maps/api');
+      const pinSvg = (fill: string) => 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+        `<svg viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg"><circle cx="14" cy="14" r="10" fill="${fill}" opacity="0.15"/><circle cx="14" cy="14" r="6" fill="${fill}"/><circle cx="14" cy="14" r="2.5" fill="white"/></svg>`
+      );
+      const styles = [
+        { featureType: 'all', elementType: 'labels.text.fill', stylers: [{ color: '#6E6E73' }] },
+        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#D6E4F0' }] },
+        { featureType: 'landscape', elementType: 'geometry', stylers: [{ color: '#F0F0F3' }] },
+        { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: '#FFFFFF' }] },
+        { featureType: 'poi', elementType: 'all', stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit', elementType: 'all', stylers: [{ visibility: 'off' }] },
+      ];
+      return (
+        <GoogleMap
+          mapContainerStyle={{ width: '100%', height: '100%' }}
+          center={pickup || { lat: 40.7128, lng: -74.006 }}
+          zoom={12}
+          onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
+          options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
+        >
+          {pickup && <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
+          {dropoff && <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
+          {directions && <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />}
+        </GoogleMap>
+      );
+    } catch (err) {
+      console.error('[HeroBooking] Map render failed:', err);
+      return null;
+    }
   };
 
   const renderAutocomplete = (type: 'pickup' | 'dropoff') => {
@@ -180,13 +185,30 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         </div>
       );
     }
-    const { Autocomplete } = require('@react-google-maps/api');
-    return (
-      <Autocomplete
-        onLoad={(ac: google.maps.places.Autocomplete) => { type === 'pickup' ? pickupAcRef.current = ac : dropoffAcRef.current = ac; }}
-        onPlaceChanged={type === 'pickup' ? onPickup : onDropoff}
-        options={{ fields: ['formatted_address', 'geometry', 'place_id'] }}
-      >
+    try {
+      const { Autocomplete } = require('@react-google-maps/api');
+      return (
+        <Autocomplete
+          onLoad={(ac: google.maps.places.Autocomplete) => { type === 'pickup' ? pickupAcRef.current = ac : dropoffAcRef.current = ac; }}
+          onPlaceChanged={type === 'pickup' ? onPickup : onDropoff}
+          options={{ fields: ['formatted_address', 'geometry', 'place_id'] }}
+        >
+          <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#34C759]' : 'bg-[#1D1D1F]'}`} />
+            <input
+              type="text"
+              placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
+              value={type === 'pickup' ? pickupText : dropoffText}
+              onChange={(e) => type === 'pickup' ? setPickupText(e.target.value) : setDropoffText(e.target.value)}
+              className="w-full bg-transparent text-[15px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
+            />
+          </div>
+        </Autocomplete>
+      );
+    } catch (err) {
+      console.error('[HeroBooking] Autocomplete failed:', err);
+      // Fall back to plain input
+      return (
         <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
           <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#34C759]' : 'bg-[#1D1D1F]'}`} />
           <input
@@ -197,8 +219,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             className="w-full bg-transparent text-[15px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
           />
         </div>
-      </Autocomplete>
-    );
+      );
+    }
   };
 
   // ── Booked state ───────────────────────────────────────────────────
