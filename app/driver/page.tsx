@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth/context';
 import { createClient } from '@/lib/supabase/client';
+import ConnectCard from '@/components/ConnectCard';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TAKEME DRIVER — Minimal PWA
@@ -319,6 +320,11 @@ export default function DriverPage() {
             >
               {actionLoading ? 'Going online...' : 'Go online'}
             </button>
+
+            {/* TAKEME CONNECT promo */}
+            <div className="mt-4 w-full max-w-xs">
+              <ConnectCard compact />
+            </div>
           </div>
         )}
 
@@ -341,6 +347,11 @@ export default function DriverPage() {
             >
               {actionLoading ? 'Going offline...' : 'Go offline'}
             </button>
+
+            {/* TAKEME CONNECT promo */}
+            <div className="mt-2 w-full max-w-xs">
+              <ConnectCard compact />
+            </div>
           </div>
         )}
 

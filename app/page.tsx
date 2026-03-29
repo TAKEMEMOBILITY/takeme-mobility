@@ -194,6 +194,10 @@ export default function HomePage() {
                   Driver Hub
                 </Link>
               </div>
+
+              <p className="mt-3 text-[12px] text-[#A1A1A6] animate-fade-in stagger-4">
+                Includes optional <Link href="/driver/connect" className="underline underline-offset-2 hover:text-[#86868B]">unlimited SIM plan</Link>
+              </p>
             </div>
 
             {/* Right: Booking card */}
