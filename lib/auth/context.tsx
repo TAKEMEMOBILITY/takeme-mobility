@@ -54,8 +54,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!sb) { setLoading(false); return; }
 
     try {
-      const res = await sb.auth.getUser();
-      const u = res?.data?.user;
+      // Try getSession first (reads from cookie/storage), then getUser
+      const sessionRes = await sb.auth.getSession();
+      const sessionUser = sessionRes?.data?.session?.user;
+      if (sessionUser) {
+        setUser({ id: sessionUser.id, phone: sessionUser.phone, email: sessionUser.email });
+        setLoading(false);
+        return;
+      }
+
+      const userRes = await sb.auth.getUser();
+      const u = userRes?.data?.user;
       if (u) {
         setUser({ id: u.id, phone: u.phone, email: u.email });
       } else {

@@ -69,44 +69,49 @@ export async function POST(request: NextRequest) {
 
     // 2. Find or create Supabase user by phone
     const admin = getAdminClient();
-
-    // Use a deterministic email derived from phone — Supabase requires email for magiclink
     const syntheticEmail = `${body.phone.replace('+', '')}@sms.takememobility.com`;
 
-    const { data: userList } = await admin.auth.admin.listUsers();
     let userId: string;
     let userEmail: string;
 
-    const existing = userList?.users?.find(
-      (u: { phone?: string }) => u.phone === body.phone,
-    );
+    // Try to create user first — if phone already exists, Supabase returns error
+    const { data: created, error: createErr } = await admin.auth.admin.createUser({
+      phone: body.phone,
+      email: syntheticEmail,
+      phone_confirm: true,
+      email_confirm: true,
+      user_metadata: { phone: body.phone },
+    });
 
-    if (existing) {
+    if (created?.user) {
+      // New user created
+      userId = created.user.id;
+      userEmail = syntheticEmail;
+    } else if (createErr?.message?.includes('already been registered') ||
+               createErr?.message?.includes('already exists') ||
+               createErr?.status === 422) {
+      // User exists — find them by listing (filtered)
+      const { data: userList } = await admin.auth.admin.listUsers({ perPage: 1000 });
+      const existing = userList?.users?.find(
+        (u: { phone?: string }) => u.phone === body.phone,
+      );
+
+      if (!existing) {
+        console.error('[verify-otp] User exists but not found');
+        return NextResponse.json({ error: 'Account error. Please try again.' }, { status: 500 });
+      }
+
       userId = existing.id;
       userEmail = existing.email || syntheticEmail;
 
-      // Ensure email is set (needed for generateLink)
+      // Ensure email is set for generateLink
       if (!existing.email) {
         await admin.auth.admin.updateUserById(userId, { email: syntheticEmail });
         userEmail = syntheticEmail;
       }
     } else {
-      // Create new user
-      const { data: created, error: createErr } = await admin.auth.admin.createUser({
-        phone: body.phone,
-        email: syntheticEmail,
-        phone_confirm: true,
-        email_confirm: true,
-        user_metadata: { phone: body.phone },
-      });
-
-      if (createErr || !created?.user) {
-        console.error('[verify-otp] User creation failed:', createErr);
-        return NextResponse.json({ error: 'Could not create account.' }, { status: 500 });
-      }
-
-      userId = created.user.id;
-      userEmail = syntheticEmail;
+      console.error('[verify-otp] User creation failed:', createErr);
+      return NextResponse.json({ error: 'Could not create account.' }, { status: 500 });
     }
 
     // 3. Generate a magic link to get a real token pair

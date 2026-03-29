@@ -32,7 +32,7 @@ function PhoneAuth() {
   const params = useSearchParams();
   const redirect = params.get('redirect') || '/';
 
-  const [step, setStep] = useState<'phone' | 'code'>('phone');
+  const [step, setStep] = useState<'phone' | 'code' | 'success'>('phone');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
@@ -93,7 +93,8 @@ function PhoneAuth() {
     if (err) {
       setError(err);
     } else {
-      router.replace(redirect);
+      setStep('success');
+      setTimeout(() => router.replace(redirect), 1500);
     }
   }, [code, phone, verifyOtp, router, redirect]);
 
@@ -117,7 +118,9 @@ function PhoneAuth() {
             <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
           </Link>
           <p className="mt-3 text-[15px] text-[#86868B]">
-            {step === 'phone' ? 'Enter your phone number to continue' : 'Enter the code we sent you'}
+            {step === 'phone' ? 'Enter your phone number to continue'
+              : step === 'code' ? 'Enter the code we sent you'
+              : 'You\'re signed in'}
           </p>
         </div>
 
@@ -199,6 +202,19 @@ function PhoneAuth() {
               </button>
             </div>
           </form>
+        )}
+
+        {/* ── Success step ─────────────────────────────────── */}
+        {step === 'success' && (
+          <div className="flex flex-col items-center py-4">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#34C759]/10">
+              <svg className="h-7 w-7 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            </div>
+            <p className="mt-4 text-[16px] font-semibold text-[#1D1D1F]">Signed in</p>
+            <p className="mt-1 text-[13px] text-[#86868B]">Redirecting you back...</p>
+          </div>
         )}
 
         <p className="mt-10 text-center text-[12px] text-[#A1A1A6]">
