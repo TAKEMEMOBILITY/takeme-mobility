@@ -59,6 +59,15 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const [selectedAirline, setSelectedAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
 
+  // Passenger selection
+  type RideFor = 'me' | 'someone' | 'vip';
+  const [rideFor, setRideFor] = useState<RideFor>('me');
+  const [passengerName, setPassengerName] = useState('');
+  const [passengerPhone, setPassengerPhone] = useState('');
+  const [driverNotes, setDriverNotes] = useState('');
+  const [meetGreet, setMeetGreet] = useState(false);
+  const [nameSign, setNameSign] = useState(false);
+
   const pickupInputRef = useRef<HTMLInputElement>(null);
   const dropoffInputRef = useRef<HTMLInputElement>(null);
   const pickupAcRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -223,6 +232,12 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
           destinationAddress: dropoff.address, destinationLat: dropoff.lat, destinationLng: dropoff.lng,
           distanceKm: route.distanceKm, durationMin: route.durationMin, vehicleType: selectedTier,
           ...(isAirportTrip && selectedAirline ? { airline: selectedAirline, flightNumber: flightNumber || undefined } : {}),
+          ...(rideFor !== 'me' ? {
+            rideFor,
+            passengerName: passengerName || undefined,
+            passengerPhone: passengerPhone || undefined,
+            ...(rideFor === 'vip' ? { driverNotes: driverNotes || undefined, meetGreet, nameSign } : {}),
+          } : {}),
         }),
       });
       const data = await res.json().catch(() => ({})) as { checkoutUrl?: string; error?: string };
@@ -356,6 +371,107 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
             <svg className="h-4 w-4 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
             <span className="text-[14px] font-medium text-[#1D1D1F]">Now</span>
           </div>
+        </div>
+
+        {/* ── Passenger selection ────────────────────────────────── */}
+        <div className="mt-3">
+          <div className="flex rounded-xl border border-[#E5E5EA] overflow-hidden">
+            {([
+              { id: 'me' as RideFor, label: 'For me' },
+              { id: 'someone' as RideFor, label: 'Someone else' },
+              { id: 'vip' as RideFor, label: 'VIP guest' },
+            ]).map((opt, i) => (
+              <button
+                key={opt.id}
+                onClick={() => setRideFor(opt.id)}
+                className={`flex-1 py-2.5 text-[13px] font-medium transition-colors duration-150 ${
+                  i > 0 ? 'border-l border-[#E5E5EA]' : ''
+                } ${
+                  rideFor === opt.id
+                    ? opt.id === 'vip'
+                      ? 'bg-[#1D1D1F] text-white'
+                      : 'bg-[#1D1D1F] text-white'
+                    : 'bg-white text-[#86868B] hover:bg-[#F5F5F7]'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Fields for "someone else" */}
+          {rideFor === 'someone' && (
+            <div className="mt-2 space-y-2">
+              <input
+                type="text"
+                placeholder="Passenger name"
+                value={passengerName}
+                onChange={(e) => setPassengerName(e.target.value)}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#1D1D1F] transition-colors"
+              />
+              <input
+                type="tel"
+                placeholder="Passenger phone"
+                value={passengerPhone}
+                onChange={(e) => setPassengerPhone(e.target.value)}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#1D1D1F] transition-colors"
+              />
+            </div>
+          )}
+
+          {/* Fields for "VIP guest" */}
+          {rideFor === 'vip' && (
+            <div className="mt-2 space-y-2">
+              <input
+                type="text"
+                placeholder="Guest name"
+                value={passengerName}
+                onChange={(e) => setPassengerName(e.target.value)}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#1D1D1F] transition-colors"
+              />
+              <input
+                type="tel"
+                placeholder="Guest phone"
+                value={passengerPhone}
+                onChange={(e) => setPassengerPhone(e.target.value)}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#1D1D1F] transition-colors"
+              />
+              <input
+                type="text"
+                placeholder="Notes for driver (optional)"
+                value={driverNotes}
+                onChange={(e) => setDriverNotes(e.target.value)}
+                className="w-full rounded-lg border border-[#E5E5EA] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none focus:border-[#1D1D1F] transition-colors"
+              />
+              <div className="flex gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setMeetGreet(!meetGreet)}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors ${
+                    meetGreet ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white' : 'border-[#E5E5EA] text-[#86868B] hover:border-[#C7C7CC]'
+                  }`}
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                  </svg>
+                  Meet & greet
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setNameSign(!nameSign)}
+                  className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-[12px] font-medium transition-colors ${
+                    nameSign ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white' : 'border-[#E5E5EA] text-[#86868B] hover:border-[#C7C7CC]'
+                  }`}
+                >
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
+                  </svg>
+                  Name sign
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* ── Airport trip: airline info ────────────────────────── */}
