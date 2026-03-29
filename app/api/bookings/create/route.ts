@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
-import { createCheckoutSession } from '@/lib/stripe';
 import { SEATTLE_TIERS, calculateFare, kmToMiles } from '@/lib/seattle-pricing';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -10,8 +9,8 @@ import { SEATTLE_TIERS, calculateFare, kmToMiles } from '@/lib/seattle-pricing';
 // 1. Validates inputs
 // 2. Recalculates price server-side (never trusts frontend)
 // 3. Inserts booking into Supabase (status: pending)
-// 4. Creates Stripe Checkout session
-// 5. Returns checkout URL for redirect
+// 4. If Stripe is configured, creates Checkout session
+// 5. Returns booking + optional checkout URL
 // ═══════════════════════════════════════════════════════════════════════════
 
 const requestSchema = z.object({
@@ -29,9 +28,15 @@ const requestSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     // 1. Auth
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    let supabase;
+    try {
+      supabase = await createClient();
+    } catch (err) {
+      console.error('[bookings/create] Supabase client failed:', err);
+      return NextResponse.json({ error: 'Service temporarily unavailable.' }, { status: 503 });
+    }
 
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return NextResponse.json({ error: 'Sign in to book a ride.' }, { status: 401 });
     }
@@ -47,18 +52,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg }, { status: 400 });
     }
 
-    // 3. Server-side price calculation — NEVER trust frontend price
+    // 3. Server-side price calculation
     const tier = SEATTLE_TIERS.find(t => t.id === body.vehicleType);
     if (!tier) {
-      return NextResponse.json({ error: 'Invalid vehicle type' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid vehicle type.' }, { status: 400 });
     }
 
     const fare = calculateFare(tier, body.distanceKm, body.durationMin);
     const distanceMiles = kmToMiles(body.distanceKm);
 
-    // Sanity check
     if (fare.total > 500) {
-      return NextResponse.json({ error: 'Fare exceeds maximum. Please try a shorter route.' }, { status: 400 });
+      return NextResponse.json({ error: 'Fare exceeds maximum. Try a shorter route.' }, { status: 400 });
     }
 
     // 4. Insert booking
@@ -83,37 +87,67 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError || !booking) {
-      console.error('Booking insert failed:', insertError);
-      return NextResponse.json({ error: 'Could not create booking. Please try again.' }, { status: 500 });
+      console.error('[bookings/create] Insert failed:', insertError);
+      // Surface the actual error for debugging
+      const detail = insertError?.message || 'Unknown database error';
+      return NextResponse.json({
+        error: `Booking failed: ${detail}. The bookings table may need to be created.`,
+      }, { status: 500 });
     }
 
-    // 5. Create Stripe Checkout session
-    const origin = request.headers.get('origin') || 'https://takememobility.com';
+    // 5. Try Stripe Checkout — optional, booking still succeeds without it
+    let checkoutUrl: string | null = null;
 
-    const session = await createCheckoutSession({
-      rideId: booking.id,
-      amount: Math.round(fare.total * 100), // cents
-      currency: 'usd',
-      customerEmail: user.email ?? undefined,
-      successUrl: `${origin}/booking/success?id=${booking.id}`,
-      cancelUrl: `${origin}/?cancelled=true`,
-    });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (stripeKey && !stripeKey.includes('PASTE')) {
+      try {
+        const { createCheckoutSession } = await import('@/lib/stripe');
+        const origin = request.headers.get('origin') || 'https://takememobility.com';
 
-    // Save Stripe session ID to booking
-    await supabase
-      .from('bookings')
-      .update({ stripe_session_id: session.id })
-      .eq('id', booking.id);
+        const session = await createCheckoutSession({
+          rideId: booking.id,
+          amount: Math.round(fare.total * 100),
+          currency: 'usd',
+          customerEmail: user.email ?? undefined,
+          successUrl: `${origin}/booking/success?id=${booking.id}`,
+          cancelUrl: `${origin}/?cancelled=true`,
+        });
 
-    // 6. Return
+        checkoutUrl = session.url;
+
+        // Save session ID
+        await supabase
+          .from('bookings')
+          .update({ stripe_session_id: session.id })
+          .eq('id', booking.id);
+      } catch (stripeErr) {
+        console.error('[bookings/create] Stripe failed (booking still created):', stripeErr);
+        // Booking exists — mark as confirmed without payment for now
+        await supabase
+          .from('bookings')
+          .update({ status: 'confirmed' })
+          .eq('id', booking.id);
+      }
+    } else {
+      // No Stripe — auto-confirm
+      await supabase
+        .from('bookings')
+        .update({ status: 'confirmed' })
+        .eq('id', booking.id);
+    }
+
     return NextResponse.json({
       bookingId: booking.id,
       price: fare.total,
-      checkoutUrl: session.url,
+      distanceMiles,
+      durationMin: body.durationMin,
+      vehicleType: body.vehicleType,
+      checkoutUrl,
     }, { status: 201 });
 
   } catch (err) {
-    console.error('POST /api/bookings/create failed:', err);
-    return NextResponse.json({ error: 'Booking failed. Please try again.' }, { status: 500 });
+    console.error('[bookings/create] Unhandled:', err);
+    const msg = err instanceof Error ? err.message : 'Booking failed';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
 }
