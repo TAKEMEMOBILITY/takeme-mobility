@@ -237,18 +237,25 @@ export default function DriverDashboard() {
                 </div>
               </div>
 
-              {/* Actions */}
-              <div className="flex border-t border-white/10">
-                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white transition-colors hover:bg-white/5">
+              {/* Primary action */}
+              <div className="border-t border-white/10 px-6 py-4">
+                <button className="flex w-full items-center justify-center rounded-xl bg-white py-3 text-[14px] font-semibold text-[#1D1D1F] transition-colors hover:bg-white/90">
                   Instant cash out
                 </button>
-                <div className="w-[1px] bg-white/10" />
-                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/50 transition-colors hover:bg-white/5">
-                  Transactions
+              </div>
+
+              {/* Secondary actions */}
+              <div className="flex border-t border-white/10">
+                <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
+                  View card
                 </button>
                 <div className="w-[1px] bg-white/10" />
-                <button className="flex-1 py-3.5 text-center text-[13px] font-semibold text-white/50 transition-colors hover:bg-white/5">
-                  Freeze card
+                <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
+                  {CARD.physicalStatus === 'delivered' ? 'Manage card' : 'Order physical'}
+                </button>
+                <div className="w-[1px] bg-white/10" />
+                <button className="flex-1 py-3 text-center text-[12px] font-medium text-white/50 transition-colors hover:bg-white/5 hover:text-white/70">
+                  Transactions
                 </button>
               </div>
             </div>
