@@ -117,12 +117,19 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
             {loading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#D2D2D7] border-t-[#1D1D1F]" />
             ) : (
               <>
-                <Link href={signInHref} className="hidden text-[14px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 sm:block">
+                <Link href="/driver" className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:block">
+                  Driver Hub
+                </Link>
+                <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:block">
+                  Drive with us
+                </Link>
+                <div className="hidden h-4 w-[1px] bg-[#E5E5EA] lg:block" />
+                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 sm:block">
                   Sign in
                 </Link>
                 <Link
@@ -204,6 +211,23 @@ export default function HomePage() {
                     <span className="mt-0.5 text-[16px] font-semibold leading-tight text-white">Google Play</span>
                   </div>
                 </a>
+              </div>
+
+              {/* Driver CTAs */}
+              <div className="mt-8 flex items-center gap-5 animate-fade-in stagger-5">
+                <Link href="/driver/apply" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
+                  <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Become a Driver
+                </Link>
+                <span className="h-3.5 w-[1px] bg-[#E5E5EA]" />
+                <Link href="/driver" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
+                  <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+                  </svg>
+                  Driver Hub
+                </Link>
               </div>
             </div>
 
