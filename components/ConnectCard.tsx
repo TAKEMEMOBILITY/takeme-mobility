@@ -1,8 +1,31 @@
 'use client';
 
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function ConnectCard({ compact = false }: { compact?: boolean }) {
+  const router = useRouter();
+  const [activating, setActivating] = useState(false);
+
+  const handleActivate = useCallback(async () => {
+    setActivating(true);
+    try {
+      const res = await fetch('/api/connect/subscribe', { method: 'POST' });
+      const data = await res.json() as { checkoutUrl?: string; activated?: boolean; error?: string };
+      if (!res.ok) {
+        if (res.status === 401) { router.push('/auth/login?redirect=/driver/connect'); return; }
+        alert(data.error || 'Subscription failed');
+        return;
+      }
+      if (data.checkoutUrl) { window.location.href = data.checkoutUrl; return; }
+      if (data.activated) { router.push('/driver/connect/success'); }
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setActivating(false);
+    }
+  }, [router]);
   if (compact) {
     return (
       <Link href="/driver/connect" className="flex items-center gap-4 rounded-2xl border border-[#E5E5EA] bg-white p-4 transition-all duration-200 hover:border-[#C7C7CC] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
@@ -69,12 +92,13 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
 
       {/* CTA */}
       <div className="px-6 pb-6">
-        <Link
-          href="/driver/connect"
-          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#1D1D1F] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98]"
+        <button
+          onClick={handleActivate}
+          disabled={activating}
+          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#1D1D1F] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
         >
-          Activate plan
-        </Link>
+          {activating ? 'Activating...' : 'Activate plan'}
+        </button>
       </div>
     </div>
   );

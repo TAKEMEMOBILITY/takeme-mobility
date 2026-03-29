@@ -23,6 +23,16 @@ const requestSchema = z.object({
   distanceKm: z.number().positive(),
   durationMin: z.number().int().positive(),
   vehicleType: z.enum(['electric', 'comfort_electric', 'premium_electric', 'suv_electric', 'women_rider']),
+  // Airport
+  airline: z.string().optional(),
+  flightNumber: z.string().max(10).optional(),
+  // Passenger
+  rideFor: z.enum(['me', 'someone', 'vip']).optional(),
+  passengerName: z.string().optional(),
+  passengerPhone: z.string().optional(),
+  driverNotes: z.string().max(500).optional(),
+  meetGreet: z.boolean().optional(),
+  nameSign: z.boolean().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -82,6 +92,17 @@ export async function POST(request: NextRequest) {
         price: fare.total,
         currency: 'USD',
         status: 'pending',
+        // Airport
+        is_airport_trip: !!(body.airline),
+        airline: body.airline ?? null,
+        flight_number: body.flightNumber ?? null,
+        // Passenger
+        ride_for: body.rideFor ?? 'me',
+        passenger_name: body.passengerName ?? null,
+        passenger_phone: body.passengerPhone ?? null,
+        driver_notes: body.driverNotes ?? null,
+        meet_greet: body.meetGreet ?? false,
+        name_sign: body.nameSign ?? false,
       })
       .select('id, price')
       .single();
