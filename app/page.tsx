@@ -151,25 +151,25 @@ export default function HomePage() {
       </nav>
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-white pt-24 pb-16 md:pt-28 md:pb-20">
+      <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-          <div className="grid items-center gap-10 lg:grid-cols-[1fr_480px] lg:gap-16">
+          <div className="grid items-start gap-8 lg:grid-cols-[1fr_480px] lg:gap-14">
 
             {/* Left */}
-            <div>
+            <div className="pt-2 lg:pt-4">
               <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F] animate-fade-in">
                 Your ride is already
                 <br />
                 on the way.
               </h1>
 
-              <p className="mt-5 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
+              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
                 Book in seconds. Track in real time.
                 <br />
                 Arrive with confidence.
               </p>
 
-              <div className="mt-8 flex items-center gap-3.5 animate-fade-in stagger-2">
+              <div className="mt-7 flex items-center gap-3.5 animate-fade-in stagger-2">
                 <Link
                   href={ctaHref}
                   className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
@@ -185,7 +185,7 @@ export default function HomePage() {
               </div>
 
               {/* Driver CTAs */}
-              <div className="mt-6 flex items-center gap-5 animate-fade-in stagger-3">
+              <div className="mt-5 flex items-center gap-5 animate-fade-in stagger-3">
                 <Link href="/driver/apply" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
                   <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
