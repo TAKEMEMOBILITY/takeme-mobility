@@ -128,8 +128,9 @@ export default function HomePage() {
               <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#D2D2D7] border-t-[#1D1D1F]" />
             ) : (
               <>
-                <Link href="/driver" className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:block">
+                <Link href="/driver" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:flex">
                   Driver Hub
+                  <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
                 </Link>
                 <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:block">
                   Drive with us
