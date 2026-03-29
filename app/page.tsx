@@ -7,7 +7,8 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'Technology', 'Safety', 'Cities'] as const;
+const NAV_ITEMS = ['Rides', 'Connect', 'Technology', 'Safety', 'Cities'] as const;
+const NAV_ROUTES: Record<string, string> = { Rides: '/#how-it-works', Connect: '/connect', Technology: '/', Safety: '/', Cities: '/' };
 
 const TRUST_CARDS = [
   {
@@ -109,11 +110,16 @@ export default function HomePage() {
             <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
           </Link>
 
-          <div className="hidden items-center gap-12 lg:flex">
+          <div className="hidden items-center gap-10 lg:flex">
             {NAV_ITEMS.map((item) => (
-              <span key={item} className="cursor-pointer text-[14px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60">
+              <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
                 {item}
-              </span>
+                {item === 'Connect' && (
+                  <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
+                    New
+                  </span>
+                )}
+              </Link>
             ))}
           </div>
 
