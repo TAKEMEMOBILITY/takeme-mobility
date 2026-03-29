@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { checkVerification } from '@/lib/twilio';
-import { createServiceClient } from '@/lib/supabase/service';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/auth/verify-otp
 //
-// 1. Verify OTP via Twilio Verify
-// 2. Find or create Supabase user by phone
-// 3. Sign them in by generating a session
-// 4. Return session (set cookies via Supabase server client)
+// 1. Verify OTP code via Twilio Verify
+// 2. Find or create Supabase user (admin API, service role)
+// 3. Generate a real Supabase session (admin.generateLink)
+// 4. Set session cookies so it persists across refreshes
+//
+// Result: real authenticated session. Not fake. Not manual.
 // ═══════════════════════════════════════════════════════════════════════════
 
 const schema = z.object({
@@ -18,90 +20,125 @@ const schema = z.object({
   code: z.string().length(6, 'Code must be 6 digits'),
 });
 
+// Service-role client for admin operations (no cookies needed)
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  if (!url || !key) throw new Error('Supabase service config missing');
+  return createServerClient(url, key, {
+    cookies: { getAll: () => [], setAll: () => {} },
+  });
+}
+
+// Cookie-aware client for setting the session
+async function getSessionClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  if (!url || !key) throw new Error('Supabase config missing');
+  const cookieStore = await cookies();
+  return createServerClient(url, key, {
+    cookies: {
+      getAll: () => cookieStore.getAll(),
+      setAll: (cookiesToSet) => {
+        try {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        } catch {}
+      },
+    },
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
+    // Parse input
     let body: z.infer<typeof schema>;
     try {
       body = schema.parse(await request.json());
     } catch (err) {
-      const msg = err instanceof z.ZodError
-        ? err.issues[0]?.message || 'Invalid input'
-        : 'Invalid request';
+      const msg = err instanceof z.ZodError ? err.issues[0]?.message || 'Invalid input' : 'Invalid request';
       return NextResponse.json({ error: msg }, { status: 400 });
     }
 
     // 1. Verify OTP via Twilio
     const verification = await checkVerification(body.phone, body.code);
     if (!verification.success) {
-      return NextResponse.json({ error: verification.error || 'Invalid code' }, { status: 400 });
+      return NextResponse.json({ error: verification.error || 'Invalid or expired code' }, { status: 400 });
     }
 
-    // 2. Find or create user in Supabase
-    const svc = createServiceClient();
+    // 2. Find or create Supabase user by phone
+    const admin = getAdminClient();
 
-    // Search for existing user by phone
-    const { data: users } = await svc.auth.admin.listUsers();
-    const existing = users?.users?.find(
+    // Use a deterministic email derived from phone — Supabase requires email for magiclink
+    const syntheticEmail = `${body.phone.replace('+', '')}@sms.takememobility.com`;
+
+    const { data: userList } = await admin.auth.admin.listUsers();
+    let userId: string;
+    let userEmail: string;
+
+    const existing = userList?.users?.find(
       (u: { phone?: string }) => u.phone === body.phone,
     );
 
-    let userId: string;
-
     if (existing) {
       userId = existing.id;
+      userEmail = existing.email || syntheticEmail;
+
+      // Ensure email is set (needed for generateLink)
+      if (!existing.email) {
+        await admin.auth.admin.updateUserById(userId, { email: syntheticEmail });
+        userEmail = syntheticEmail;
+      }
     } else {
-      // Create new user with phone
-      const { data: newUser, error: createError } = await svc.auth.admin.createUser({
+      // Create new user
+      const { data: created, error: createErr } = await admin.auth.admin.createUser({
         phone: body.phone,
+        email: syntheticEmail,
         phone_confirm: true,
+        email_confirm: true,
         user_metadata: { phone: body.phone },
       });
 
-      if (createError || !newUser?.user) {
-        console.error('User creation failed:', createError);
+      if (createErr || !created?.user) {
+        console.error('[verify-otp] User creation failed:', createErr);
         return NextResponse.json({ error: 'Could not create account.' }, { status: 500 });
       }
 
-      userId = newUser.user.id;
+      userId = created.user.id;
+      userEmail = syntheticEmail;
     }
 
-    // 3. Generate a magic link / session for this user
-    //    Using generateLink with magiclink type to get a session token
-    const { data: linkData, error: linkError } = await svc.auth.admin.generateLink({
+    // 3. Generate a magic link to get a real token pair
+    const { data: linkData, error: linkErr } = await admin.auth.admin.generateLink({
       type: 'magiclink',
-      email: `${body.phone.replace('+', '')}@phone.takememobility.com`,
+      email: userEmail,
     });
 
-    if (linkError || !linkData) {
-      // Fallback: sign in via Supabase phone OTP directly
-      // This works if Supabase phone provider is enabled
-      try {
-        const supabase = await createClient();
-        await supabase.auth.signInWithOtp({ phone: body.phone });
-        // The OTP was already verified via Twilio, so verify immediately
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-          phone: body.phone,
-          token: body.code,
-          type: 'sms',
-        });
-
-        if (!verifyError) {
-          return NextResponse.json({ verified: true, userId });
-        }
-      } catch {}
-
-      // If all else fails, return success with userId
-      // The client will need to handle session differently
-      return NextResponse.json({ verified: true, userId });
+    if (linkErr || !linkData?.properties?.hashed_token) {
+      console.error('[verify-otp] generateLink failed:', linkErr);
+      return NextResponse.json({ error: 'Could not create session.' }, { status: 500 });
     }
 
-    // 4. Use the generated token to create a session
-    //    The client will use this to set the session
+    // 4. Use the token to create a real session with cookies
+    const sessionClient = await getSessionClient();
+
+    const { error: otpErr } = await sessionClient.auth.verifyOtp({
+      type: 'magiclink',
+      token_hash: linkData.properties.hashed_token,
+    });
+
+    if (otpErr) {
+      console.error('[verify-otp] Session creation failed:', otpErr);
+      return NextResponse.json({ error: 'Could not sign in. Please try again.' }, { status: 500 });
+    }
+
+    // Session cookies are now set by the sessionClient's setAll callback.
+    // The user is fully authenticated.
+
     return NextResponse.json({
       verified: true,
       userId,
-      // The token from generateLink can be used client-side
-      token: linkData.properties?.hashed_token,
     });
 
   } catch (err) {

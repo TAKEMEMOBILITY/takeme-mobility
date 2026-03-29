@@ -3,11 +3,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Auth Context — Phone OTP via custom API routes + Supabase session
+// Auth Context — Phone OTP
 //
-// Send OTP: POST /api/auth/send-otp (Twilio Verify)
-// Verify OTP: POST /api/auth/verify-otp (Twilio + Supabase user)
-// Session: Supabase client tracks auth state after verify
+// OTP sent/verified via custom API routes (Twilio + Supabase Admin).
+// Session is set server-side via cookies in the verify-otp route.
+// After verify succeeds, client refreshes auth state from Supabase.
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface User {
@@ -22,6 +22,7 @@ interface AuthContextType {
   sendOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, code: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -30,6 +31,7 @@ const AuthContext = createContext<AuthContextType>({
   sendOtp: async () => ({ error: 'Not initialized' }),
   verifyOtp: async () => ({ error: 'Not initialized' }),
   signOut: async () => {},
+  refreshUser: async () => {},
 });
 
 function getSupabase() {
@@ -46,19 +48,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const supabaseRef = useRef<ReturnType<typeof getSupabase>>(null);
 
-  // Load existing session
-  useEffect(() => {
-    const sb = getSupabase();
+  const fetchUser = useCallback(async () => {
+    const sb = supabaseRef.current ?? getSupabase();
     supabaseRef.current = sb;
     if (!sb) { setLoading(false); return; }
 
-    sb.auth.getUser()
-      .then((res: { data: { user: { id: string; phone?: string; email?: string } | null } }) => {
-        const u = res.data?.user;
-        if (u) setUser({ id: u.id, phone: u.phone, email: u.email });
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    try {
+      const res = await sb.auth.getUser();
+      const u = res?.data?.user;
+      if (u) {
+        setUser({ id: u.id, phone: u.phone, email: u.email });
+      } else {
+        setUser(null);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Initial load + auth state listener
+  useEffect(() => {
+    fetchUser();
+
+    const sb = supabaseRef.current;
+    if (!sb) return;
 
     try {
       const { data } = sb.auth.onAuthStateChange(
@@ -72,10 +87,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       );
       return () => { try { data?.subscription?.unsubscribe(); } catch {} };
-    } catch { setLoading(false); }
-  }, []);
+    } catch {}
+  }, [fetchUser]);
 
-  // Send OTP via custom API (Twilio Verify)
+  // Send OTP via Twilio
   const sendOtp = useCallback(async (phone: string): Promise<{ error: string | null }> => {
     try {
       const res = await fetch('/api/auth/send-otp', {
@@ -91,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Verify OTP via custom API (Twilio + Supabase)
+  // Verify OTP — server sets session cookies, then we refresh client state
   const verifyOtp = useCallback(async (phone: string, code: string): Promise<{ error: string | null }> => {
     try {
       const res = await fetch('/api/auth/verify-otp', {
@@ -99,28 +114,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ phone, code }),
       });
-      const data = await res.json() as { verified?: boolean; userId?: string; error?: string };
+      const data = await res.json() as { verified?: boolean; error?: string };
       if (!res.ok) return { error: data.error || 'Verification failed' };
 
-      if (data.verified && data.userId) {
-        // Try to establish Supabase session via phone OTP
-        const sb = supabaseRef.current ?? getSupabase();
-        if (sb) {
-          try {
-            // Supabase phone auth — since Twilio already verified, this should work
-            await sb.auth.signInWithOtp({ phone });
-            const { error } = await sb.auth.verifyOtp({ phone, token: code, type: 'sms' });
-            if (!error) {
-              // Session is now set — onAuthStateChange will fire
-              return { error: null };
-            }
-          } catch {}
-
-          // Fallback: set user manually from API response
-          setUser({ id: data.userId, phone });
-        } else {
-          setUser({ id: data.userId, phone });
-        }
+      if (data.verified) {
+        // Session cookies are set by the server response.
+        // Re-fetch user to pick up the new session.
+        await fetchUser();
         return { error: null };
       }
 
@@ -128,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {
       return { error: 'Network error. Please try again.' };
     }
-  }, []);
+  }, [fetchUser]);
 
   const signOut = useCallback(async () => {
     const sb = supabaseRef.current ?? getSupabase();
@@ -137,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, sendOtp, verifyOtp, signOut }}>
+    <AuthContext.Provider value={{ user, loading, sendOtp, verifyOtp, signOut, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );
