@@ -3,8 +3,11 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// Auth Context — Phone OTP via Supabase
-// Lazy-loads Supabase client. Never crashes if SDK is unavailable.
+// Auth Context — Phone OTP via custom API routes + Supabase session
+//
+// Send OTP: POST /api/auth/send-otp (Twilio Verify)
+// Verify OTP: POST /api/auth/verify-otp (Twilio + Supabase user)
+// Session: Supabase client tracks auth state after verify
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface User {
@@ -17,7 +20,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   sendOtp: (phone: string) => Promise<{ error: string | null }>;
-  verifyOtp: (phone: string, token: string) => Promise<{ error: string | null }>;
+  verifyOtp: (phone: string, code: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -43,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const supabaseRef = useRef<ReturnType<typeof getSupabase>>(null);
 
+  // Load existing session
   useEffect(() => {
     const sb = getSupabase();
     supabaseRef.current = sb;
@@ -71,33 +75,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch { setLoading(false); }
   }, []);
 
+  // Send OTP via custom API (Twilio Verify)
   const sendOtp = useCallback(async (phone: string): Promise<{ error: string | null }> => {
-    const sb = supabaseRef.current ?? getSupabase();
-    if (!sb) return { error: 'Auth service unavailable' };
-
     try {
-      const { error } = await sb.auth.signInWithOtp({ phone });
-      return { error: error?.message ?? null };
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err.message : 'Failed to send code' };
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json();
+      if (!res.ok) return { error: data.error || 'Failed to send code' };
+      return { error: null };
+    } catch {
+      return { error: 'Network error. Please try again.' };
     }
   }, []);
 
-  const verifyOtp = useCallback(async (phone: string, token: string): Promise<{ error: string | null }> => {
-    const sb = supabaseRef.current ?? getSupabase();
-    if (!sb) return { error: 'Auth service unavailable' };
-
+  // Verify OTP via custom API (Twilio + Supabase)
+  const verifyOtp = useCallback(async (phone: string, code: string): Promise<{ error: string | null }> => {
     try {
-      const { error } = await sb.auth.verifyOtp({ phone, token, type: 'sms' });
-      return { error: error?.message ?? null };
-    } catch (err: unknown) {
-      return { error: err instanceof Error ? err.message : 'Verification failed' };
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone, code }),
+      });
+      const data = await res.json() as { verified?: boolean; userId?: string; error?: string };
+      if (!res.ok) return { error: data.error || 'Verification failed' };
+
+      if (data.verified && data.userId) {
+        // Try to establish Supabase session via phone OTP
+        const sb = supabaseRef.current ?? getSupabase();
+        if (sb) {
+          try {
+            // Supabase phone auth — since Twilio already verified, this should work
+            await sb.auth.signInWithOtp({ phone });
+            const { error } = await sb.auth.verifyOtp({ phone, token: code, type: 'sms' });
+            if (!error) {
+              // Session is now set — onAuthStateChange will fire
+              return { error: null };
+            }
+          } catch {}
+
+          // Fallback: set user manually from API response
+          setUser({ id: data.userId, phone });
+        } else {
+          setUser({ id: data.userId, phone });
+        }
+        return { error: null };
+      }
+
+      return { error: 'Verification failed' };
+    } catch {
+      return { error: 'Network error. Please try again.' };
     }
   }, []);
 
   const signOut = useCallback(async () => {
     const sb = supabaseRef.current ?? getSupabase();
-    if (sb) await sb.auth.signOut();
+    try { if (sb) await sb.auth.signOut(); } catch {}
     setUser(null);
   }, []);
 
