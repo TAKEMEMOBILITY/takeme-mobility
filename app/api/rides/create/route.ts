@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { findOrCreateCustomer, createPaymentIntent } from '@/lib/stripe';
-import { assignDriver } from '@/lib/dispatch';
+import { dispatchWithRetry } from '@/lib/dispatch-queue';
 import { TIERS, calculateFare, type VehicleClass } from '@/lib/pricing';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -208,9 +208,12 @@ export async function POST(request: NextRequest) {
       console.warn('Payment setup failed (ride still created):', payErr);
     }
 
-    // 6. Attempt driver assignment (non-blocking, best-effort)
+    // 6. Start dispatch queue (non-blocking, retries in background)
+    // Fire-and-forget: the queue retries with backoff and updates ride status
     let assignedDriver: { name: string; vehicle: string; plate: string } | null = null;
     try {
+      // First attempt is synchronous for fast matching
+      const { assignDriver } = await import('@/lib/dispatch');
       const dispatch = await assignDriver(rideData.id);
       if (dispatch.success && dispatch.driver) {
         assignedDriver = {
@@ -218,10 +221,15 @@ export async function POST(request: NextRequest) {
           vehicle: `${dispatch.driver.vehicle_make} ${dispatch.driver.vehicle_model}`,
           plate: dispatch.driver.plate_number,
         };
+      } else {
+        // No immediate match — start background retry queue
+        dispatchWithRetry(rideData.id).catch(err =>
+          console.error('[dispatch-queue] Background dispatch failed:', err)
+        );
       }
     } catch (dispatchErr) {
-      // Non-fatal — rider can retry or system polls
-      console.warn('Auto-dispatch failed (ride still created):', dispatchErr);
+      console.warn('Auto-dispatch failed, starting retry queue:', dispatchErr);
+      dispatchWithRetry(rideData.id).catch(() => {});
     }
 
     // 7. Return ride + payment + driver

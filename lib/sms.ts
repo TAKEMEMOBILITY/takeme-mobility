@@ -1,4 +1,5 @@
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
+import { createServiceClient } from "@/lib/supabase/service";
 
 const sns = new SNSClient({
   region: process.env.AWS_REGION!,
@@ -8,17 +9,32 @@ const sns = new SNSClient({
   },
 });
 
-// Store OTPs temporarily in memory
-const otpStore = new Map<string, { code: string; expires: number }>();
-
 export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; error?: string }> {
   try {
     const code = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore.set(phoneNumber, { code, expires: Date.now() + 10 * 60 * 1000 });
+    const supabase = createServiceClient();
 
+    // Store OTP with rate limit check (max 3 per 5 min, 10 min TTL)
+    const { data, error: rpcError } = await supabase.rpc('store_otp', {
+      p_phone: phoneNumber,
+      p_code: code,
+      p_ttl_seconds: 600,
+    });
+
+    if (rpcError) {
+      console.error('[sms] store_otp RPC failed:', rpcError.message);
+      return { success: false, error: 'Could not generate code.' };
+    }
+
+    const result = data as { success: boolean; error?: string };
+    if (!result.success) {
+      return { success: false, error: result.error };
+    }
+
+    // Send SMS via AWS SNS
     await sns.send(new PublishCommand({
       PhoneNumber: phoneNumber,
-      Message: `TakeMe verification code: ${code}`,
+      Message: `Your TakeMe verification code: ${code}`,
     }));
 
     return { success: true };
@@ -29,11 +45,22 @@ export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; 
 }
 
 export async function verifyOTP(phoneNumber: string, code: string): Promise<{ success: boolean; error?: string }> {
-  const stored = otpStore.get(phoneNumber);
-  if (!stored) return { success: false, error: "Code not found." };
-  if (Date.now() > stored.expires) return { success: false, error: "Code expired." };
-  if (stored.code !== code) return { success: false, error: "Invalid code." };
-  
-  otpStore.delete(phoneNumber);
-  return { success: true };
+  try {
+    const supabase = createServiceClient();
+
+    const { data, error: rpcError } = await supabase.rpc('verify_otp', {
+      p_phone: phoneNumber,
+      p_code: code,
+    });
+
+    if (rpcError) {
+      console.error('[sms] verify_otp RPC failed:', rpcError.message);
+      return { success: false, error: 'Verification failed.' };
+    }
+
+    return data as { success: boolean; error?: string };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Verification failed.";
+    return { success: false, error: msg };
+  }
 }

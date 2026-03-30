@@ -7,8 +7,7 @@ import { createServiceClient } from '@/lib/supabase/service';
 // POST /api/card/fund
 //
 // Transfers funds from driver's available balance to their TAKEME Card.
-// In production, this triggers a Stripe top-up to Issuing balance.
-// For MVP, we track the transfer in our DB.
+// Uses atomic RPC to prevent race conditions on concurrent requests.
 // ═══════════════════════════════════════════════════════════════════════════
 
 const schema = z.object({
@@ -24,45 +23,20 @@ export async function POST(request: NextRequest) {
     const body = schema.parse(await request.json());
     const svc = createServiceClient();
 
-    // Get current balance
-    const { data: balance } = await svc
-      .from('driver_balances')
-      .select('available, card_balance')
-      .eq('driver_id', user.id)
-      .single();
+    // Atomic transfer via RPC — prevents read-then-write race condition
+    const { data, error: rpcError } = await svc.rpc('transfer_to_card', {
+      p_driver_id: user.id,
+      p_amount: body.amount,
+    });
 
-    if (!balance) {
-      // Create balance record if it doesn't exist
-      await svc.from('driver_balances').insert({
-        driver_id: user.id,
-        available: 0,
-        card_balance: 0,
-      });
-      return NextResponse.json({ error: 'No available balance to transfer.' }, { status: 400 });
-    }
-
-    if (balance.available < body.amount) {
-      return NextResponse.json({
-        error: `Insufficient balance. Available: $${Number(balance.available).toFixed(2)}`,
-      }, { status: 400 });
-    }
-
-    // Transfer: deduct from available, add to card_balance
-    const newAvailable = Number(balance.available) - body.amount;
-    const newCardBalance = Number(balance.card_balance) + body.amount;
-
-    const { error: updateErr } = await svc
-      .from('driver_balances')
-      .update({
-        available: newAvailable,
-        card_balance: newCardBalance,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('driver_id', user.id);
-
-    if (updateErr) {
-      console.error('[card/fund] Balance update failed:', updateErr);
+    if (rpcError) {
+      console.error('[card/fund] Transfer RPC failed:', rpcError);
       return NextResponse.json({ error: 'Transfer failed.' }, { status: 500 });
+    }
+
+    const result = data as { success: boolean; error?: string; available?: number; card_balance?: number };
+    if (!result.success) {
+      return NextResponse.json({ error: result.error ?? 'Insufficient balance.' }, { status: 400 });
     }
 
     // Log the transfer
@@ -73,14 +47,11 @@ export async function POST(request: NextRequest) {
       status: 'completed',
     });
 
-    // In production: trigger Stripe top-up here
-    // const topup = await createTopUp(Math.round(body.amount * 100), `TAKEME Card fund - ${user.id}`);
-
     return NextResponse.json({
       funded: true,
       amount: body.amount,
-      newAvailable: newAvailable,
-      newCardBalance: newCardBalance,
+      newAvailable: result.available,
+      newCardBalance: result.card_balance,
     });
   } catch (err) {
     console.error('[card/fund]', err);

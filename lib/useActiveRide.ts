@@ -7,7 +7,7 @@
 // Also polls driver location for map updates.
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { createClient } from '@/lib/supabase/client';
 
 export type RidePhase =
@@ -70,7 +70,6 @@ export function useActiveRide(rideId: string | null): UseActiveRideReturn {
   const [driver, setDriver] = useState<DriverInfo | null>(null);
   const [driverPosition, setDriverPosition] = useState<DriverPosition | null>(null);
   const [loading, setLoading] = useState(true);
-  const locationIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const supabase = createClient();
 
@@ -222,13 +221,7 @@ export function useActiveRide(rideId: string | null): UseActiveRideReturn {
             await fetchDriverInfo(mapped.assignedDriverId, mapped.vehicleId);
           }
 
-          // If ride just completed or cancelled, stop location polling
-          if (mapped.status === 'completed' || mapped.status === 'cancelled') {
-            if (locationIntervalRef.current) {
-              clearInterval(locationIntervalRef.current);
-              locationIntervalRef.current = null;
-            }
-          }
+          // Location subscription auto-cleans via useEffect when status changes
         },
       )
       .subscribe();
@@ -238,34 +231,58 @@ export function useActiveRide(rideId: string | null): UseActiveRideReturn {
     };
   }, [rideId, supabase, mapRow, driver, fetchDriverInfo]);
 
-  // ── Poll driver location every 5s during active phases ─────────────
+  // ── Subscribe to driver location via Realtime (replaces 5s polling) ──
   useEffect(() => {
     const driverId = ride?.assignedDriverId;
     const activePhases: RidePhase[] = ['driver_assigned', 'driver_arriving', 'arrived', 'in_progress'];
 
     if (!driverId || !ride || !activePhases.includes(ride.status)) {
-      if (locationIntervalRef.current) {
-        clearInterval(locationIntervalRef.current);
-        locationIntervalRef.current = null;
-      }
       return;
     }
 
-    // Fetch immediately
+    // Fetch immediately on mount
     fetchDriverLocation(driverId);
 
-    // Then poll
-    locationIntervalRef.current = setInterval(() => {
-      fetchDriverLocation(driverId);
-    }, 5000);
+    // Subscribe to realtime updates on driver_locations table
+    const channel = supabase
+      .channel(`driver-loc-${driverId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'driver_locations',
+          filter: `driver_id=eq.${driverId}`,
+        },
+        (payload: { new: Record<string, unknown> }) => {
+          const row = payload.new;
+          const loc = row.location as unknown;
+          let lat: number | null = null;
+          let lng: number | null = null;
+
+          if (typeof loc === 'object' && loc !== null) {
+            const geo = loc as { coordinates?: number[] };
+            if (geo.coordinates && geo.coordinates.length >= 2) {
+              lng = geo.coordinates[0];
+              lat = geo.coordinates[1];
+            }
+          }
+
+          if (lat !== null && lng !== null) {
+            setDriverPosition({
+              lat,
+              lng,
+              heading: row.heading ? Number(row.heading) : null,
+            });
+          }
+        },
+      )
+      .subscribe();
 
     return () => {
-      if (locationIntervalRef.current) {
-        clearInterval(locationIntervalRef.current);
-        locationIntervalRef.current = null;
-      }
+      supabase.removeChannel(channel);
     };
-  }, [ride?.assignedDriverId, ride?.status, fetchDriverLocation]);
+  }, [ride?.assignedDriverId, ride?.status, supabase, fetchDriverLocation]);
 
   return { ride, driver, driverPosition, loading };
 }

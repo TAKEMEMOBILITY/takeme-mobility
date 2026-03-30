@@ -52,6 +52,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
     }
 
+    const eventId = event.id as string;
     const eventType = event.type as string;
     const data = event.data as { object: Record<string, unknown> };
     const obj = data.object;
@@ -59,6 +60,19 @@ export async function POST(request: NextRequest) {
     console.log(`[Stripe Webhook] ${eventType}:`, obj.id);
 
     const supabase = createServiceClient();
+
+    // Deduplicate: skip if we've already processed this event
+    if (eventId) {
+      const { error: dedupErr } = await supabase
+        .from('processed_webhook_events')
+        .insert({ event_id: eventId, event_type: eventType });
+
+      if (dedupErr?.code === '23505') {
+        // Unique constraint violation — already processed
+        console.log(`[Stripe Webhook] Duplicate event skipped: ${eventId}`);
+        return NextResponse.json({ received: true, duplicate: true });
+      }
+    }
 
     // 3. Route by event type
     switch (eventType) {

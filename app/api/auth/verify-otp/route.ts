@@ -90,11 +90,15 @@ export async function POST(request: NextRequest) {
     } else if (createErr?.message?.includes('already been registered') ||
                createErr?.message?.includes('already exists') ||
                createErr?.status === 422) {
-      // User exists — find them by listing (filtered)
-      const { data: userList } = await admin.auth.admin.listUsers({ perPage: 1000 });
-      const existing = userList?.users?.find(
-        (u: { phone?: string }) => u.phone === body.phone,
-      );
+      // User exists — look up directly via service role query on auth.users
+      // This avoids the O(n) listUsers scan that breaks at scale
+      const { data: existingRows } = await admin
+        .from('users' as 'users')
+        .select('id, phone, email')
+        .eq('phone', body.phone)
+        .limit(1);
+
+      const existing = (existingRows as { id: string; phone?: string; email?: string }[] | null)?.[0];
 
       if (!existing) {
         console.error('[verify-otp] User exists but not found');
