@@ -1,14 +1,25 @@
 {
-  "name": "my-app",
+  "name": "takeme-mobility",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/shared",
+    "packages/rider",
+    "packages/driver"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "rider": "npm run start --workspace=packages/rider",
+    "driver": "npm run start --workspace=packages/driver",
+    "rider:dev": "npm run dev --workspace=packages/rider",
+    "driver:dev": "npm run dev --workspace=packages/driver",
+    "shared:build": "npm run build --workspace=packages/shared"
   },
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.1020.0",
     "@react-google-maps/api": "^2.20.8",
     "@stripe/react-stripe-js": "^6.0.0",
     "@stripe/stripe-js": "^9.0.0",
