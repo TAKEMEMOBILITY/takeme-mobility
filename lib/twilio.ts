@@ -18,7 +18,7 @@ export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; 
 
     await sns.send(new PublishCommand({
       PhoneNumber: phoneNumber,
-      Message: TakeMe doğrulama kodunuz: ${code},
+      Message: TakeMe dogrulama kodunuz: ${code},
     }));
 
     return { success: true };
@@ -30,9 +30,9 @@ export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; 
 
 export async function verifyOTP(phoneNumber: string, code: string): Promise<{ success: boolean; error?: string }> {
   const stored = otpStore.get(phoneNumber);
-  if (!stored) return { success: false, error: "Kod bulunamadı." };
-  if (Date.now() > stored.expires) return { success: false, error: "Kod süresi doldu." };
-  if (stored.code !== code) return { success: false, error: "Geçersiz kod." };
+  if (!stored) return { success: false, error: "Kod bulunamadi." };
+  if (Date.now() > stored.expires) return { success: false, error: "Kod suresi doldu." };
+  if (stored.code !== code) return { success: false, error: "Gecersiz kod." };
   
   otpStore.delete(phoneNumber);
   return { success: true };
