@@ -5,7 +5,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 // ═══════════════════════════════════════════════════════════════════════════
 // Auth Context — Phone OTP
 //
-// OTP sent/verified via custom API routes (Twilio + Supabase Admin).
+// OTP sent/verified via custom API routes (AWS SNS + Supabase Admin).
 // Session is set server-side via cookies in the verify-otp route.
 // After verify succeeds, client refreshes auth state from Supabase.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -99,7 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [fetchUser]);
 
-  // Send OTP via Twilio
+  // Send OTP via AWS SNS
   const sendOtp = useCallback(async (phone: string): Promise<{ error: string | null }> => {
     try {
       const res = await fetch('/api/auth/send-otp', {

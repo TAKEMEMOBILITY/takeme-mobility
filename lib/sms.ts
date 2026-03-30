@@ -8,7 +8,7 @@ const sns = new SNSClient({
   },
 });
 
-// OTP'leri geçici olarak hafızada tut
+// Store OTPs temporarily in memory
 const otpStore = new Map<string, { code: string; expires: number }>();
 
 export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; error?: string }> {
@@ -18,7 +18,7 @@ export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; 
 
     await sns.send(new PublishCommand({
       PhoneNumber: phoneNumber,
-      Message: `TakeMe dogrulama kodunuz: ${code}`,
+      Message: `TakeMe verification code: ${code}`,
     }));
 
     return { success: true };
@@ -30,9 +30,9 @@ export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; 
 
 export async function verifyOTP(phoneNumber: string, code: string): Promise<{ success: boolean; error?: string }> {
   const stored = otpStore.get(phoneNumber);
-  if (!stored) return { success: false, error: "Kod bulunamadi." };
-  if (Date.now() > stored.expires) return { success: false, error: "Kod suresi doldu." };
-  if (stored.code !== code) return { success: false, error: "Gecersiz kod." };
+  if (!stored) return { success: false, error: "Code not found." };
+  if (Date.now() > stored.expires) return { success: false, error: "Code expired." };
+  if (stored.code !== code) return { success: false, error: "Invalid code." };
   
   otpStore.delete(phoneNumber);
   return { success: true };
