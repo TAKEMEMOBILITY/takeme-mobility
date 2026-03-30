@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { sendOTP } from '@/lib/twilio';
+import { sendOTP } from '@/lib/sms';
 
 // POST /api/auth/send-otp
 const schema = z.object({
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : 'Unknown error';
     console.error('[send-otp] Unhandled error:', message);
     return NextResponse.json({
-      error: Verification service error: ${message},
+      error: `Verification service error: ${message}`,
     }, { status: 500 });
   }
 }

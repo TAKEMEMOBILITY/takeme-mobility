@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { checkVerification } from '@/lib/twilio';
+import { verifyOTP } from '@/lib/sms';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/auth/verify-otp
 //
-// 1. Verify OTP code via Twilio Verify
+// 1. Verify OTP code via AWS SNS
 // 2. Find or create Supabase user (admin API, service role)
 // 3. Generate a real Supabase session (admin.generateLink)
 // 4. Set session cookies so it persists across refreshes
@@ -61,8 +61,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: msg }, { status: 400 });
     }
 
-    // 1. Verify OTP via Twilio
-    const verification = await checkVerification(body.phone, body.code);
+    // 1. Verify OTP via AWS SNS
+    const verification = await verifyOTP(body.phone, body.code);
     if (!verification.success) {
       return NextResponse.json({ error: verification.error || 'Invalid or expired code' }, { status: 400 });
     }
