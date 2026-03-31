@@ -2,22 +2,28 @@ import { NextRequest, NextResponse } from 'next/server';
 import { processDispatchQueue } from '@/lib/dispatch-queue';
 import { getDispatchQueueLength } from '@/lib/redis';
 
-// POST /api/dispatch/worker
+// GET /api/dispatch/worker
 // Processes pending dispatch queue items. Called by:
-// - Vercel Cron (every 10 seconds)
-// - QStash webhook
+// - Vercel Cron (every 1 minute, sends GET with Authorization header)
 // - Manual trigger
 //
 // Protected by CRON_SECRET to prevent unauthorized calls.
 
-export async function POST(request: NextRequest) {
-  // Verify cron secret (optional — skip in dev)
+export async function GET(request: NextRequest) {
+  // Verify cron secret
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Allow unauthenticated health check (returns queue length only)
+    try {
+      const queueLength = await getDispatchQueueLength();
+      return NextResponse.json({ queueLength, status: 'ready' });
+    } catch {
+      return NextResponse.json({ error: 'Redis unavailable' }, { status: 500 });
+    }
   }
 
+  // Authenticated — process the queue
   try {
     const queueLength = await getDispatchQueueLength();
     if (queueLength === 0) {
@@ -34,12 +40,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET for health check / manual trigger in dev
-export async function GET() {
-  try {
-    const queueLength = await getDispatchQueueLength();
-    return NextResponse.json({ queueLength, status: 'ready' });
-  } catch (err) {
-    return NextResponse.json({ error: 'Redis unavailable' }, { status: 500 });
-  }
+// POST also works (for QStash or manual triggers)
+export async function POST(request: NextRequest) {
+  return GET(request);
 }
