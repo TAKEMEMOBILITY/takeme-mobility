@@ -14,6 +14,7 @@
 import { assignDriver } from '@/lib/dispatch';
 import { createServiceClient } from '@/lib/supabase/service';
 import { enqueueDispatch, dequeueDispatch, moveToDLQ } from '@/lib/redis';
+import { publishDispatchEvent, scheduleDispatchRetry } from '@/lib/qstash';
 import { sendPushNotification, rideRequestNotification } from '@/lib/push';
 
 const MAX_RETRIES = 5;
@@ -27,9 +28,14 @@ interface DispatchQueueResult {
 
 /**
  * Enqueue a ride for dispatch. Called from rides/create route.
+ * Tries QStash first (instant, event-driven), falls back to Redis queue.
  */
 export async function queueRideForDispatch(rideId: string): Promise<void> {
-  await enqueueDispatch(rideId, 0);
+  const published = await publishDispatchEvent(rideId, 0);
+  if (!published) {
+    // QStash unavailable — fall back to Redis queue (processed by cron)
+    await enqueueDispatch(rideId, 0);
+  }
 }
 
 /**
@@ -131,8 +137,11 @@ export async function processOneDispatch(): Promise<DispatchQueueResult | null> 
     return { assigned: false, retries: MAX_RETRIES, error: 'No drivers found' };
   }
 
-  // Re-enqueue with exponential backoff delay via attempt counter
-  await enqueueDispatch(rideId, attempt + 1);
+  // Re-enqueue with exponential backoff — QStash first, Redis fallback
+  const retried = await scheduleDispatchRetry(rideId, attempt + 1);
+  if (!retried) {
+    await enqueueDispatch(rideId, attempt + 1);
+  }
   return { assigned: false, retries: attempt + 1, error: result.error };
 }
 
