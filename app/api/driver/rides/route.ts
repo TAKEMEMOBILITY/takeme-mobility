@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { getDriverOffer, clearDriverOffer } from '@/lib/redis';
 import { finalizeAssignment } from '@/lib/dispatch';
+import { assessTripFraud } from '@/lib/fraud';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET /api/driver/rides      — get assigned ride for current driver
@@ -165,10 +166,41 @@ export async function PUT(request: NextRequest) {
       case 'in_progress':
         update.trip_started_at = now;
         break;
-      case 'completed':
+      case 'completed': {
         update.trip_completed_at = now;
         update.final_fare = null; // set by payment capture
+
+        // Run fraud assessment on trip completion
+        try {
+          const { data: fullRide } = await svc.from('rides')
+            .select('rider_id, pickup_lat, pickup_lng, dropoff_lat, dropoff_lng, distance_km, duration_min, estimated_fare')
+            .eq('id', body.rideId).single();
+
+          if (fullRide) {
+            const fraud = await assessTripFraud({
+              rideId: body.rideId,
+              riderId: fullRide.rider_id,
+              driverId: driver.id,
+              pickupLat: Number(fullRide.pickup_lat),
+              pickupLng: Number(fullRide.pickup_lng),
+              dropoffLat: Number(fullRide.dropoff_lat),
+              dropoffLng: Number(fullRide.dropoff_lng),
+              distanceKm: Number(fullRide.distance_km ?? 0),
+              durationMin: Number(fullRide.duration_min ?? 0),
+            });
+
+            if (fraud.action === 'cancel') {
+              // Auto-cancel fraudulent trip
+              update.status = 'cancelled';
+              update.cancel_reason = `Fraud detected (score ${fraud.totalScore}): ${fraud.reasons.join(', ')}`;
+              update.cancelled_by = 'system';
+            }
+          }
+        } catch (fraudErr) {
+          console.error('[fraud] Assessment failed (non-blocking):', fraudErr);
+        }
         break;
+      }
       case 'cancelled':
         update.cancelled_at = now;
         update.cancelled_by = 'driver';
