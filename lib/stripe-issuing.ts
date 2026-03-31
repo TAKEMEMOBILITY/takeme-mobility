@@ -1,9 +1,16 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // Stripe Issuing — TAKEME Card operations
 // Creates cardholders, virtual cards, and physical cards via REST API.
+//
+// Feature flag: Set STRIPE_ISSUING_ENABLED=true to enable.
+// When disabled, all functions return mock data without hitting Stripe.
 // ═══════════════════════════════════════════════════════════════════════════
 
 const STRIPE_API = 'https://api.stripe.com/v1';
+
+export function isIssuingEnabled(): boolean {
+  return process.env.STRIPE_ISSUING_ENABLED === 'true';
+}
 
 function getKey(): string {
   const key = process.env.STRIPE_SECRET_KEY ?? '';
@@ -53,6 +60,10 @@ export async function createCardholder(params: {
   postalCode?: string;
   country?: string;
 }): Promise<{ id: string; status: string }> {
+  if (!isIssuingEnabled()) {
+    console.log('[stripe-issuing] Feature disabled — returning mock cardholder');
+    return { id: `ich_mock_${params.userId.slice(0, 8)}`, status: 'active' };
+  }
   const body: Record<string, string> = {
     'name': params.name,
     'email': params.email,
@@ -74,17 +85,42 @@ export async function createCardholder(params: {
 
 // ── Virtual card ─────────────────────────────────────────────────────────
 
-export async function createVirtualCard(cardholderId: string, userId: string): Promise<{
+// Default spending limits for driver cards
+const DRIVER_SPENDING_LIMITS = {
+  dailyLimit: 50000,   // $500/day in cents
+  monthlyLimit: 500000, // $5,000/month in cents
+  perTransaction: 20000, // $200 per transaction in cents
+};
+
+export async function createVirtualCard(cardholderId: string, userId: string, options?: {
+  dailyLimit?: number;
+  monthlyLimit?: number;
+  perTransaction?: number;
+}): Promise<{
   id: string;
   last4: string;
   status: string;
 }> {
+  if (!isIssuingEnabled()) {
+    console.log('[stripe-issuing] Feature disabled — returning mock virtual card');
+    return { id: `ic_mock_v_${userId.slice(0, 8)}`, last4: '0000', status: 'active' };
+  }
+
+  const daily = options?.dailyLimit ?? DRIVER_SPENDING_LIMITS.dailyLimit;
+  const monthly = options?.monthlyLimit ?? DRIVER_SPENDING_LIMITS.monthlyLimit;
+  const perTx = options?.perTransaction ?? DRIVER_SPENDING_LIMITS.perTransaction;
+
   const data = await post('/issuing/cards', {
     'cardholder': cardholderId,
     'currency': 'usd',
     'type': 'virtual',
     'status': 'active',
-    'spending_controls[allowed_categories][]': 'all',
+    'spending_controls[spending_limits][0][amount]': String(daily),
+    'spending_controls[spending_limits][0][interval]': 'daily',
+    'spending_controls[spending_limits][1][amount]': String(monthly),
+    'spending_controls[spending_limits][1][interval]': 'monthly',
+    'spending_controls[spending_limits][2][amount]': String(perTx),
+    'spending_controls[spending_limits][2][interval]': 'per_authorization',
     'metadata[user_id]': userId,
     'metadata[card_type]': 'takeme_virtual',
   });
@@ -109,6 +145,11 @@ export async function createPhysicalCard(cardholderId: string, userId: string, s
   last4: string;
   status: string;
 }> {
+  if (!isIssuingEnabled()) {
+    console.log('[stripe-issuing] Feature disabled — returning mock physical card');
+    return { id: `ic_mock_p_${userId.slice(0, 8)}`, last4: '0000', status: 'inactive' };
+  }
+
   const data = await post('/issuing/cards', {
     'cardholder': cardholderId,
     'currency': 'usd',
