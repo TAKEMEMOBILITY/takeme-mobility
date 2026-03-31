@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { findOrCreateCustomer, createPaymentIntent } from '@/lib/stripe';
 import { dispatchWithRetry } from '@/lib/dispatch-queue';
 import { TIERS, calculateFare, type VehicleClass } from '@/lib/pricing';
+import { rateLimit } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/rides/create
@@ -43,6 +44,10 @@ const requestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limit
+    const rateLimited = await rateLimit(request, 'rides-create');
+    if (rateLimited) return rateLimited;
+
     // 1. Authenticate
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
 import { cacheDriverLocation } from '@/lib/redis';
 import { publishDriverLocation } from '@/lib/ably';
+import { rateLimit } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/driver/location
@@ -19,6 +20,10 @@ const requestSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limit
+    const rateLimited = await rateLimit(request, 'driver-location');
+    if (rateLimited) return rateLimited;
+
     // 1. Authenticate
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

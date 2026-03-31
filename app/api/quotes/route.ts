@@ -4,6 +4,7 @@ import { calculateRoute, geocodeAddress } from '@/lib/route-service';
 import { generateQuotes, type QuoteResult } from '@/lib/pricing';
 import { createClient } from '@/lib/supabase/server';
 import { getSurgeMultiplier } from '@/lib/surge';
+import { rateLimit } from '@/lib/rate-limit';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/quotes
@@ -93,6 +94,10 @@ const QUOTE_TTL_MINUTES = 5;
 
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limit
+    const rateLimited = await rateLimit(request, 'quotes');
+    if (rateLimited) return rateLimited;
+
     // 1. Parse + validate
     let body: RequestBody;
     try {

@@ -1,9 +1,12 @@
 'use client';
 
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // Next.js App Router global error boundary.
 // Catches errors in root layout and all pages.
-// Must render its own <html> and <body> since the root layout may have crashed.
+// Reports to Sentry for observability.
 // ═══════════════════════════════════════════════════════════════════════════
 
 export default function GlobalError({
@@ -13,6 +16,9 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
   return (
     <html lang="en">
       <body style={{ margin: 0, fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif' }}>

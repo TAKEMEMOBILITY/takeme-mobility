@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { sendOTP } from '@/lib/sms';
+import { rateLimit } from '@/lib/rate-limit';
 
 // POST /api/auth/send-otp
 const schema = z.object({
@@ -9,6 +10,10 @@ const schema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // 0. Rate limit check
+    const rateLimited = await rateLimit(request, 'send-otp');
+    if (rateLimited) return rateLimited;
+
     // 1. Validate input
     let body: z.infer<typeof schema>;
     try {

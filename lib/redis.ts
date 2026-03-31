@@ -108,3 +108,49 @@ export async function getDispatchQueueLength(): Promise<number> {
   const r = getRedis();
   return r.llen(DISPATCH_QUEUE);
 }
+
+// ── Dead-letter queue (failed dispatches) ────────────────────────────────
+const DLQ = 'queue:dispatch:dlq';
+
+interface DLQItem {
+  rideId: string;
+  attempts: number;
+  lastError: string;
+  failedAt: number;
+}
+
+export async function moveToDLQ(rideId: string, attempts: number, error: string): Promise<void> {
+  const r = getRedis();
+  const item: DLQItem = { rideId, attempts, lastError: error, failedAt: Date.now() };
+  await r.lpush(DLQ, JSON.stringify(item));
+}
+
+export async function getDLQItems(limit: number = 50): Promise<DLQItem[]> {
+  const r = getRedis();
+  const items = await r.lrange(DLQ, 0, limit - 1);
+  return items.map(item =>
+    typeof item === 'string' ? JSON.parse(item) : item as unknown as DLQItem
+  );
+}
+
+export async function getDLQLength(): Promise<number> {
+  const r = getRedis();
+  return r.llen(DLQ);
+}
+
+export async function retryFromDLQ(): Promise<DLQItem | null> {
+  const r = getRedis();
+  const item = await r.rpop<string>(DLQ);
+  if (!item) return null;
+  const parsed = typeof item === 'string' ? JSON.parse(item) : item as unknown as DLQItem;
+  // Re-enqueue to main dispatch queue with reset attempt counter
+  await enqueueDispatch(parsed.rideId, 0);
+  return parsed;
+}
+
+export async function clearDLQ(): Promise<number> {
+  const r = getRedis();
+  const len = await r.llen(DLQ);
+  if (len > 0) await r.del(DLQ);
+  return len;
+}

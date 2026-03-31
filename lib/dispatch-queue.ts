@@ -13,7 +13,7 @@
 
 import { assignDriver } from '@/lib/dispatch';
 import { createServiceClient } from '@/lib/supabase/service';
-import { enqueueDispatch, dequeueDispatch } from '@/lib/redis';
+import { enqueueDispatch, dequeueDispatch, moveToDLQ } from '@/lib/redis';
 import { sendPushNotification, rideRequestNotification } from '@/lib/push';
 
 const MAX_RETRIES = 5;
@@ -83,7 +83,10 @@ export async function processOneDispatch(): Promise<DispatchQueueResult | null> 
 
   // Failed — re-enqueue or give up
   if (attempt + 1 >= MAX_RETRIES) {
-    // Max retries exhausted — cancel ride
+    // Max retries exhausted — move to dead-letter queue for manual review
+    await moveToDLQ(rideId, attempt + 1, result.error ?? 'No drivers available');
+
+    // Cancel ride
     await supabase
       .from('rides')
       .update({ status: 'cancelled', cancelled_reason: 'no_drivers_available' })
