@@ -1,0 +1,125 @@
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Alert, Linking } from 'react-native';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { API } from '@takeme/shared';
+import { Button } from '@/components/ui';
+import { useTrip } from '@/providers/trip';
+import { colors } from '@/theme/colors';
+import { typography } from '@/theme/typography';
+import { spacing, borderRadius } from '@/theme/spacing';
+
+export default function ArrivedScreen() {
+  const router = useRouter();
+  const { activeTrip, riderInfo, clearTrip, apiClient } = useTrip();
+  const [loading, setLoading] = useState(false);
+
+  const handleStartTrip = async () => {
+    if (!activeTrip || !apiClient || loading) return;
+    setLoading(true);
+    try {
+      await apiClient.put(API.DRIVER_RIDES, {
+        rideId: activeTrip.id,
+        action: 'start_trip',
+      });
+      router.replace('/(app)/trip/active');
+    } catch (err) {
+      Alert.alert('Error', 'Could not start trip.');
+      setLoading(false);
+    }
+  };
+
+  const handleCancel = async () => {
+    if (!activeTrip || !apiClient) return;
+    try {
+      await apiClient.put(API.DRIVER_RIDES, {
+        rideId: activeTrip.id,
+        action: 'cancel',
+        cancelReason: 'Rider no-show',
+      });
+      clearTrip();
+      router.replace('/(app)/(tabs)/dashboard');
+    } catch {
+      clearTrip();
+      router.replace('/(app)/(tabs)/dashboard');
+    }
+  };
+
+  const handleCall = () => {
+    if (riderInfo?.phone) {
+      Linking.openURL(`tel:${riderInfo.phone}`);
+    } else {
+      Alert.alert('Contact', 'Rider phone number not available');
+    }
+  };
+
+  const handleMessage = () => {
+    if (riderInfo?.phone) {
+      Linking.openURL(`sms:${riderInfo.phone}`);
+    } else {
+      Alert.alert('Contact', 'Rider phone number not available');
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.mapPlaceholder}>
+        <Text style={styles.mapLabel}>Waiting for rider</Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.status}>You've arrived</Text>
+        <Text style={styles.hint}>
+          Waiting for {riderInfo?.name ?? 'the rider'} at the pickup location
+        </Text>
+
+        <View style={styles.actions}>
+          <Pressable style={styles.contactButton} onPress={handleCall}>
+            <Text style={styles.contactText}>Call Rider</Text>
+          </Pressable>
+          <Pressable style={styles.contactButton} onPress={handleMessage}>
+            <Text style={styles.contactText}>Message</Text>
+          </Pressable>
+        </View>
+
+        <Button
+          title={loading ? 'Starting...' : 'Start Trip'}
+          onPress={handleStartTrip}
+          size="lg"
+          fullWidth
+          disabled={loading}
+        />
+
+        <Pressable style={styles.cancelLink} onPress={handleCancel}>
+          <Text style={styles.cancelText}>Cancel Ride</Text>
+        </Pressable>
+      </View>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
+  mapPlaceholder: {
+    flex: 1, backgroundColor: colors.gray100,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  mapLabel: { ...typography.h3, color: colors.textMuted },
+  card: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: borderRadius.xl, borderTopRightRadius: borderRadius.xl,
+    padding: spacing['2xl'],
+    shadowColor: colors.black, shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.08, shadowRadius: 12, elevation: 8,
+  },
+  status: { ...typography.h3, color: colors.accent, marginBottom: spacing.xs },
+  hint: { ...typography.body, color: colors.textSecondary, marginBottom: spacing.xl },
+  actions: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.xl },
+  contactButton: {
+    flex: 1, alignItems: 'center', paddingVertical: spacing.md,
+    backgroundColor: colors.gray100, borderRadius: borderRadius.md,
+  },
+  contactText: { ...typography.captionBold, color: colors.text },
+  cancelLink: { alignItems: 'center', marginTop: spacing.lg },
+  cancelText: { ...typography.captionBold, color: colors.error },
+});
