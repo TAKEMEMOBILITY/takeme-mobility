@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { calculateRoute, geocodeAddress } from '@/lib/route-service';
 import { generateQuotes, type QuoteResult } from '@/lib/pricing';
 import { createClient } from '@/lib/supabase/server';
+import { getSurgeMultiplier } from '@/lib/surge';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // POST /api/quotes
@@ -122,9 +123,17 @@ export async function POST(request: NextRequest) {
     const pickupAddress = route.pickupAddress || pickup.address;
     const dropoffAddress = route.dropoffAddress || dropoff.address;
 
-    // 4. Generate fare quotes for all tiers
+    // 4. Calculate dynamic surge multiplier if not explicitly provided
+    let surgeMultiplier = body.surgeMultiplier;
+    if (surgeMultiplier === 1.0) {
+      try {
+        surgeMultiplier = await getSurgeMultiplier(pickup.lat, pickup.lng);
+      } catch { /* fallback to 1.0 */ }
+    }
+
+    // 5. Generate fare quotes for all tiers
     const quotes = generateQuotes(route.distanceKm, route.durationMin, {
-      surgeMultiplier: body.surgeMultiplier,
+      surgeMultiplier,
       currency: body.currency,
     });
 

@@ -5,6 +5,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { createServiceClient } from '@/lib/supabase/service';
+import { selectBestDriver } from '@/lib/matching';
 
 export interface NearbyDriver {
   driver_id: string;
@@ -96,8 +97,9 @@ export async function assignDriver(rideId: string): Promise<AssignmentResult> {
     return { success: false, driver: null, error: 'No drivers available nearby' };
   }
 
-  // 3. Pick the nearest driver
-  const nearest = drivers[0];
+  // 3. Pick the best driver using smart matching algorithm
+  const best = selectBestDriver(drivers, ride.pickup_lat, ride.pickup_lng);
+  const nearest = best ?? drivers[0];
 
   // 4. Assign — update ride and driver atomically
   const now = new Date().toISOString();

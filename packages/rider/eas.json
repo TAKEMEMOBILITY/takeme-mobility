@@ -1,0 +1,57 @@
+{
+  "cli": {
+    "version": ">= 18.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Debug",
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://qghlgmqruguaoijkuwyu.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_QCo_-OsEUSwodxTP8uNLoA_YFxeqngF",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyAAzHRMlXeeVY7F9ttuGoqaBQCF-wpzLK8",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TFnhBDAgNx57aS7vu4pk9pWBMRkNoTOOZttRSouVJKld0Cbcayc8xKaGnER36c8lAMffdr83WXkCJ4fIAZ7BXwo000yYDknuU",
+        "EXPO_PUBLIC_API_BASE_URL": "https://your-api.vercel.app",
+        "EXPO_PUBLIC_AUTH_MODE": "dev"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "ios": {
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://qghlgmqruguaoijkuwyu.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_QCo_-OsEUSwodxTP8uNLoA_YFxeqngF",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyAAzHRMlXeeVY7F9ttuGoqaBQCF-wpzLK8",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TFnhBDAgNx57aS7vu4pk9pWBMRkNoTOOZttRSouVJKld0Cbcayc8xKaGnER36c8lAMffdr83WXkCJ4fIAZ7BXwo000yYDknuU",
+        "EXPO_PUBLIC_API_BASE_URL": "https://your-api.vercel.app",
+        "EXPO_PUBLIC_AUTH_MODE": "dev"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_SUPABASE_URL": "https://qghlgmqruguaoijkuwyu.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "sb_publishable_QCo_-OsEUSwodxTP8uNLoA_YFxeqngF",
+        "EXPO_PUBLIC_GOOGLE_MAPS_API_KEY": "AIzaSyAAzHRMlXeeVY7F9ttuGoqaBQCF-wpzLK8",
+        "EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY": "pk_test_51TFnhBDAgNx57aS7vu4pk9pWBMRkNoTOOZttRSouVJKld0Cbcayc8xKaGnER36c8lAMffdr83WXkCJ4fIAZ7BXwo000yYDknuU",
+        "EXPO_PUBLIC_API_BASE_URL": "https://your-api.vercel.app",
+        "EXPO_PUBLIC_AUTH_MODE": "production"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-apple-id@example.com",
+        "ascAppId": "your-asc-app-id"
+      }
+    }
+  }
+}

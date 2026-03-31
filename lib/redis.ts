@@ -1,0 +1,110 @@
+// ═══════════════════════════════════════════════════════════════════════════
+// TAKEME MOBILITY — Upstash Redis Client
+// Serverless Redis for dispatch queue, driver cache, rate limiting.
+// ═══════════════════════════════════════════════════════════════════════════
+
+import { Redis } from '@upstash/redis';
+
+let redis: Redis | null = null;
+
+export function getRedis(): Redis {
+  if (!redis) {
+    const url = process.env.UPSTASH_REDIS_REST_URL;
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+    if (!url || !token) {
+      throw new Error('UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN required');
+    }
+    redis = new Redis({ url, token });
+  }
+  return redis;
+}
+
+// ── Driver availability cache ────────────────────────────────────────────
+// Stores online drivers with their location for fast proximity lookups.
+// TTL: 90 seconds (drivers must send heartbeat via location updates)
+
+interface CachedDriverLocation {
+  driverId: string;
+  lat: number;
+  lng: number;
+  heading: number | null;
+  speedKmh: number | null;
+  vehicleClass: string;
+  updatedAt: number; // epoch ms
+}
+
+const DRIVER_KEY_PREFIX = 'driver:loc:';
+const ONLINE_DRIVERS_SET = 'drivers:online';
+const DRIVER_TTL = 90; // seconds
+
+export async function cacheDriverLocation(data: CachedDriverLocation): Promise<void> {
+  const r = getRedis();
+  const key = `${DRIVER_KEY_PREFIX}${data.driverId}`;
+
+  await Promise.all([
+    r.set(key, JSON.stringify(data), { ex: DRIVER_TTL }),
+    r.sadd(ONLINE_DRIVERS_SET, data.driverId),
+    r.expire(ONLINE_DRIVERS_SET, 300), // cleanup set every 5 min
+  ]);
+}
+
+export async function getDriverLocation(driverId: string): Promise<CachedDriverLocation | null> {
+  const r = getRedis();
+  const data = await r.get<string>(`${DRIVER_KEY_PREFIX}${driverId}`);
+  if (!data) return null;
+  return typeof data === 'string' ? JSON.parse(data) : data as unknown as CachedDriverLocation;
+}
+
+export async function getOnlineDriverIds(): Promise<string[]> {
+  const r = getRedis();
+  return (await r.smembers(ONLINE_DRIVERS_SET)) as string[];
+}
+
+export async function removeDriverFromCache(driverId: string): Promise<void> {
+  const r = getRedis();
+  await Promise.all([
+    r.del(`${DRIVER_KEY_PREFIX}${driverId}`),
+    r.srem(ONLINE_DRIVERS_SET, driverId),
+  ]);
+}
+
+// ── Generic rate limiter ─────────────────────────────────────────────────
+export async function checkRateLimit(
+  key: string,
+  maxRequests: number,
+  windowSeconds: number,
+): Promise<{ allowed: boolean; remaining: number }> {
+  const r = getRedis();
+  const fullKey = `ratelimit:${key}`;
+  const current = await r.incr(fullKey);
+
+  if (current === 1) {
+    await r.expire(fullKey, windowSeconds);
+  }
+
+  return {
+    allowed: current <= maxRequests,
+    remaining: Math.max(0, maxRequests - current),
+  };
+}
+
+// ── Dispatch queue (Redis-backed) ────────────────────────────────────────
+const DISPATCH_QUEUE = 'queue:dispatch';
+
+export async function enqueueDispatch(rideId: string, attempt: number = 0): Promise<void> {
+  const r = getRedis();
+  const item = JSON.stringify({ rideId, attempt, enqueuedAt: Date.now() });
+  await r.lpush(DISPATCH_QUEUE, item);
+}
+
+export async function dequeueDispatch(): Promise<{ rideId: string; attempt: number } | null> {
+  const r = getRedis();
+  const item = await r.rpop<string>(DISPATCH_QUEUE);
+  if (!item) return null;
+  return typeof item === 'string' ? JSON.parse(item) : item as unknown as { rideId: string; attempt: number };
+}
+
+export async function getDispatchQueueLength(): Promise<number> {
+  const r = getRedis();
+  return r.llen(DISPATCH_QUEUE);
+}
