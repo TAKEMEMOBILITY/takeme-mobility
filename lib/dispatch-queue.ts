@@ -1,184 +1,257 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// TAKEME MOBILITY — Persistent Dispatch Queue
-// Redis-backed queue with API-triggered processing.
-// Survives Vercel serverless timeouts (unlike in-memory retry loops).
+// TAKEME MOBILITY — Production Dispatch Queue
 //
-// Flow:
-// 1. Ride created → enqueueDispatch(rideId)
-// 2. Cron/API → processDispatchQueue() picks items, runs assignDriver()
-// 3. On success → push notification to driver
-// 4. On failure → re-enqueue with incremented attempt (max 5)
-// 5. On max retries → cancel ride, notify rider
+// Offer → Accept/Timeout → Escalate cycle:
+//   1. QStash triggers worker instantly on ride creation
+//   2. Worker acquires Redis lock, finds best candidate
+//   3. Offer sent to driver (push + Redis key with 15s TTL)
+//   4. QStash schedules 15s timeout callback
+//   5. If driver accepts → finalize (cleared via driver/rides API)
+//   6. If timeout → exclude driver, escalate to next candidate
+//   7. After 3 attempts → cancel ride, DLQ, Sentry alert
 // ═══════════════════════════════════════════════════════════════════════════
 
-import { assignDriver } from '@/lib/dispatch';
+import * as Sentry from '@sentry/nextjs';
+import {
+  findCandidates,
+  offerRideToDriver,
+  checkOfferAccepted,
+  handleOfferExpiry,
+  MAX_ESCALATIONS,
+} from '@/lib/dispatch';
 import { createServiceClient } from '@/lib/supabase/service';
-import { enqueueDispatch, dequeueDispatch, moveToDLQ } from '@/lib/redis';
-import { publishDispatchEvent, scheduleDispatchRetry } from '@/lib/qstash';
-import { sendPushNotification, rideRequestNotification } from '@/lib/push';
+import {
+  acquireDispatchLock,
+  releaseDispatchLock,
+  getDriverOffer,
+  moveToDLQ,
+  cleanupDispatchState,
+  enqueueDispatch,
+  dequeueDispatch,
+} from '@/lib/redis';
+import { publishDispatchEvent, scheduleOfferTimeout } from '@/lib/qstash';
+import { sendPushNotification } from '@/lib/push';
 
-const MAX_RETRIES = 5;
-
-interface DispatchQueueResult {
-  assigned: boolean;
+interface DispatchResult {
+  action: 'offered' | 'assigned' | 'escalated' | 'cancelled' | 'skipped';
+  rideId: string;
+  attempt: number;
   driverName?: string;
-  retries: number;
   error?: string;
 }
 
 /**
- * Enqueue a ride for dispatch. Called from rides/create route.
- * Tries QStash first (instant, event-driven), falls back to Redis queue.
+ * Main dispatch handler — called by worker endpoint.
+ * Finds best driver and sends offer (does NOT assign immediately).
+ */
+export async function dispatchRide(rideId: string, attempt: number = 0): Promise<DispatchResult> {
+  // 1. Acquire lock — prevents double-dispatch
+  const locked = await acquireDispatchLock(rideId);
+  if (!locked) {
+    return { action: 'skipped', rideId, attempt, error: 'Already being dispatched' };
+  }
+
+  try {
+    // 2. Find candidates (excludes already-timed-out drivers)
+    const { candidates, ride } = await findCandidates(rideId);
+
+    if (!ride) {
+      await releaseDispatchLock(rideId);
+      return { action: 'skipped', rideId, attempt, error: 'Ride no longer searching' };
+    }
+
+    if (candidates.length === 0) {
+      // No candidates left — check if we should cancel or retry
+      if (attempt >= MAX_ESCALATIONS) {
+        await cancelRideNoDrivers(rideId, attempt);
+        return { action: 'cancelled', rideId, attempt, error: 'No drivers after max escalations' };
+      }
+      // Release lock and retry later (maybe new drivers come online)
+      await releaseDispatchLock(rideId);
+      const retried = await publishDispatchEvent(rideId, attempt + 1);
+      if (!retried) await enqueueDispatch(rideId, attempt + 1);
+      return { action: 'escalated', rideId, attempt, error: 'No candidates, retrying' };
+    }
+
+    // 3. Pick best candidate
+    const driver = candidates[0];
+
+    // 4. Send offer (Redis key + push notification)
+    await offerRideToDriver(rideId, driver, ride);
+
+    // 5. Schedule timeout check in 15 seconds via QStash
+    const scheduled = await scheduleOfferTimeout(rideId, attempt);
+    if (!scheduled) {
+      // QStash unavailable — fall back to Redis queue with delay marker
+      console.warn(`[dispatch] QStash timeout scheduling failed for ${rideId}, using Redis fallback`);
+    }
+
+    // Release lock (timeout handler will re-lock if needed)
+    await releaseDispatchLock(rideId);
+
+    return {
+      action: 'offered',
+      rideId,
+      attempt,
+      driverName: driver.driver_name,
+    };
+  } catch (err) {
+    await releaseDispatchLock(rideId);
+    Sentry.captureException(err, {
+      tags: { component: 'dispatch', rideId, attempt: String(attempt) },
+    });
+    console.error(`[dispatch] Error dispatching ride ${rideId}:`, err);
+    return { action: 'skipped', rideId, attempt, error: String(err) };
+  }
+}
+
+/**
+ * Handle offer timeout — called 15s after offer was sent.
+ * Checks if driver accepted. If not, escalates to next candidate.
+ */
+export async function handleTimeout(rideId: string, attempt: number): Promise<DispatchResult> {
+  // Check if offer was already accepted
+  const accepted = await checkOfferAccepted(rideId);
+  if (accepted) {
+    return { action: 'assigned', rideId, attempt };
+  }
+
+  // Offer expired — get the driver who was offered
+  const offeredDriverId = await getDriverOffer(rideId);
+
+  if (offeredDriverId) {
+    // Driver didn't respond — expire the offer
+    await handleOfferExpiry(rideId, offeredDriverId);
+
+    Sentry.captureMessage(`Driver offer timed out for ride ${rideId}`, {
+      level: 'warning',
+      tags: { component: 'dispatch', rideId, driverId: offeredDriverId, attempt: String(attempt) },
+    });
+  }
+
+  // Check if we've exhausted escalation attempts
+  const nextAttempt = attempt + 1;
+  if (nextAttempt >= MAX_ESCALATIONS) {
+    await cancelRideNoDrivers(rideId, nextAttempt);
+    return { action: 'cancelled', rideId, attempt: nextAttempt, error: 'Max escalations reached' };
+  }
+
+  // Escalate: trigger dispatch again for next candidate
+  console.log(`[dispatch] Escalating ride ${rideId} to attempt ${nextAttempt}`);
+  const published = await publishDispatchEvent(rideId, nextAttempt);
+  if (!published) {
+    await enqueueDispatch(rideId, nextAttempt);
+  }
+
+  return { action: 'escalated', rideId, attempt: nextAttempt };
+}
+
+/**
+ * Cancel ride after all escalation attempts failed.
+ */
+async function cancelRideNoDrivers(rideId: string, attempts: number): Promise<void> {
+  const supabase = createServiceClient();
+
+  // Move to DLQ for review
+  await moveToDLQ(rideId, attempts, 'No driver accepted after max escalations');
+
+  // Cancel ride
+  await supabase
+    .from('rides')
+    .update({ status: 'cancelled', cancelled_reason: 'no_drivers_available' })
+    .eq('id', rideId)
+    .eq('status', 'searching_driver');
+
+  // Log event
+  await supabase.from('ride_events').insert({
+    ride_id: rideId,
+    event_type: 'dispatch_exhausted',
+    new_status: 'cancelled',
+    old_status: 'searching_driver',
+    actor: 'system',
+    metadata: { attempts, reason: 'All drivers timed out or unavailable' },
+  });
+
+  // Notify rider
+  const { data: rideData } = await supabase
+    .from('rides')
+    .select('rider_id')
+    .eq('id', rideId)
+    .single();
+
+  if (rideData?.rider_id) {
+    const { data: push } = await supabase
+      .from('push_tokens')
+      .select('token')
+      .eq('user_id', rideData.rider_id)
+      .eq('role', 'rider')
+      .single();
+
+    if (push?.token) {
+      await sendPushNotification({
+        to: push.token,
+        title: 'No Drivers Available',
+        body: 'We couldn\'t find a driver for your ride. Please try again.',
+        data: { type: 'dispatch_failed', rideId },
+        priority: 'high',
+      });
+    }
+  }
+
+  // Cleanup Redis state
+  await cleanupDispatchState(rideId);
+
+  // Alert in Sentry
+  Sentry.captureMessage(`Ride ${rideId} cancelled — no drivers after ${attempts} escalations`, {
+    level: 'error',
+    tags: { component: 'dispatch', rideId },
+    extra: { attempts },
+  });
+
+  console.error(`[dispatch] Ride ${rideId} cancelled — no drivers after ${attempts} attempts`);
+}
+
+/**
+ * Queue a ride for dispatch (called from rides/create).
+ * Tries QStash first for instant dispatch, falls back to Redis queue.
  */
 export async function queueRideForDispatch(rideId: string): Promise<void> {
   const published = await publishDispatchEvent(rideId, 0);
   if (!published) {
-    // QStash unavailable — fall back to Redis queue (processed by cron)
     await enqueueDispatch(rideId, 0);
   }
 }
 
 /**
- * Process one item from the dispatch queue.
- * Called by the dispatch worker API endpoint or cron job.
+ * Process items from Redis queue (cron fallback).
  */
-export async function processOneDispatch(): Promise<DispatchQueueResult | null> {
-  const item = await dequeueDispatch();
-  if (!item) return null;
-
-  const { rideId, attempt } = item;
-  const supabase = createServiceClient();
-
-  // Check ride is still searching
-  const { data: ride } = await supabase
-    .from('rides')
-    .select('status, pickup_address, dropoff_address, estimated_fare, distance_km')
-    .eq('id', rideId)
-    .single();
-
-  if (!ride || ride.status !== 'searching_driver') {
-    return { assigned: false, retries: attempt, error: 'Ride no longer searching' };
-  }
-
-  // Attempt assignment
-  const result = await assignDriver(rideId);
-
-  if (result.success && result.driver) {
-    console.log(`[dispatch-queue] Ride ${rideId} → ${result.driver.driver_name} (attempt ${attempt + 1})`);
-
-    // Send push notification to assigned driver
-    const { data: pushToken } = await supabase
-      .from('push_tokens')
-      .select('token')
-      .eq('user_id', result.driver.driver_id)
-      .eq('role', 'driver')
-      .single();
-
-    if (pushToken?.token) {
-      await sendPushNotification(rideRequestNotification(pushToken.token, {
-        rideId,
-        pickupAddress: ride.pickup_address,
-        dropoffAddress: ride.dropoff_address,
-        estimatedFare: Number(ride.estimated_fare),
-        distanceKm: Number(ride.distance_km),
-      }));
-    }
-
-    return { assigned: true, driverName: result.driver.driver_name, retries: attempt + 1 };
-  }
-
-  // Failed — re-enqueue or give up
-  if (attempt + 1 >= MAX_RETRIES) {
-    // Max retries exhausted — move to dead-letter queue for manual review
-    await moveToDLQ(rideId, attempt + 1, result.error ?? 'No drivers available');
-
-    // Cancel ride
-    await supabase
-      .from('rides')
-      .update({ status: 'cancelled', cancelled_reason: 'no_drivers_available' })
-      .eq('id', rideId)
-      .eq('status', 'searching_driver');
-
-    await supabase.from('ride_events').insert({
-      ride_id: rideId,
-      event_type: 'dispatch_timeout',
-      new_status: 'cancelled',
-      old_status: 'searching_driver',
-      actor: 'system',
-      metadata: { reason: result.error, max_retries: MAX_RETRIES },
-    });
-
-    // Notify rider that no drivers found
-    const { data: rideData } = await supabase
-      .from('rides')
-      .select('rider_id')
-      .eq('id', rideId)
-      .single();
-
-    if (rideData?.rider_id) {
-      const { data: riderPush } = await supabase
-        .from('push_tokens')
-        .select('token')
-        .eq('user_id', rideData.rider_id)
-        .eq('role', 'rider')
-        .single();
-
-      if (riderPush?.token) {
-        await sendPushNotification({
-          to: riderPush.token,
-          title: 'No Drivers Available',
-          body: 'We couldn\'t find a driver for your ride. Please try again.',
-          data: { type: 'dispatch_failed', rideId },
-        });
-      }
-    }
-
-    console.warn(`[dispatch-queue] Ride ${rideId} cancelled after ${MAX_RETRIES} retries`);
-    return { assigned: false, retries: MAX_RETRIES, error: 'No drivers found' };
-  }
-
-  // Re-enqueue with exponential backoff — QStash first, Redis fallback
-  const retried = await scheduleDispatchRetry(rideId, attempt + 1);
-  if (!retried) {
-    await enqueueDispatch(rideId, attempt + 1);
-  }
-  return { assigned: false, retries: attempt + 1, error: result.error };
-}
-
-/**
- * Process all pending items in the queue (up to a limit).
- * Called by the dispatch worker cron endpoint.
- */
-export async function processDispatchQueue(maxItems: number = 10): Promise<{
-  processed: number;
-  assigned: number;
-  failed: number;
+export async function processRedisQueue(maxItems: number = 10): Promise<{
+  processed: number; offered: number; failed: number;
 }> {
   let processed = 0;
-  let assigned = 0;
+  let offered = 0;
   let failed = 0;
 
   for (let i = 0; i < maxItems; i++) {
-    const result = await processOneDispatch();
-    if (!result) break; // queue empty
+    const item = await dequeueDispatch();
+    if (!item) break;
 
+    const result = await dispatchRide(item.rideId, item.attempt);
     processed++;
-    if (result.assigned) assigned++;
+    if (result.action === 'offered') offered++;
     else failed++;
   }
 
-  return { processed, assigned, failed };
+  return { processed, offered, failed };
 }
 
-// Legacy export for backward compatibility with rides/create
-export async function dispatchWithRetry(rideId: string): Promise<DispatchQueueResult> {
-  // First try synchronously
+// Legacy export
+export async function dispatchWithRetry(rideId: string): Promise<{ assigned: boolean; retries: number; error?: string }> {
+  const { findCandidates: fc, assignDriver } = await import('@/lib/dispatch');
   const result = await assignDriver(rideId);
-  if (result.success && result.driver) {
-    return { assigned: true, driverName: result.driver.driver_name, retries: 1 };
+  if (result.success) {
+    return { assigned: true, retries: 1 };
   }
-
-  // Enqueue for background processing
   await queueRideForDispatch(rideId);
   return { assigned: false, retries: 0, error: 'Queued for background dispatch' };
 }

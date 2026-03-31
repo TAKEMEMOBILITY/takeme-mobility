@@ -109,6 +109,62 @@ export async function getDispatchQueueLength(): Promise<number> {
   return r.llen(DISPATCH_QUEUE);
 }
 
+// ── Dispatch lock (prevents double-dispatch) ─────────────────────────────
+
+export async function acquireDispatchLock(rideId: string, ttlSec: number = 60): Promise<boolean> {
+  const r = getRedis();
+  const key = `dispatch:lock:${rideId}`;
+  const result = await r.set(key, '1', { nx: true, ex: ttlSec });
+  return result === 'OK';
+}
+
+export async function releaseDispatchLock(rideId: string): Promise<void> {
+  const r = getRedis();
+  await r.del(`dispatch:lock:${rideId}`);
+}
+
+// ── Driver offer tracking (15s TTL per offer) ────────────────────────────
+
+export async function setDriverOffer(rideId: string, driverId: string, ttlSec: number = 15): Promise<void> {
+  const r = getRedis();
+  await r.set(`dispatch:offer:${rideId}`, driverId, { ex: ttlSec });
+}
+
+export async function getDriverOffer(rideId: string): Promise<string | null> {
+  const r = getRedis();
+  return r.get<string>(`dispatch:offer:${rideId}`);
+}
+
+export async function clearDriverOffer(rideId: string): Promise<void> {
+  const r = getRedis();
+  await r.del(`dispatch:offer:${rideId}`);
+}
+
+// ── Excluded drivers (already offered + timed out for this ride) ─────────
+
+export async function addExcludedDriver(rideId: string, driverId: string): Promise<void> {
+  const r = getRedis();
+  const key = `dispatch:excluded:${rideId}`;
+  await r.sadd(key, driverId);
+  await r.expire(key, 300); // 5 min TTL
+}
+
+export async function getExcludedDrivers(rideId: string): Promise<string[]> {
+  const r = getRedis();
+  return (await r.smembers(`dispatch:excluded:${rideId}`)) as string[];
+}
+
+// ── Cleanup all dispatch state for a ride ────────────────────────────────
+
+export async function cleanupDispatchState(rideId: string): Promise<void> {
+  const r = getRedis();
+  await Promise.all([
+    r.del(`dispatch:lock:${rideId}`),
+    r.del(`dispatch:offer:${rideId}`),
+    r.del(`dispatch:excluded:${rideId}`),
+  ]);
+}
+
 // ── Dead-letter queue (failed dispatches) ────────────────────────────────
 const DLQ = 'queue:dispatch:dlq';
 

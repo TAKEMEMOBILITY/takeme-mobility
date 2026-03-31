@@ -1,11 +1,29 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// TAKEME MOBILITY — Dispatch Service
-// Finds nearby drivers and assigns them to rides.
-// Runs server-side only with service role (bypasses RLS).
+// TAKEME MOBILITY — Dispatch Service (Production-Grade)
+//
+// Flow: offer → accept/timeout → escalate
+//   1. Find candidates (PostGIS + smart matching)
+//   2. Offer ride to best driver (Redis offer with 15s TTL + push)
+//   3. If driver accepts within 15s → finalize assignment
+//   4. If timeout → exclude driver, offer to next candidate
+//   5. After 3 attempts → cancel ride, DLQ, Sentry
+//
+// Redis lock prevents double-dispatch of the same ride.
 // ═══════════════════════════════════════════════════════════════════════════
 
 import { createServiceClient } from '@/lib/supabase/service';
-import { selectBestDriver } from '@/lib/matching';
+import { selectBestDriver, type DriverCandidate } from '@/lib/matching';
+import {
+  setDriverOffer,
+  getDriverOffer,
+  clearDriverOffer,
+  addExcludedDriver,
+  getExcludedDrivers,
+} from '@/lib/redis';
+import { sendPushNotification, rideRequestNotification } from '@/lib/push';
+
+export const OFFER_TIMEOUT_SEC = 15;
+export const MAX_ESCALATIONS = 3;
 
 export interface NearbyDriver {
   driver_id: string;
@@ -39,7 +57,6 @@ export async function findNearbyDrivers(
   limit = 10,
 ): Promise<NearbyDriver[]> {
   const supabase = createServiceClient();
-
   const { data, error } = await supabase.rpc('find_nearby_drivers', {
     pickup_lat: pickupLat,
     pickup_lng: pickupLng,
@@ -52,96 +69,239 @@ export async function findNearbyDrivers(
     console.error('find_nearby_drivers RPC failed:', error.message);
     return [];
   }
-
   return (data as NearbyDriver[]) ?? [];
 }
 
 /**
- * Assign the nearest available driver to a ride.
- * Updates ride status to driver_assigned and driver status to busy.
- * Returns the assigned driver or null if none available.
+ * Find candidates for a ride, excluding already-offered drivers.
+ * Returns ranked list (best match first).
  */
-export async function assignDriver(rideId: string): Promise<AssignmentResult> {
+export async function findCandidates(rideId: string): Promise<{
+  candidates: NearbyDriver[];
+  ride: { id: string; pickup_lat: number; pickup_lng: number; vehicle_class: string; status: string; pickup_address: string; dropoff_address: string; estimated_fare: number; distance_km: number } | null;
+}> {
   const supabase = createServiceClient();
 
-  // 1. Fetch ride details
-  const { data: ride, error: rideError } = await supabase
+  const { data: ride } = await supabase
     .from('rides')
-    .select('id, pickup_lat, pickup_lng, vehicle_class, status')
+    .select('id, pickup_lat, pickup_lng, vehicle_class, status, pickup_address, dropoff_address, estimated_fare, distance_km')
     .eq('id', rideId)
     .single();
 
-  if (rideError || !ride) {
-    return { success: false, driver: null, error: 'Ride not found' };
+  if (!ride || ride.status !== 'searching_driver') {
+    return { candidates: [], ride: null };
   }
 
-  if (ride.status !== 'searching_driver') {
-    return { success: false, driver: null, error: `Ride is in status ${ride.status}, not searching_driver` };
-  }
+  // Get excluded drivers (already timed out for this ride)
+  const excluded = await getExcludedDrivers(rideId);
 
-  // 2. Find nearby drivers (expanding radius if needed)
+  // Find nearby drivers with expanding radius
   let drivers: NearbyDriver[] = [];
-  const radii = [3000, 5000, 10000]; // 3km, 5km, 10km
-
+  const radii = [3000, 5000, 10000];
   for (const radius of radii) {
-    drivers = await findNearbyDrivers(
-      ride.pickup_lat,
-      ride.pickup_lng,
-      ride.vehicle_class,
-      radius,
-    );
+    drivers = await findNearbyDrivers(ride.pickup_lat, ride.pickup_lng, ride.vehicle_class as 'economy' | 'comfort' | 'premium', radius);
+    // Filter out excluded drivers
+    drivers = drivers.filter(d => !excluded.includes(d.driver_id));
     if (drivers.length > 0) break;
   }
 
-  if (drivers.length === 0) {
-    return { success: false, driver: null, error: 'No drivers available nearby' };
+  // Rank by smart matching
+  if (drivers.length > 1) {
+    const best = selectBestDriver(drivers as DriverCandidate[], ride.pickup_lat, ride.pickup_lng);
+    if (best) {
+      // Move best to front, keep rest as fallbacks
+      drivers = [best as unknown as NearbyDriver, ...drivers.filter(d => d.driver_id !== best.driver_id)];
+    }
   }
 
-  // 3. Pick the best driver using smart matching algorithm
-  const best = selectBestDriver(drivers, ride.pickup_lat, ride.pickup_lng);
-  const nearest = best ?? drivers[0];
+  return { candidates: drivers, ride };
+}
 
-  // 4. Assign — update ride and driver atomically
+/**
+ * Offer a ride to a specific driver.
+ * Sets Redis offer key (15s TTL) and sends push notification.
+ * Does NOT assign the ride — waits for driver to accept.
+ */
+export async function offerRideToDriver(
+  rideId: string,
+  driver: NearbyDriver,
+  ride: { pickup_address: string; dropoff_address: string; estimated_fare: number; distance_km: number },
+): Promise<boolean> {
+  // Set offer in Redis (15s TTL — auto-expires if driver doesn't respond)
+  await setDriverOffer(rideId, driver.driver_id, OFFER_TIMEOUT_SEC);
+
+  // Send push notification to driver
+  const supabase = createServiceClient();
+  const { data: pushToken } = await supabase
+    .from('push_tokens')
+    .select('token')
+    .eq('user_id', driver.driver_id)
+    .eq('role', 'driver')
+    .single();
+
+  if (pushToken?.token) {
+    await sendPushNotification(rideRequestNotification(pushToken.token, {
+      rideId,
+      pickupAddress: ride.pickup_address,
+      dropoffAddress: ride.dropoff_address,
+      estimatedFare: Number(ride.estimated_fare),
+      distanceKm: Number(ride.distance_km),
+    }));
+  }
+
+  // Log the offer
+  await supabase.from('ride_events').insert({
+    ride_id: rideId,
+    event_type: 'offer_sent',
+    actor: 'system',
+    metadata: {
+      driver_id: driver.driver_id,
+      driver_name: driver.driver_name,
+      distance_m: driver.distance_m,
+      timeout_sec: OFFER_TIMEOUT_SEC,
+    },
+  });
+
+  console.log(`[dispatch] Offered ride ${rideId} to ${driver.driver_name} (${Math.round(driver.distance_m)}m away, ${OFFER_TIMEOUT_SEC}s timeout)`);
+  return true;
+}
+
+/**
+ * Check if the offer for a ride was accepted by the driver.
+ * If the Redis offer key is gone, the driver accepted (cleared it via accept API).
+ */
+export async function checkOfferAccepted(rideId: string): Promise<boolean> {
+  const offer = await getDriverOffer(rideId);
+  // If key is null, either accepted (cleared) or expired (TTL)
+  // We check the ride status to distinguish
+  const supabase = createServiceClient();
+  const { data: ride } = await supabase
+    .from('rides')
+    .select('status')
+    .eq('id', rideId)
+    .single();
+
+  return ride?.status === 'driver_assigned' || ride?.status === 'driver_arriving';
+}
+
+/**
+ * Handle offer timeout: exclude the driver, release them back to available.
+ */
+export async function handleOfferExpiry(rideId: string, driverId: string): Promise<void> {
+  // Add to excluded list so we don't re-offer
+  await addExcludedDriver(rideId, driverId);
+
+  // Clear any remaining offer
+  await clearDriverOffer(rideId);
+
+  // Log timeout
+  const supabase = createServiceClient();
+  await supabase.from('ride_events').insert({
+    ride_id: rideId,
+    event_type: 'offer_timeout',
+    actor: 'system',
+    metadata: { driver_id: driverId, timeout_sec: OFFER_TIMEOUT_SEC },
+  });
+
+  console.log(`[dispatch] Offer timed out for ride ${rideId}, driver ${driverId}`);
+}
+
+/**
+ * Finalize assignment — called when driver accepts the offer.
+ * Updates ride status + driver status atomically.
+ */
+export async function finalizeAssignment(rideId: string, driverId: string): Promise<AssignmentResult> {
+  const supabase = createServiceClient();
+
+  // Clear the Redis offer (signals acceptance to timeout checker)
+  await clearDriverOffer(rideId);
+
+  // Get driver details
+  const { data: drivers } = await supabase
+    .from('drivers')
+    .select('id, full_name, rating')
+    .eq('id', driverId)
+    .single();
+
+  const { data: vehicle } = await supabase
+    .from('vehicles')
+    .select('id, make, model, color, plate_number')
+    .eq('driver_id', driverId)
+    .eq('is_active', true)
+    .single();
+
+  if (!drivers) {
+    return { success: false, driver: null, error: 'Driver not found' };
+  }
+
   const now = new Date().toISOString();
 
+  // Update ride (optimistic lock)
   const { error: assignError } = await supabase
     .from('rides')
     .update({
-      assigned_driver_id: nearest.driver_id,
-      vehicle_id: nearest.vehicle_id,
+      assigned_driver_id: driverId,
+      vehicle_id: vehicle?.id ?? null,
       status: 'driver_assigned',
       driver_assigned_at: now,
     })
     .eq('id', rideId)
-    .eq('status', 'searching_driver'); // optimistic lock
+    .eq('status', 'searching_driver');
 
   if (assignError) {
-    console.error('Ride assignment failed:', assignError.message);
-    return { success: false, driver: null, error: 'Assignment failed' };
+    return { success: false, driver: null, error: 'Assignment failed — ride status changed' };
   }
 
-  // 5. Set driver status to busy
+  // Set driver to busy
   await supabase
     .from('drivers')
     .update({ status: 'busy' })
-    .eq('id', nearest.driver_id)
-    .eq('status', 'available'); // only if still available
+    .eq('id', driverId)
+    .eq('status', 'available');
 
-  // 6. Log the assignment event
+  // Cleanup dispatch state
+  const { cleanupDispatchState } = await import('@/lib/redis');
+  await cleanupDispatchState(rideId);
+
+  // Log event
   await supabase.from('ride_events').insert({
     ride_id: rideId,
     event_type: 'driver_assigned',
     new_status: 'driver_assigned',
     old_status: 'searching_driver',
-    actor: 'system',
+    actor: 'driver',
     metadata: {
-      driver_id: nearest.driver_id,
-      driver_name: nearest.driver_name,
-      vehicle: `${nearest.vehicle_make} ${nearest.vehicle_model}`,
-      plate: nearest.plate_number,
-      distance_m: nearest.distance_m,
+      driver_id: driverId,
+      driver_name: drivers.full_name,
+      vehicle: vehicle ? `${vehicle.make} ${vehicle.model}` : 'Unknown',
+      plate: vehicle?.plate_number ?? '',
     },
   });
 
-  return { success: true, driver: nearest };
+  const driverResult: NearbyDriver = {
+    driver_id: driverId,
+    driver_name: drivers.full_name,
+    driver_rating: Number(drivers.rating),
+    vehicle_id: vehicle?.id ?? '',
+    vehicle_make: vehicle?.make ?? '',
+    vehicle_model: vehicle?.model ?? '',
+    vehicle_color: vehicle?.color ?? '',
+    plate_number: vehicle?.plate_number ?? '',
+    distance_m: 0,
+    heading: null,
+    lat: 0,
+    lng: 0,
+  };
+
+  return { success: true, driver: driverResult };
+}
+
+// Legacy export for backward compatibility
+export async function assignDriver(rideId: string): Promise<AssignmentResult> {
+  const { candidates, ride } = await findCandidates(rideId);
+  if (candidates.length === 0 || !ride) {
+    return { success: false, driver: null, error: 'No drivers available' };
+  }
+  // Direct assignment (used for first sync attempt in ride creation)
+  return finalizeAssignment(rideId, candidates[0].driver_id);
 }

@@ -1,24 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { processDispatchQueue, processOneDispatch } from '@/lib/dispatch-queue';
-import { getDispatchQueueLength, enqueueDispatch } from '@/lib/redis';
+import { dispatchRide, handleTimeout, processRedisQueue } from '@/lib/dispatch-queue';
+import { getDispatchQueueLength } from '@/lib/redis';
 
+// ═══════════════════════════════════════════════════════════════════════════
 // /api/dispatch/worker
-// Processes dispatch queue items. Called by:
-// - QStash (event-driven, POST with {rideId, attempt} body)
-// - Vercel Cron (every 1 minute, GET with CRON_SECRET)
-// - Manual trigger
 //
-// QStash gives sub-5s matching. Cron is the safety net.
+// Action-based routing:
+//   POST { action: 'dispatch',      rideId, attempt } — Find + offer driver
+//   POST { action: 'timeout_check', rideId, attempt } — Check if accepted, escalate
+//   GET  (with CRON_SECRET)                           — Process Redis queue (cron)
+//   GET  (no auth)                                    — Health check
+// ═══════════════════════════════════════════════════════════════════════════
 
 function isAuthorized(request: NextRequest): boolean {
   const cronSecret = process.env.CRON_SECRET;
   if (!cronSecret) return true;
   const auth = request.headers.get('authorization');
-  // Accept both CRON_SECRET and QStash's Upstash-Signature
   return auth === `Bearer ${cronSecret}` || !!request.headers.get('upstash-signature');
 }
 
-// GET — Vercel Cron or health check
+// GET — Vercel Cron (safety net, every 1 min) or health check
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
     try {
@@ -30,13 +31,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const queueLength = await getDispatchQueueLength();
-    if (queueLength === 0) {
-      return NextResponse.json({ processed: 0, message: 'Queue empty' });
-    }
-
-    const result = await processDispatchQueue(10);
-    console.log(`[dispatch-worker] Cron processed ${result.processed}: ${result.assigned} assigned, ${result.failed} failed`);
+    const result = await processRedisQueue(10);
     return NextResponse.json(result);
   } catch (err) {
     console.error('[dispatch-worker] Cron error:', err);
@@ -44,34 +39,40 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST — QStash event-driven dispatch (instant, with rideId in body)
+// POST — QStash event-driven dispatch (instant)
 export async function POST(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    // QStash sends {rideId, attempt} in the body
-    let body: { rideId?: string; attempt?: number } = {};
-    try {
-      body = await request.json();
-    } catch {
-      // No body — process from Redis queue instead
+    const body = await request.json().catch(() => ({})) as {
+      rideId?: string;
+      attempt?: number;
+      action?: 'dispatch' | 'timeout_check';
+    };
+
+    if (!body.rideId) {
+      // No rideId — process Redis queue
+      const result = await processRedisQueue(10);
+      return NextResponse.json(result);
     }
 
-    if (body.rideId) {
-      // Direct dispatch for a specific ride (from QStash)
-      await enqueueDispatch(body.rideId, body.attempt ?? 0);
-      const result = await processOneDispatch();
-      console.log(`[dispatch-worker] QStash: ride ${body.rideId} → ${result?.assigned ? 'assigned' : 'queued'}`);
-      return NextResponse.json(result ?? { processed: 0 });
+    const { rideId, attempt = 0, action = 'dispatch' } = body;
+
+    if (action === 'timeout_check') {
+      // 15s timeout fired — check if driver accepted, escalate if not
+      const result = await handleTimeout(rideId, attempt);
+      console.log(`[dispatch-worker] Timeout: ride ${rideId} → ${result.action}`);
+      return NextResponse.json(result);
     }
 
-    // No rideId — process general queue
-    const result = await processDispatchQueue(10);
+    // Default: find driver and send offer
+    const result = await dispatchRide(rideId, attempt);
+    console.log(`[dispatch-worker] Dispatch: ride ${rideId} → ${result.action}`);
     return NextResponse.json(result);
   } catch (err) {
-    console.error('[dispatch-worker] QStash error:', err);
+    console.error('[dispatch-worker] Error:', err);
     return NextResponse.json({ error: 'Worker failed' }, { status: 500 });
   }
 }

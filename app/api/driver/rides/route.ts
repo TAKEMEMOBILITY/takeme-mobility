@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { getDriverOffer, clearDriverOffer } from '@/lib/redis';
+import { finalizeAssignment } from '@/lib/dispatch';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET /api/driver/rides      — get assigned ride for current driver
@@ -117,6 +119,25 @@ export async function PUT(request: NextRequest) {
       .single();
 
     if (!ride) return NextResponse.json({ error: 'Ride not found' }, { status: 404 });
+
+    // ── Special handling for ACCEPT (offer-based flow) ───────────────
+    if (body.action === 'accept' && ride.status === 'searching_driver') {
+      // Verify this driver has an active offer for this ride
+      const offeredDriverId = await getDriverOffer(body.rideId);
+      if (offeredDriverId && offeredDriverId !== driver.id) {
+        return NextResponse.json({ error: 'This ride was offered to another driver' }, { status: 403 });
+      }
+
+      // Finalize the assignment (clears Redis offer, updates ride + driver status)
+      const result = await finalizeAssignment(body.rideId, driver.id);
+      if (!result.success) {
+        return NextResponse.json({ error: result.error ?? 'Accept failed' }, { status: 400 });
+      }
+
+      return NextResponse.json({ status: 'driver_assigned', rideId: body.rideId, driver: result.driver });
+    }
+
+    // For non-accept actions, verify the driver owns the ride
     if (ride.assigned_driver_id !== driver.id) {
       return NextResponse.json({ error: 'Not your ride' }, { status: 403 });
     }
