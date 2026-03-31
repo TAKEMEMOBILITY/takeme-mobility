@@ -9,9 +9,19 @@ let qstashClient: Client | null = null;
 
 function getQStash(): Client | null {
   if (!qstashClient) {
-    const token = process.env.QSTASH_TOKEN;
+    // Support multi-region: US East 1 (primary) → EU Central 1 (fallback) → legacy QSTASH_TOKEN
+    const token = process.env.US_EAST_1_QSTASH_TOKEN
+      ?? process.env.QSTASH_TOKEN
+      ?? process.env.EU_CENTRAL_1_QSTASH_TOKEN;
     if (!token) return null;
-    qstashClient = new Client({ token });
+
+    const baseUrl = process.env.US_EAST_1_QSTASH_URL
+      ?? process.env.EU_CENTRAL_1_QSTASH_URL;
+
+    qstashClient = new Client({
+      token,
+      ...(baseUrl ? { baseUrl } : {}),
+    });
   }
   return qstashClient;
 }
