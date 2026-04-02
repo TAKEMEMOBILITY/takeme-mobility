@@ -20,6 +20,9 @@ interface AuthState {
 interface AuthActions {
   sendOtp: (phone: string) => Promise<{ success: boolean; error?: string }>;
   verifyOtp: (phone: string, code: string) => Promise<{ success: boolean; error?: string }>;
+  // Temporary email OTP fallback — remove once AWS SMS Production Access is approved
+  sendEmailOtp: (email: string) => Promise<{ success: boolean; error?: string }>;
+  verifyEmailOtp: (email: string, code: string) => Promise<{ success: boolean; error?: string }>;
   signOut: () => Promise<void>;
 }
 
@@ -89,14 +92,32 @@ function DevAuthProvider({ children }: { children: React.ReactNode }) {
     return { success: true };
   }, []);
 
+  const sendEmailOtp = useCallback(async (email: string) => {
+    console.log(`[auth:dev:driver] Email OTP "sent" to ${email}. Use code: ${DEV_OTP}`);
+    return { success: true };
+  }, []);
+
+  const verifyEmailOtp = useCallback(async (email: string, code: string) => {
+    if (code !== DEV_OTP) {
+      return { success: false, error: `Wrong code. Enter ${DEV_OTP}` };
+    }
+    const digits = email.replace(/[^a-z0-9]/gi, '').slice(0, 8);
+    const user = createDevUser(`email-${digits}`);
+    user.email = email;
+    const session = createDevSession(user);
+    console.log('[auth:dev:driver] Signed in via email as:', user.id, email);
+    setState({ user, session, loading: false, initialized: true });
+    return { success: true };
+  }, []);
+
   const signOut = useCallback(async () => {
     console.log('[auth:dev:driver] Signed out');
     setState({ user: null, session: null, loading: false, initialized: true });
   }, []);
 
   const value = useMemo(
-    () => ({ ...state, sendOtp, verifyOtp, signOut }),
-    [state, sendOtp, verifyOtp, signOut],
+    () => ({ ...state, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp, signOut }),
+    [state, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -196,6 +217,44 @@ function ProductionAuthProvider({ children }: { children: React.ReactNode }) {
     [apiClient, supabase],
   );
 
+  // Temporary email OTP fallback via direct Supabase — remove once AWS SMS Production Access is approved
+  const sendEmailOtp = useCallback(
+    async (email: string) => {
+      try {
+        setState((prev) => ({ ...prev, loading: true }));
+        const { error } = await supabase.auth.signInWithOtp({ email });
+        if (error) return { success: false, error: error.message };
+        return { success: true };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to send email OTP';
+        return { success: false, error: message };
+      } finally {
+        setState((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [supabase],
+  );
+
+  const verifyEmailOtp = useCallback(
+    async (email: string, code: string) => {
+      try {
+        setState((prev) => ({ ...prev, loading: true }));
+        const { data, error } = await supabase.auth.verifyOtp({
+          email, token: code, type: 'email',
+        });
+        if (error) return { success: false, error: error.message };
+        console.log('[auth:driver] Verified via email, user:', data.user?.id);
+        return { success: true };
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : 'Failed to verify email OTP';
+        return { success: false, error: message };
+      } finally {
+        setState((prev) => ({ ...prev, loading: false }));
+      }
+    },
+    [supabase],
+  );
+
   const signOut = useCallback(async () => {
     setState((prev) => ({ ...prev, loading: true }));
     await supabase.auth.signOut();
@@ -208,8 +267,8 @@ function ProductionAuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase]);
 
   const value = useMemo(
-    () => ({ ...state, sendOtp, verifyOtp, signOut }),
-    [state, sendOtp, verifyOtp, signOut],
+    () => ({ ...state, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp, signOut }),
+    [state, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp, signOut],
   );
 
   return (
