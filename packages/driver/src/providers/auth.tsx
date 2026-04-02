@@ -222,7 +222,7 @@ function ProductionAuthProvider({ children }: { children: React.ReactNode }) {
     async (email: string) => {
       try {
         setState((prev) => ({ ...prev, loading: true }));
-        const { error } = await supabase.auth.signInWithOtp({ email });
+        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
         if (error) return { success: false, error: error.message };
         return { success: true };
       } catch (err: unknown) {

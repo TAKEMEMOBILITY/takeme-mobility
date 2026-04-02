@@ -201,7 +201,7 @@ function ProductionAuthProvider({ children }: { children: React.ReactNode }) {
   const sendEmailOtp = useCallback(async (email: string) => {
     try {
       setState((prev) => ({ ...prev, loading: true }));
-      const { error } = await supabase.auth.signInWithOtp({ email });
+      const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
       if (error) return { success: false as const, error: error.message };
       return { success: true as const };
     } catch (err: unknown) {
