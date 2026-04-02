@@ -144,13 +144,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchUser]);
 
-  // Temporary email OTP fallback via direct Supabase — remove once AWS SMS Production Access is approved
+  // Temporary email OTP fallback via server-side API — remove once AWS SMS Production Access is approved
+  // Uses custom API routes that send OTP via AWS SES + verify via otp_codes table + create Supabase session
   const sendEmailOtp = useCallback(async (email: string): Promise<{ error: string | null }> => {
-    const sb = supabaseRef.current ?? getSupabase();
-    if (!sb) return { error: 'Supabase not configured' };
     try {
-      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-      if (error) return { error: error.message };
+      const res = await fetch('/api/auth/send-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) return { error: data.error || 'Failed to send code' };
       return { error: null };
     } catch {
       return { error: 'Network error. Please try again.' };
@@ -158,13 +162,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const verifyEmailOtp = useCallback(async (email: string, code: string): Promise<{ error: string | null }> => {
-    const sb = supabaseRef.current ?? getSupabase();
-    if (!sb) return { error: 'Supabase not configured' };
     try {
-      const { error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
-      if (error) return { error: error.message };
-      await fetchUser();
-      return { error: null };
+      const res = await fetch('/api/auth/verify-email-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
+      });
+      const data = await res.json() as { verified?: boolean; error?: string };
+      if (!res.ok) return { error: data.error || 'Verification failed' };
+
+      if (data.verified) {
+        await fetchUser();
+        return { error: null };
+      }
+      return { error: 'Verification failed' };
     } catch {
       return { error: 'Network error. Please try again.' };
     }
