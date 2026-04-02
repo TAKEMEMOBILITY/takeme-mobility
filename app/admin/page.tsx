@@ -1,11 +1,22 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+
+// Dynamically import chart components to avoid SSR issues with recharts
+const RidesPerHourChart = dynamic(
+  () => import('./_charts').then(m => m.RidesPerHourChart),
+  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#71717a]">Loading chart...</div> }
+);
+const RevenueChart = dynamic(
+  () => import('./_charts').then(m => m.RevenueChart),
+  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#71717a]">Loading chart...</div> }
+);
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TAKEME ADMIN DASHBOARD
-// Real-time metrics, driver management, ride oversight, system health.
-// Auto-refreshes every 10 seconds. Requires admin role.
+// TAKEME ADMIN DASHBOARD — Phase 3
+// Real-time metrics, charts, activity feed. Auto-refreshes every 10 seconds.
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface DashboardData {
@@ -23,14 +34,36 @@ interface DashboardData {
     revenueMonth: number;
   };
   dispatch: { queueLength: number; dlqLength: number; pendingApplications: number };
-  activeRides: Array<{ id: string; status: string; pickup_address: string; dropoff_address: string; estimated_fare: number; assigned_driver_id: string | null; requested_at: string }>;
-  recentRides: Array<{ id: string; status: string; pickup_address: string; dropoff_address: string; estimated_fare: number; final_fare: number | null; vehicle_class: string; requested_at: string; trip_completed_at: string | null }>;
-  pendingApplications: Array<{ id: string; full_name: string; phone: string; email: string; status: string; created_at: string }>;
-  recentApplications: Array<{ id: string; full_name: string; phone: string; email: string; vehicle_make: string; vehicle_model: string; status: string; created_at: string }>;
+  activeRides: Array<{
+    id: string; status: string; pickup_address: string; dropoff_address: string;
+    estimated_fare: number; assigned_driver_id: string | null; requested_at: string;
+  }>;
+  recentRides: Array<{
+    id: string; status: string; pickup_address: string; dropoff_address: string;
+    estimated_fare: number; final_fare: number | null; vehicle_class: string;
+    requested_at: string; trip_completed_at: string | null;
+  }>;
+  pendingApplications: Array<{
+    id: string; full_name: string; phone: string; email: string;
+    status: string; created_at: string;
+  }>;
   timestamp: string;
 }
 
-const usd = (n: number) => `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+interface MetricsData {
+  hourly: Array<{ hour: string; label: string; rides: number }>;
+  dailyRevenue: Array<{ date: string; label: string; revenue: number }>;
+  rates: {
+    matchRate: number;
+    cancelRate: number;
+    avgEta: number;
+    driverUtilization: number;
+  };
+}
+
+const usd = (n: number) =>
+  `$${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
 const ago = (iso: string) => {
   const ms = Date.now() - new Date(iso).getTime();
   if (ms < 60000) return 'just now';
@@ -40,38 +73,46 @@ const ago = (iso: string) => {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  searching_driver: '#F59E0B',
-  driver_assigned: '#3B82F6',
-  driver_arriving: '#8B5CF6',
-  arrived: '#6366F1',
-  in_progress: '#10B981',
-  completed: '#059669',
-  cancelled: '#EF4444',
-  pending: '#F59E0B',
-  approved: '#10B981',
-  rejected: '#EF4444',
+  searching_driver: 'text-amber-400 bg-amber-400/10',
+  driver_assigned: 'text-blue-400 bg-blue-400/10',
+  driver_arriving: 'text-violet-400 bg-violet-400/10',
+  arrived: 'text-indigo-400 bg-indigo-400/10',
+  in_progress: 'text-emerald-400 bg-emerald-400/10',
+  completed: 'text-emerald-500 bg-emerald-500/10',
+  cancelled: 'text-red-400 bg-red-400/10',
+  pending: 'text-amber-400 bg-amber-400/10',
 };
 
 export default function AdminDashboard() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [metrics, setMetrics] = useState<MetricsData | null>(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'drivers' | 'rides' | 'dispatch' | 'system'>('overview');
-  const [actionLoading, setActionLoading] = useState('');
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/dashboard');
-      if (res.status === 401 || res.status === 403) {
+      const [dashRes, metricsRes] = await Promise.all([
+        fetch('/api/admin/dashboard'),
+        fetch('/api/admin/metrics'),
+      ]);
+
+      if (dashRes.status === 401 || dashRes.status === 403) {
         setError('Admin access required. Please sign in with an admin account.');
         setLoading(false);
         return;
       }
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      setData(json);
+      if (!dashRes.ok) throw new Error(`Dashboard HTTP ${dashRes.status}`);
+
+      const dashJson = await dashRes.json();
+      setData(dashJson);
+
+      if (metricsRes.ok) {
+        const metricsJson = await metricsRes.json();
+        setMetrics(metricsJson);
+      }
+
       setError('');
-    } catch (err) {
+    } catch {
       setError('Failed to load dashboard');
     } finally {
       setLoading(false);
@@ -80,321 +121,386 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetchData();
-    const interval = setInterval(fetchData, 10000); // Auto-refresh every 10s
+    const interval = setInterval(fetchData, 10000);
     return () => clearInterval(interval);
   }, [fetchData]);
 
-  const performAction = async (action: string, targetId: string, reason?: string) => {
-    setActionLoading(targetId);
-    try {
-      const res = await fetch('/api/admin/actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, targetId, reason }),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        alert(`Action failed: ${data.error}`);
-      } else {
-        fetchData(); // Refresh
-      }
-    } catch {
-      alert('Action failed');
-    } finally {
-      setActionLoading('');
-    }
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+          <p className="text-sm text-[#71717a]">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (loading) return <Page><Center>Loading dashboard...</Center></Page>;
-  if (error) return <Page><Center style={{ color: '#EF4444' }}>{error}</Center></Page>;
-  if (!data) return <Page><Center>No data</Center></Page>;
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+        <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-8 py-6 text-center">
+          <p className="text-red-400 text-sm">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!data) return null;
 
   const m = data.metrics;
 
   return (
-    <Page>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-        <div>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: '#0F172A', margin: 0 }}>TakeMe Admin</h1>
-          <p style={{ fontSize: 13, color: '#94A3B8', margin: '4px 0 0' }}>
-            Last updated: {data.timestamp ? ago(data.timestamp) : '...'} · Auto-refreshes every 10s
-          </p>
-        </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          {(['overview', 'drivers', 'rides', 'dispatch', 'system'] as const).map(tab => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: '8px 16px', borderRadius: 8, border: 'none', cursor: 'pointer',
-                fontSize: 13, fontWeight: 600, textTransform: 'capitalize',
-                backgroundColor: activeTab === tab ? '#0F172A' : '#F1F5F9',
-                color: activeTab === tab ? '#fff' : '#64748B',
-              }}
-            >{tab}</button>
-          ))}
-        </div>
-      </div>
-
-      {/* Metrics Cards — always visible */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <MetricCard label="Active Rides" value={m.activeRides} color="#3B82F6" />
-        <MetricCard label="Online Drivers" value={m.onlineDrivers} sub={`${m.availableDrivers} available / ${m.totalDrivers} total`} color="#10B981" />
-        <MetricCard label="Total Riders" value={m.totalRiders} color="#8B5CF6" />
-        <MetricCard label="Revenue Today" value={usd(m.revenueToday)} sub={`Week: ${usd(m.revenueWeek)} · Month: ${usd(m.revenueMonth)}`} color="#F59E0B" />
-      </div>
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 32 }}>
-        <MetricCard label="Completed Today" value={m.completedToday} color="#059669" />
-        <MetricCard label="Completed Week" value={m.completedWeek} color="#059669" />
-        <MetricCard label="Completed Month" value={m.completedMonth} color="#059669" />
-        <MetricCard label="Dispatch Queue" value={data.dispatch.queueLength} sub={`DLQ: ${data.dispatch.dlqLength}`} color={data.dispatch.dlqLength > 0 ? '#EF4444' : '#94A3B8'} />
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
-        <>
-          {/* Active Rides */}
-          <Section title={`Active Rides (${data.activeRides.length})`}>
-            {data.activeRides.length === 0 ? <Empty>No active rides</Empty> : (
-              <Table headers={['Status', 'Pickup', 'Dropoff', 'Fare', 'Requested', 'Actions']}>
-                {data.activeRides.map(r => (
-                  <tr key={r.id}>
-                    <td><StatusBadge status={r.status} /></td>
-                    <td style={td}>{r.pickup_address?.slice(0, 30)}</td>
-                    <td style={td}>{r.dropoff_address?.slice(0, 30)}</td>
-                    <td style={td}>{usd(Number(r.estimated_fare))}</td>
-                    <td style={td}>{ago(r.requested_at)}</td>
-                    <td style={td}>
-                      <ActionBtn label="Cancel" color="#EF4444" loading={actionLoading === r.id}
-                        onClick={() => performAction('cancel_ride', r.id, 'Admin cancelled')} />
-                    </td>
-                  </tr>
-                ))}
-              </Table>
-            )}
-          </Section>
-
-          {/* Recent Rides */}
-          <Section title="Recent Rides">
-            <Table headers={['Status', 'Pickup', 'Dropoff', 'Class', 'Fare', 'When']}>
-              {data.recentRides.map(r => (
-                <tr key={r.id}>
-                  <td><StatusBadge status={r.status} /></td>
-                  <td style={td}>{r.pickup_address?.slice(0, 25)}</td>
-                  <td style={td}>{r.dropoff_address?.slice(0, 25)}</td>
-                  <td style={td}>{r.vehicle_class}</td>
-                  <td style={td}>{usd(Number(r.final_fare ?? r.estimated_fare))}</td>
-                  <td style={td}>{ago(r.requested_at)}</td>
-                </tr>
-              ))}
-            </Table>
-          </Section>
-        </>
-      )}
-
-      {activeTab === 'drivers' && (
-        <>
-          {/* Pending Applications */}
-          <Section title={`Pending Applications (${data.pendingApplications.length})`}>
-            {data.pendingApplications.length === 0 ? <Empty>No pending applications</Empty> : (
-              <Table headers={['Name', 'Phone', 'Email', 'Applied', 'Actions']}>
-                {data.pendingApplications.map(app => (
-                  <tr key={app.id}>
-                    <td style={{ ...td, fontWeight: 600 }}>{app.full_name}</td>
-                    <td style={td}>{app.phone}</td>
-                    <td style={td}>{app.email}</td>
-                    <td style={td}>{ago(app.created_at)}</td>
-                    <td style={{ ...td, display: 'flex', gap: 8 }}>
-                      <ActionBtn label="Approve" color="#10B981" loading={actionLoading === app.id}
-                        onClick={() => performAction('approve_driver', app.id)} />
-                      <ActionBtn label="Reject" color="#EF4444" loading={actionLoading === app.id}
-                        onClick={() => performAction('reject_driver', app.id, 'Does not meet requirements')} />
-                    </td>
-                  </tr>
-                ))}
-              </Table>
-            )}
-          </Section>
-
-          {/* All Applications */}
-          <Section title="All Applications">
-            <Table headers={['Name', 'Vehicle', 'Status', 'Applied']}>
-              {data.recentApplications.map(app => (
-                <tr key={app.id}>
-                  <td style={{ ...td, fontWeight: 500 }}>{app.full_name}</td>
-                  <td style={td}>{app.vehicle_make} {app.vehicle_model}</td>
-                  <td><StatusBadge status={app.status} /></td>
-                  <td style={td}>{ago(app.created_at)}</td>
-                </tr>
-              ))}
-            </Table>
-          </Section>
-        </>
-      )}
-
-      {activeTab === 'rides' && (
-        <Section title="Ride Management">
-          <Table headers={['ID', 'Status', 'Route', 'Class', 'Fare', 'When', 'Actions']}>
-            {data.recentRides.map(r => (
-              <tr key={r.id}>
-                <td style={{ ...td, fontFamily: 'monospace', fontSize: 11 }}>{r.id.slice(0, 8)}...</td>
-                <td><StatusBadge status={r.status} /></td>
-                <td style={td}>{r.pickup_address?.slice(0, 20)} → {r.dropoff_address?.slice(0, 20)}</td>
-                <td style={td}>{r.vehicle_class}</td>
-                <td style={td}>{usd(Number(r.final_fare ?? r.estimated_fare))}</td>
-                <td style={td}>{ago(r.requested_at)}</td>
-                <td style={{ ...td, display: 'flex', gap: 6 }}>
-                  {r.status !== 'completed' && r.status !== 'cancelled' && (
-                    <ActionBtn label="Cancel" color="#EF4444" loading={actionLoading === r.id}
-                      onClick={() => performAction('cancel_ride', r.id)} />
-                  )}
-                  {r.status === 'completed' && (
-                    <ActionBtn label="Refund" color="#F59E0B" loading={actionLoading === r.id}
-                      onClick={() => performAction('refund_ride', r.id)} />
-                  )}
-                </td>
-              </tr>
-            ))}
-          </Table>
-        </Section>
-      )}
-
-      {activeTab === 'dispatch' && (
-        <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
-            <MetricCard label="Queue Depth" value={data.dispatch.queueLength} color="#3B82F6" />
-            <MetricCard label="Dead Letter Queue" value={data.dispatch.dlqLength} color={data.dispatch.dlqLength > 0 ? '#EF4444' : '#10B981'} />
-            <MetricCard label="Pending Apps" value={data.dispatch.pendingApplications} color="#F59E0B" />
+    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+      <div className="mx-auto max-w-[1400px]">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#e4e4e7]">Dashboard</h1>
+            <p className="mt-1 text-xs text-[#71717a]">
+              Last updated {data.timestamp ? ago(data.timestamp) : '...'} -- Auto-refreshes every 10s
+            </p>
           </div>
-          <Section title="Dispatch System Status">
-            <div style={{ padding: 24, backgroundColor: '#F8FAFC', borderRadius: 12, fontSize: 14, color: '#334155', lineHeight: 2 }}>
-              <div><strong>QStash:</strong> {data.dispatch.queueLength === 0 ? 'Idle — no pending dispatches' : `${data.dispatch.queueLength} rides awaiting dispatch`}</div>
-              <div><strong>Dead Letter Queue:</strong> {data.dispatch.dlqLength === 0 ? 'Clean — no failed dispatches' : `${data.dispatch.dlqLength} failed dispatches need review`}</div>
-              <div><strong>Offer Timeout:</strong> 15 seconds per driver</div>
-              <div><strong>Max Escalations:</strong> 3 drivers before cancellation</div>
-              <div><strong>Safety Net:</strong> Vercel Cron every 60 seconds</div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5">
+              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
+              <span className="text-xs font-medium text-emerald-400">Live</span>
             </div>
-          </Section>
-        </>
-      )}
+          </div>
+        </div>
 
-      {activeTab === 'system' && (
-        <>
-          <Section title="System Health">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-              <HealthCard title="Redis (Upstash)" status="connected" detail={`Queue: ${data.dispatch.queueLength} · DLQ: ${data.dispatch.dlqLength}`} />
-              <HealthCard title="Supabase" status="connected" detail={`${m.totalRiders} riders · ${m.totalDrivers} drivers`} />
-              <HealthCard title="Stripe" status="connected" detail={`Revenue today: ${usd(m.revenueToday)}`} />
-              <HealthCard title="QStash Dispatch" status={data.dispatch.dlqLength > 0 ? 'warning' : 'connected'} detail={data.dispatch.dlqLength > 0 ? `${data.dispatch.dlqLength} failed dispatches` : 'All dispatches healthy'} />
+        {/* ── Top Metric Cards (4x2 grid) ────────────────────────────── */}
+        <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <MetricCard
+            label="Active Rides"
+            value={m.activeRides}
+            icon={<RideIcon />}
+            accent="emerald"
+          />
+          <MetricCard
+            label="Completed Today"
+            value={m.completedToday}
+            icon={<CheckIcon />}
+            accent="blue"
+          />
+          <MetricCard
+            label="Online Drivers"
+            value={m.onlineDrivers}
+            icon={<DriverIcon />}
+            accent="violet"
+          />
+          <MetricCard
+            label="Available Drivers"
+            value={m.availableDrivers}
+            icon={<AvailableIcon />}
+            accent="cyan"
+          />
+          <MetricCard
+            label="Revenue Today"
+            value={usd(m.revenueToday)}
+            icon={<DollarIcon />}
+            accent="emerald"
+          />
+          <MetricCard
+            label="Revenue This Week"
+            value={usd(m.revenueWeek)}
+            icon={<DollarIcon />}
+            accent="blue"
+          />
+          <MetricCard
+            label="Revenue This Month"
+            value={usd(m.revenueMonth)}
+            icon={<DollarIcon />}
+            accent="amber"
+          />
+          <MetricCard
+            label="DLQ Depth"
+            value={data.dispatch.dlqLength}
+            icon={<AlertIcon />}
+            accent={data.dispatch.dlqLength > 0 ? 'red' : 'emerald'}
+            alert={data.dispatch.dlqLength > 0}
+          />
+        </div>
+
+        {/* ── Charts Row ─────────────────────────────────────────────── */}
+        <div className="mb-8 grid gap-6 lg:grid-cols-2">
+          {/* Rides per hour chart */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <h3 className="mb-4 text-sm font-semibold text-[#e4e4e7]">Rides Per Hour (24h)</h3>
+            <div className="h-[250px] w-full">
+              <RidesPerHourChart data={metrics?.hourly ?? []} />
             </div>
-          </Section>
-          <Section title="Environment">
-            <div style={{ padding: 24, backgroundColor: '#0F172A', borderRadius: 12, fontFamily: 'monospace', fontSize: 12, color: '#94A3B8', lineHeight: 2.2 }}>
-              <div>NODE_ENV={process.env.NODE_ENV ?? 'production'}</div>
-              <div>STRIPE_ISSUING={process.env.NEXT_PUBLIC_STRIPE_ISSUING_ENABLED ?? 'false'}</div>
-              <div>SENTRY_DSN={process.env.NEXT_PUBLIC_SENTRY_DSN ? 'configured' : 'not set'}</div>
-              <div>TIMESTAMP={data.timestamp}</div>
+          </div>
+
+          {/* Revenue chart */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <h3 className="mb-4 text-sm font-semibold text-[#e4e4e7]">Revenue (7 Days)</h3>
+            <div className="h-[250px] w-full">
+              <RevenueChart data={metrics?.dailyRevenue ?? []} />
             </div>
-          </Section>
-        </>
-      )}
-    </Page>
-  );
-}
+          </div>
+        </div>
 
-// ── UI Components ────────────────────────────────────────────────────────
+        {/* ── Stats Row ──────────────────────────────────────────────── */}
+        {metrics?.rates && (
+          <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <StatCard
+              label="Match Rate"
+              value={`${metrics.rates.matchRate}%`}
+              description="Completed / requested today"
+              color={metrics.rates.matchRate >= 70 ? 'text-emerald-400' : metrics.rates.matchRate >= 40 ? 'text-amber-400' : 'text-red-400'}
+            />
+            <StatCard
+              label="Cancel Rate"
+              value={`${metrics.rates.cancelRate}%`}
+              description="Cancelled / requested today"
+              color={metrics.rates.cancelRate <= 10 ? 'text-emerald-400' : metrics.rates.cancelRate <= 25 ? 'text-amber-400' : 'text-red-400'}
+            />
+            <StatCard
+              label="Avg Duration"
+              value={`${metrics.rates.avgEta} min`}
+              description="Average completed ride duration"
+              color="text-blue-400"
+            />
+            <StatCard
+              label="Driver Utilization"
+              value={`${metrics.rates.driverUtilization}%`}
+              description="Non-offline / total drivers"
+              color={metrics.rates.driverUtilization >= 50 ? 'text-emerald-400' : 'text-amber-400'}
+            />
+          </div>
+        )}
 
-const td: React.CSSProperties = { padding: '10px 12px', fontSize: 13, color: '#334155', borderBottom: '1px solid #F1F5F9' };
+        {/* ── Recent Activity ────────────────────────────────────────── */}
+        <div className="grid gap-6 lg:grid-cols-3">
+          {/* Recent Rides (2/3 width) */}
+          <div className="lg:col-span-2 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
+            <div className="flex items-center justify-between border-b border-[#1e1e2e] px-5 py-4">
+              <h3 className="text-sm font-semibold text-[#e4e4e7]">Recent Rides</h3>
+              <Link
+                href="/admin/rides"
+                className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-[#1e1e2e]">
+                    {['Status', 'Pickup', 'Dropoff', 'Class', 'Fare', 'When'].map(h => (
+                      <th
+                        key={h}
+                        className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#71717a]"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.recentRides.slice(0, 10).map(r => (
+                    <tr
+                      key={r.id}
+                      className="border-b border-[#1e1e2e]/50 transition-colors hover:bg-[#1e1e2e]/30"
+                    >
+                      <td className="px-4 py-3">
+                        <StatusBadge status={r.status} />
+                      </td>
+                      <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">
+                        {r.pickup_address}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">
+                        {r.dropoff_address}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-[#a1a1aa] capitalize">
+                        {r.vehicle_class}
+                      </td>
+                      <td className="px-4 py-3 text-xs font-medium text-[#e4e4e7]">
+                        {usd(Number(r.final_fare ?? r.estimated_fare))}
+                      </td>
+                      <td className="px-4 py-3 text-xs text-[#71717a]">
+                        {ago(r.requested_at)}
+                      </td>
+                    </tr>
+                  ))}
+                  {data.recentRides.length === 0 && (
+                    <tr>
+                      <td colSpan={6} className="px-4 py-10 text-center text-sm text-[#71717a]">
+                        No recent rides
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-function Page({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#FAFBFC', padding: '32px 48px', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-      <div style={{ maxWidth: 1200, margin: '0 auto' }}>{children}</div>
+          {/* Pending Driver Applications (1/3 width) */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
+            <div className="flex items-center justify-between border-b border-[#1e1e2e] px-5 py-4">
+              <h3 className="text-sm font-semibold text-[#e4e4e7]">Pending Applications</h3>
+              <Link
+                href="/admin/drivers"
+                className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+              >
+                View all
+              </Link>
+            </div>
+            <div className="divide-y divide-[#1e1e2e]/50">
+              {data.pendingApplications.length === 0 ? (
+                <div className="px-5 py-10 text-center text-sm text-[#71717a]">
+                  No pending applications
+                </div>
+              ) : (
+                data.pendingApplications.slice(0, 8).map(app => (
+                  <div
+                    key={app.id}
+                    className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-[#1e1e2e]/30"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-[#e4e4e7]">{app.full_name}</p>
+                      <p className="text-xs text-[#71717a]">{app.email}</p>
+                    </div>
+                    <span className="text-xs text-[#71717a]">{ago(app.created_at)}</span>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function Center({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
-  return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh', fontSize: 16, color: '#64748B', ...style }}>{children}</div>;
-}
+// ── Sub-components ─────────────────────────────────────────────────────────
 
-function MetricCard({ label, value, sub, color }: { label: string; value: number | string; sub?: string; color: string }) {
+function MetricCard({
+  label,
+  value,
+  icon,
+  accent,
+  alert,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ReactNode;
+  accent: 'emerald' | 'blue' | 'violet' | 'cyan' | 'amber' | 'red';
+  alert?: boolean;
+}) {
+  const accentMap = {
+    emerald: 'text-emerald-400 bg-emerald-500/10',
+    blue: 'text-blue-400 bg-blue-500/10',
+    violet: 'text-violet-400 bg-violet-500/10',
+    cyan: 'text-cyan-400 bg-cyan-500/10',
+    amber: 'text-amber-400 bg-amber-500/10',
+    red: 'text-red-400 bg-red-500/10',
+  };
+  const textColor = {
+    emerald: 'text-emerald-400',
+    blue: 'text-blue-400',
+    violet: 'text-violet-400',
+    cyan: 'text-cyan-400',
+    amber: 'text-amber-400',
+    red: 'text-red-400',
+  };
+
   return (
-    <div style={{ backgroundColor: '#fff', borderRadius: 12, padding: '20px 24px', border: '1px solid #F1F5F9' }}>
-      <p style={{ fontSize: 12, fontWeight: 600, color: '#94A3B8', margin: 0, textTransform: 'uppercase', letterSpacing: 0.5 }}>{label}</p>
-      <p style={{ fontSize: 28, fontWeight: 700, color, margin: '8px 0 0', letterSpacing: -0.5 }}>{value}</p>
-      {sub && <p style={{ fontSize: 11, color: '#94A3B8', margin: '6px 0 0' }}>{sub}</p>}
+    <div
+      className={`rounded-xl border bg-[#0f0f17] p-4 transition-colors ${
+        alert ? 'border-red-500/30 bg-red-500/5' : 'border-[#1e1e2e]'
+      }`}
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">
+          {label}
+        </span>
+        <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${accentMap[accent]}`}>
+          {icon}
+        </div>
+      </div>
+      <p className={`text-2xl font-bold ${textColor[accent]}`}>{value}</p>
     </div>
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function StatCard({
+  label,
+  value,
+  description,
+  color,
+}: {
+  label: string;
+  value: string;
+  description: string;
+  color: string;
+}) {
   return (
-    <div style={{ marginBottom: 32 }}>
-      <h2 style={{ fontSize: 16, fontWeight: 600, color: '#0F172A', marginBottom: 12 }}>{title}</h2>
-      <div style={{ backgroundColor: '#fff', borderRadius: 12, border: '1px solid #F1F5F9', overflow: 'hidden' }}>{children}</div>
+    <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">{label}</p>
+      <p className={`mt-2 text-xl font-bold ${color}`}>{value}</p>
+      <p className="mt-1 text-[11px] text-[#52525b]">{description}</p>
     </div>
-  );
-}
-
-function Empty({ children }: { children: React.ReactNode }) {
-  return <div style={{ padding: 40, textAlign: 'center', fontSize: 14, color: '#94A3B8' }}>{children}</div>;
-}
-
-function Table({ headers, children }: { headers: string[]; children: React.ReactNode }) {
-  return (
-    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-      <thead>
-        <tr style={{ backgroundColor: '#F8FAFC' }}>
-          {headers.map(h => (
-            <th key={h} style={{ padding: '10px 12px', fontSize: 11, fontWeight: 600, color: '#94A3B8', textAlign: 'left', textTransform: 'uppercase', letterSpacing: 0.5, borderBottom: '1px solid #F1F5F9' }}>{h}</th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </table>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const color = STATUS_COLORS[status] ?? '#94A3B8';
+  const classes = STATUS_COLORS[status] ?? 'text-[#71717a] bg-[#71717a]/10';
   return (
-    <span style={{
-      display: 'inline-block', padding: '3px 10px', borderRadius: 999,
-      fontSize: 11, fontWeight: 600, color,
-      backgroundColor: color + '15', whiteSpace: 'nowrap',
-    }}>
+    <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${classes}`}>
       {status.replace(/_/g, ' ')}
     </span>
   );
 }
 
-function ActionBtn({ label, color, onClick, loading }: { label: string; color: string; onClick: () => void; loading: boolean }) {
+// ── Icons ──────────────────────────────────────────────────────────────────
+
+function RideIcon() {
   return (
-    <button
-      onClick={onClick}
-      disabled={loading}
-      style={{
-        padding: '5px 12px', borderRadius: 6, border: `1px solid ${color}33`,
-        backgroundColor: color + '10', color, fontSize: 12, fontWeight: 600,
-        cursor: loading ? 'wait' : 'pointer', opacity: loading ? 0.5 : 1,
-      }}
-    >{loading ? '...' : label}</button>
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H21M3.375 14.25h.008M21 14.25h-5.625m0 0h-3.75" />
+    </svg>
   );
 }
 
-function HealthCard({ title, status, detail }: { title: string; status: 'connected' | 'warning' | 'error'; detail: string }) {
-  const colors = { connected: '#10B981', warning: '#F59E0B', error: '#EF4444' };
-  const c = colors[status];
+function CheckIcon() {
   return (
-    <div style={{ backgroundColor: '#fff', borderRadius: 12, padding: 20, border: '1px solid #F1F5F9' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-        <div style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c }} />
-        <span style={{ fontSize: 14, fontWeight: 600, color: '#0F172A' }}>{title}</span>
-      </div>
-      <p style={{ fontSize: 12, color: '#64748B', margin: 0 }}>{detail}</p>
-    </div>
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function DriverIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
+    </svg>
+  );
+}
+
+function AvailableIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+    </svg>
+  );
+}
+
+function DollarIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  );
+}
+
+function AlertIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+    </svg>
   );
 }
