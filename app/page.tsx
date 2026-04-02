@@ -7,8 +7,14 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'Connect', 'Technology', 'Safety', 'Cities'] as const;
-const NAV_ROUTES: Record<string, string> = { Rides: '/#how-it-works', Connect: '/connect', Technology: '/', Safety: '/', Cities: '/' };
+const NAV_ITEMS = ['Rides', 'Rental Cars', 'Takeme Protection', 'Technology', 'Safety'] as const;
+const NAV_ROUTES: Record<string, string> = {
+  Rides: '/#how-it-works',
+  'Rental Cars': '/rentals',
+  'Takeme Protection': '/protection',
+  Technology: '/technology',
+  Safety: '/safety',
+};
 
 const TRUST_CARDS = [
   {
@@ -114,7 +120,7 @@ export default function HomePage() {
             {NAV_ITEMS.map((item) => (
               <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
                 {item}
-                {item === 'Connect' && (
+                {item === 'Rental Cars' && (
                   <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
                     New
                   </span>
@@ -398,8 +404,8 @@ export default function HomePage() {
             </div>
             <div className="flex gap-16">
               {[
-                { t: 'Product', items: ['Rides', 'Business', 'Cities', 'Pricing'] },
-                { t: 'Company', items: ['About', 'Careers', 'Safety', 'Press'] },
+                { t: 'Product', items: ['Rides', 'Rental Cars', 'Takeme Protection', 'Business', 'Pricing'] },
+                { t: 'Company', items: ['About', 'Careers', 'Safety', 'Cities', 'Press'] },
                 { t: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
               ].map((col) => (
                 <div key={col.t}>
