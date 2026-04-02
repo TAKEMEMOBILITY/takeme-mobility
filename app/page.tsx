@@ -7,14 +7,15 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'Rental Cars', 'Takeme Protection', 'Technology', 'Safety'] as const;
+const NAV_ITEMS = ['Rides', 'Rental Cars', 'Connect', 'Technology', 'Safety'] as const;
 const NAV_ROUTES: Record<string, string> = {
   Rides: '/#how-it-works',
   'Rental Cars': '/rentals',
-  'Takeme Protection': '/protection',
+  Connect: '/connect',
   Technology: '/technology',
   Safety: '/safety',
 };
+const NAV_BADGES = new Set(['Rental Cars', 'Connect']);
 
 const TRUST_CARDS = [
   {
@@ -53,11 +54,17 @@ const STEPS = [
   { title: 'Arrive and go', description: 'Payment completes automatically. No fumbling, no tipping screens, no friction. Just go.' },
 ];
 
-const CITIES = [
-  { name: 'New York', country: 'US' }, { name: 'London', country: 'UK' },
-  { name: 'Zurich', country: 'CH' }, { name: 'Berlin', country: 'DE' },
-  { name: 'Paris', country: 'FR' }, { name: 'Tokyo', country: 'JP' },
-  { name: 'Singapore', country: 'SG' }, { name: 'Dubai', country: 'AE' },
+const SEATTLE_NEIGHBORHOODS = [
+  { name: 'Downtown Seattle', tag: 'Launch' },
+  { name: 'South Lake Union', tag: 'Launch' },
+  { name: 'Capitol Hill', tag: 'Launch' },
+  { name: 'SeaTac Airport', tag: 'SEA' },
+  { name: 'Bellevue', tag: 'Eastside' },
+  { name: 'University District', tag: 'Launch' },
+];
+
+const COMING_SOON_CITIES = [
+  'Portland, OR', 'San Francisco, CA', 'Los Angeles, CA', 'Austin, TX', 'New York, NY',
 ];
 
 // ── Hooks ────────────────────────────────────────────────────────────────
@@ -120,7 +127,7 @@ export default function HomePage() {
             {NAV_ITEMS.map((item) => (
               <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
                 {item}
-                {item === 'Rental Cars' && (
+                {NAV_BADGES.has(item) && (
                   <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
                     New
                   </span>
@@ -159,6 +166,25 @@ export default function HomePage() {
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
+        {/* Animated route line — subtle teal SVG */}
+        <svg
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
+          width="900" height="500" viewBox="0 0 900 500" fill="none"
+        >
+          <path
+            d="M50 400 C150 380, 200 300, 280 280 S380 200, 420 180 S500 120, 560 140 S650 200, 700 180 S780 100, 850 80"
+            stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" fill="none"
+            strokeDasharray="1200" strokeDashoffset="1200"
+            style={{ animation: 'routeDraw 3s ease-out 0.5s forwards' }}
+          />
+          <circle cx="50" cy="400" r="6" fill="#0D9488" opacity="0" style={{ animation: 'dotFade 0.4s ease-out 0.3s forwards' }} />
+          <circle cx="850" cy="80" r="6" fill="#0D9488" opacity="0" style={{ animation: 'dotFade 0.4s ease-out 3.2s forwards' }} />
+        </svg>
+        <style>{`
+          @keyframes routeDraw { to { stroke-dashoffset: 0; } }
+          @keyframes dotFade { to { opacity: 0.6; } }
+        `}</style>
+
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div className="grid items-start gap-8 lg:grid-cols-[1fr_480px] lg:gap-14">
 
@@ -265,6 +291,25 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ═══ STATS BAR ═════════════════════════════════════════════════════ */}
+      <section className="border-t border-[#F5F5F7] bg-white">
+        <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            {[
+              { value: '<5s', label: 'matching' },
+              { value: '100%', label: 'Electric' },
+              { value: 'Real-time', label: 'tracking' },
+              { value: 'AI-powered', label: 'safety' },
+            ].map((stat, i) => (
+              <div key={i} className={`flex flex-col items-center py-6 ${i > 0 ? 'border-l border-[#F5F5F7]' : ''}`}>
+                <span className="text-[20px] font-bold tracking-[-0.02em] text-[#1D1D1F]">{stat.value}</span>
+                <span className="mt-0.5 text-[13px] font-medium text-[#A1A1A6]">{stat.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ═══ HOW IT WORKS ═════════════════════════════════════════════════ */}
       <section id="how-it-works" className="bg-[#F5F5F7]">
         <div
@@ -303,22 +348,35 @@ export default function HomePage() {
             <div>
               <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Coverage</p>
               <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-                One standard.<br />Every city.
+                Where precision meets<br />the pavement.
               </h2>
             </div>
             <p className="max-w-sm text-[15px] leading-[1.7] text-[#6E6E73]">
-              The same premium experience whether you're in Manhattan or Mayfair. More cities every quarter.
+              Launching in Seattle. Expanding everywhere.
             </p>
           </div>
-          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {CITIES.map((c) => (
-              <div key={c.name} className="group flex items-center justify-between rounded-2xl border border-[#F5F5F7] bg-[#FAFAFA] px-5 py-5 transition-all duration-200 hover:border-[#E8E8ED]">
+
+          {/* Seattle neighborhoods */}
+          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {SEATTLE_NEIGHBORHOODS.map((n) => (
+              <Link key={n.name} href="/cities" className="group flex items-center justify-between rounded-2xl border border-[#F5F5F7] bg-[#FAFAFA] px-5 py-5 transition-all duration-200 hover:border-[#E8E8ED]">
                 <div>
-                  <span className="text-[15px] font-semibold text-[#1D1D1F]">{c.name}</span>
-                  <span className="ml-2 text-[12px] font-medium text-[#A1A1A6]">{c.country}</span>
+                  <span className="text-[15px] font-semibold text-[#1D1D1F]">{n.name}</span>
+                  <span className="ml-2 text-[11px] font-medium text-[#A1A1A6]">{n.tag}</span>
                 </div>
                 <span className="text-[#A1A1A6] transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
-              </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* Coming soon */}
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">Coming soon</span>
+            <span className="h-3.5 w-[1px] bg-[#E8E8ED]" />
+            {COMING_SOON_CITIES.map((city) => (
+              <span key={city} className="rounded-full border border-[#E8E8ED] px-3.5 py-1.5 text-[13px] font-medium text-[#C7C7CC]">
+                {city}
+              </span>
             ))}
           </div>
         </div>
