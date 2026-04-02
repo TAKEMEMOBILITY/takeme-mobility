@@ -21,6 +21,9 @@ interface AuthContextType {
   loading: boolean;
   sendOtp: (phone: string) => Promise<{ error: string | null }>;
   verifyOtp: (phone: string, code: string) => Promise<{ error: string | null }>;
+  // Temporary email OTP fallback — remove once AWS SMS Production Access is approved
+  sendEmailOtp: (email: string) => Promise<{ error: string | null }>;
+  verifyEmailOtp: (email: string, code: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -30,6 +33,8 @@ const AuthContext = createContext<AuthContextType>({
   loading: true,
   sendOtp: async () => ({ error: 'Not initialized' }),
   verifyOtp: async () => ({ error: 'Not initialized' }),
+  sendEmailOtp: async () => ({ error: 'Not initialized' }),
+  verifyEmailOtp: async () => ({ error: 'Not initialized' }),
   signOut: async () => {},
   refreshUser: async () => {},
 });
@@ -139,6 +144,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [fetchUser]);
 
+  // Temporary email OTP fallback via direct Supabase — remove once AWS SMS Production Access is approved
+  const sendEmailOtp = useCallback(async (email: string): Promise<{ error: string | null }> => {
+    const sb = supabaseRef.current ?? getSupabase();
+    if (!sb) return { error: 'Supabase not configured' };
+    try {
+      const { error } = await sb.auth.signInWithOtp({ email });
+      if (error) return { error: error.message };
+      return { error: null };
+    } catch {
+      return { error: 'Network error. Please try again.' };
+    }
+  }, []);
+
+  const verifyEmailOtp = useCallback(async (email: string, code: string): Promise<{ error: string | null }> => {
+    const sb = supabaseRef.current ?? getSupabase();
+    if (!sb) return { error: 'Supabase not configured' };
+    try {
+      const { error } = await sb.auth.verifyOtp({ email, token: code, type: 'email' });
+      if (error) return { error: error.message };
+      await fetchUser();
+      return { error: null };
+    } catch {
+      return { error: 'Network error. Please try again.' };
+    }
+  }, [fetchUser]);
+
   const signOut = useCallback(async () => {
     const sb = supabaseRef.current ?? getSupabase();
     try { if (sb) await sb.auth.signOut(); } catch {}
@@ -146,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, sendOtp, verifyOtp, signOut, refreshUser: fetchUser }}>
+    <AuthContext.Provider value={{ user, loading, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp, signOut, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

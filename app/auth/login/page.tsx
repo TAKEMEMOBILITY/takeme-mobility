@@ -26,14 +26,18 @@ function toE164(raw: string): string {
   return `+${digits}`;
 }
 
+type LoginMethod = 'phone' | 'email';
+
 function PhoneAuth() {
-  const { user, sendOtp, verifyOtp } = useAuth();
+  const { user, sendOtp, verifyOtp, sendEmailOtp, verifyEmailOtp } = useAuth();
   const router = useRouter();
   const params = useSearchParams();
   const redirect = params.get('redirect') || '/';
 
-  const [step, setStep] = useState<'phone' | 'code' | 'success'>('phone');
+  const [method, setMethod] = useState<LoginMethod>('phone');
+  const [step, setStep] = useState<'input' | 'code' | 'success'>('input');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -59,24 +63,33 @@ function PhoneAuth() {
 
   const handleSendCode = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    const digits = phone.replace(/\D/g, '');
-    if (digits.length < 10) {
-      setError('Enter a valid 10-digit phone number.');
-      return;
-    }
-
     setLoading(true);
     setError('');
-    const { error: err } = await sendOtp(toE164(phone));
-    setLoading(false);
 
-    if (err) {
-      setError(err);
+    if (method === 'phone') {
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length < 10) {
+        setError('Enter a valid 10-digit phone number.');
+        setLoading(false);
+        return;
+      }
+      const { error: err } = await sendOtp(toE164(phone));
+      setLoading(false);
+      if (err) { setError(err); return; }
     } else {
-      setStep('code');
-      setCooldown(60);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setError('Enter a valid email address.');
+        setLoading(false);
+        return;
+      }
+      const { error: err } = await sendEmailOtp(email.trim());
+      setLoading(false);
+      if (err) { setError(err); return; }
     }
-  }, [phone, sendOtp]);
+
+    setStep('code');
+    setCooldown(60);
+  }, [method, phone, email, sendOtp, sendEmailOtp]);
 
   const handleVerifyCode = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +100,9 @@ function PhoneAuth() {
 
     setLoading(true);
     setError('');
-    const { error: err } = await verifyOtp(toE164(phone), code);
+    const { error: err } = method === 'phone'
+      ? await verifyOtp(toE164(phone), code)
+      : await verifyEmailOtp(email.trim(), code);
     setLoading(false);
 
     if (err) {
@@ -96,17 +111,19 @@ function PhoneAuth() {
       setStep('success');
       setTimeout(() => router.replace(redirect), 1500);
     }
-  }, [code, phone, verifyOtp, router, redirect]);
+  }, [code, method, phone, email, verifyOtp, verifyEmailOtp, router, redirect]);
 
   const handleResend = useCallback(async () => {
     if (cooldown > 0) return;
     setLoading(true);
     setError('');
-    const { error: err } = await sendOtp(toE164(phone));
+    const { error: err } = method === 'phone'
+      ? await sendOtp(toE164(phone))
+      : await sendEmailOtp(email.trim());
     setLoading(false);
     if (err) setError(err);
     else setCooldown(60);
-  }, [cooldown, phone, sendOtp]);
+  }, [cooldown, method, phone, email, sendOtp, sendEmailOtp]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-5">
@@ -118,7 +135,8 @@ function PhoneAuth() {
             <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
           </Link>
           <p className="mt-3 text-[15px] text-[#86868B]">
-            {step === 'phone' ? 'Enter your phone number to continue'
+            {step === 'input'
+              ? (method === 'phone' ? 'Enter your phone number to continue' : 'Enter your email to continue')
               : step === 'code' ? 'Enter the code we sent you'
               : 'You\'re signed in'}
           </p>
@@ -132,25 +150,56 @@ function PhoneAuth() {
           </div>
         )}
 
-        {/* ── Phone step ────────────────────────────────────── */}
-        {step === 'phone' && (
+        {/* ── Input step ────────────────────────────────────── */}
+        {step === 'input' && (
           <form onSubmit={handleSendCode}>
-            <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-              <span className="text-[15px] font-medium text-[#86868B]">+1</span>
-              <input
-                type="tel"
-                placeholder="(555) 123-4567"
-                value={phone}
-                onChange={(e) => setPhone(formatPhone(e.target.value))}
-                maxLength={14}
-                autoFocus
-                className="w-full bg-transparent text-[17px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
-              />
+            {/* Phone / Email toggle */}
+            <div className="mb-4 flex rounded-xl bg-[#F5F5F7] p-1">
+              <button
+                type="button"
+                onClick={() => { setMethod('phone'); setError(''); }}
+                className={`flex-1 rounded-[10px] py-2 text-[13px] font-medium transition-all ${method === 'phone' ? 'bg-white text-[#1D1D1F] shadow-sm' : 'text-[#86868B]'}`}
+              >
+                Phone
+              </button>
+              <button
+                type="button"
+                onClick={() => { setMethod('email'); setError(''); }}
+                className={`flex-1 rounded-[10px] py-2 text-[13px] font-medium transition-all ${method === 'email' ? 'bg-white text-[#1D1D1F] shadow-sm' : 'text-[#86868B]'}`}
+              >
+                Email
+              </button>
             </div>
+
+            {method === 'phone' ? (
+              <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
+                <span className="text-[15px] font-medium text-[#86868B]">+1</span>
+                <input
+                  type="tel"
+                  placeholder="(555) 123-4567"
+                  value={phone}
+                  onChange={(e) => setPhone(formatPhone(e.target.value))}
+                  maxLength={14}
+                  autoFocus
+                  className="w-full bg-transparent text-[17px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
+                />
+              </div>
+            ) : (
+              <div className="flex items-center rounded-xl bg-[#F5F5F7] px-4 py-3.5">
+                <input
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => { setEmail(e.target.value); setError(''); }}
+                  autoFocus
+                  className="w-full bg-transparent text-[17px] font-medium text-[#1D1D1F] placeholder-[#A1A1A6] outline-none"
+                />
+              </div>
+            )}
 
             <button
               type="submit"
-              disabled={loading || phone.replace(/\D/g, '').length < 10}
+              disabled={loading || (method === 'phone' ? phone.replace(/\D/g, '').length < 10 : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))}
               className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#1D1D1F] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245] disabled:opacity-40"
             >
               {loading ? 'Sending code...' : 'Send verification code'}
@@ -162,7 +211,7 @@ function PhoneAuth() {
         {step === 'code' && (
           <form onSubmit={handleVerifyCode}>
             <p className="mb-3 text-center text-[13px] text-[#86868B]">
-              Sent to <span className="font-semibold text-[#1D1D1F]">+1 {phone}</span>
+              Sent to <span className="font-semibold text-[#1D1D1F]">{method === 'phone' ? `+1 ${phone}` : email}</span>
             </p>
 
             <input
@@ -187,10 +236,10 @@ function PhoneAuth() {
             <div className="mt-4 flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => { setStep('phone'); setCode(''); setError(''); }}
+                onClick={() => { setStep('input'); setCode(''); setError(''); }}
                 className="text-[13px] text-[#86868B] hover:text-[#1D1D1F]"
               >
-                Change number
+                {method === 'phone' ? 'Change number' : 'Change email'}
               </button>
               <button
                 type="button"
