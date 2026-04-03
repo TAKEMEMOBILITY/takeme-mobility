@@ -13,6 +13,7 @@ import { createServerClient } from '@supabase/ssr';
 // Route → allowed roles matrix
 const ROUTE_ROLES: Record<string, string[]> = {
   '/admin': ['backoffice_staff', 'support_manager', 'ops_core', 'exec_founder', 'security_owner', 'super_admin'],
+  '/exec': ['exec_founder', 'super_admin'],
   '/ops': ['ops_core', 'exec_founder', 'super_admin'],
   '/security': ['security_owner', 'super_admin'],
 };
@@ -231,6 +232,7 @@ function logAccessAttempt(
 export const config = {
   matcher: [
     '/admin/:path*',
+    '/exec/:path*',
     '/ops/:path*',
     '/security/:path*',
   ],
