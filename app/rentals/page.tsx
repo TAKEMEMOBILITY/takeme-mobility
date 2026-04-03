@@ -103,24 +103,37 @@ export default function FleetPage() {
             <div className="pt-2 lg:pt-6">
               <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#34C759]">TakeMe Fleet</p>
               <h1 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F]">
-                A fleet that earns.
+                Turn vehicles into
+                <br />income infrastructure.
               </h1>
               <p className="mt-4 max-w-md text-[18px] leading-[1.6] text-[#6E6E73]">
-                EV owners list vehicles. Drivers rent and start earning. TakeMe powers the system.
+                EV owners deploy assets. Drivers generate revenue. TakeMe runs the system.
               </p>
+
+              {/* Animated hero metrics */}
+              <div className="mt-6 flex flex-wrap items-center gap-5 text-[14px]">
+                <span className="tabular-nums font-semibold text-[#1D1D1F]">{usd(heroDriverNet)}/day <span className="font-normal text-[#A1A1A6]">driver net</span></span>
+                <span className="h-4 w-px bg-[#E8E8ED]" />
+                <span className="tabular-nums font-semibold text-[#1D1D1F]">$1,424/mo <span className="font-normal text-[#A1A1A6]">owner payout</span></span>
+                <span className="h-4 w-px bg-[#E8E8ED]" />
+                <span className="tabular-nums font-semibold text-[#1D1D1F]">{FLEET.length}+ <span className="font-normal text-[#A1A1A6]">EVs live</span></span>
+              </div>
+
               <div className="mt-8 flex items-center gap-3.5">
                 <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors hover:bg-[#424245]">
-                  Rent &amp; start earning
+                  Start driving
                 </a>
                 <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#1D1D1F] transition-colors hover:bg-white">
-                  List your vehicle
+                  List your EV
                 </Link>
               </div>
+
+              <p className="mt-5 text-[13px] text-[#C7C7CC]">Contracts secured &middot; Payouts automated &middot; Fully verified drivers</p>
             </div>
 
             {/* Right — Earning Economics Panel */}
             <div className="rounded-2xl border border-[#E8E8ED] bg-white p-6 shadow-[0_2px_12px_rgba(0,0,0,0.04)]">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">Earning estimate</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">Income dashboard</p>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
@@ -185,18 +198,31 @@ export default function FleetPage() {
         </div>
       </section>
 
+      {/* ═══ LIVE SYSTEM SIGNALS ══════════════════════════════════════════ */}
+      <section className="bg-[#FAFAFA]">
+        <div className="mx-auto max-w-[1200px] px-6 py-4 lg:px-10">
+          <div className="flex flex-wrap items-center justify-center gap-6 text-[13px]">
+            <span className="flex items-center gap-2"><span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" /><span className="tabular-nums font-medium text-[#1D1D1F]">32</span> <span className="text-[#A1A1A6]">vehicles active today</span></span>
+            <span className="h-3.5 w-px bg-[#E8E8ED]" />
+            <span className="flex items-center gap-2"><span className="tabular-nums font-medium text-[#1D1D1F]">$18,420</span> <span className="text-[#A1A1A6]">generated in 24h</span></span>
+            <span className="h-3.5 w-px bg-[#E8E8ED]" />
+            <span className="flex items-center gap-2"><span className="tabular-nums font-medium text-[#1D1D1F]">14</span> <span className="text-[#A1A1A6]">new drivers joined</span></span>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ HOW IT WORKS ══════════════════════════════════════════════════ */}
       <section className="bg-white">
         <div ref={howItWorks.ref} className={`mx-auto max-w-[1200px] px-6 py-24 md:py-28 lg:px-10 transition-all duration-[900ms] ease-out ${howItWorks.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">How it works</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">The system</p>
           <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-            How TakeMe Fleet works.
+            Three roles. One network.
           </h2>
           <div className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
             {[
-              { step: '01', title: 'List your EV', desc: 'Upload, verify, sign, activate.' },
-              { step: '02', title: 'TakeMe runs the system', desc: 'Contracts, payouts, verification, operations.' },
-              { step: '03', title: 'Rent and earn', desc: 'Drivers rent instantly and go online fast.' },
+              { step: '01', title: 'List your EV', desc: 'Upload → verify → activate income.' },
+              { step: '02', title: 'TakeMe runs operations', desc: 'Contracts, payouts, risk, drivers — fully managed.' },
+              { step: '03', title: 'Drivers generate revenue', desc: "Vehicles don't sit. They earn." },
             ].map(s => (
               <div key={s.step}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5F5F7]">
@@ -213,25 +239,41 @@ export default function FleetPage() {
       {/* ═══ REAL EARNINGS ═════════════════════════════════════════════════ */}
       <section className="bg-[#F5F5F7]">
         <div ref={earnings.ref} className={`mx-auto max-w-[1200px] px-6 py-24 md:py-28 lg:px-10 transition-all duration-[900ms] ease-out ${earnings.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Earnings</p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-            Real numbers. Real earnings.
-          </h2>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Economics</p>
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+              {usd(Math.round(heroVehicle.dailyRate * OWNER_COMMISSION * roiDays))}/month per vehicle.
+            </h2>
+            {/* Day toggles */}
+            <div className="flex gap-1 rounded-lg bg-white p-1 border border-[#E8E8ED]">
+              {[5, 20, 30].map(d => (
+                <button key={d} onClick={() => setRoiDays(d)} className={`rounded-md px-4 py-1.5 text-[13px] font-medium transition-colors ${roiDays === d ? 'bg-[#1D1D1F] text-white' : 'text-[#6E6E73] hover:text-[#1D1D1F]'}`}>{d} days</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Comparison */}
+          <div className="mt-6 flex items-center gap-4">
+            <div className="rounded-xl bg-[#E8E8ED] px-5 py-3">
+              <p className="text-[12px] text-[#A1A1A6]">Idle EV</p>
+              <p className="text-[20px] font-bold text-[#A1A1A6]">$0</p>
+            </div>
+            <span className="text-[20px] text-[#D2D2D7]">→</span>
+            <div className="rounded-xl bg-emerald-50 px-5 py-3">
+              <p className="text-[12px] text-emerald-600">TakeMe Fleet</p>
+              <p className="text-[20px] font-bold text-emerald-700">{usd(Math.round(heroVehicle.dailyRate * OWNER_COMMISSION * roiDays))}/mo</p>
+            </div>
+          </div>
 
           {/* ROI Calculator */}
-          <div className="mt-10 rounded-2xl border border-[#E8E8ED] bg-white p-6">
-            <p className="text-[13px] font-semibold text-[#1D1D1F]">Earnings calculator</p>
-            <p className="mt-1 text-[13px] text-[#A1A1A6]">Based on a {heroVehicle.brand} {heroVehicle.name.split(' ').slice(0, 2).join(' ')} at ${heroVehicle.dailyRate}/day</p>
-            <div className="mt-4">
-              <label className="text-[12px] font-medium text-[#6E6E73]">Rental days per month</label>
-              <input type="range" min={5} max={30} value={roiDays} onChange={e => setRoiDays(Number(e.target.value))} className="mt-2 w-full accent-[#1D1D1F]" />
-              <div className="mt-1 flex justify-between text-[12px] text-[#A1A1A6]"><span>5 days</span><span className="font-medium text-[#1D1D1F]">{roiDays} days</span><span>30 days</span></div>
-            </div>
+          <div className="mt-8 rounded-2xl border border-[#E8E8ED] bg-white p-6">
+            <p className="text-[13px] font-semibold text-[#1D1D1F]">Income breakdown</p>
+            <p className="mt-1 text-[13px] text-[#A1A1A6]">{heroVehicle.brand} {heroVehicle.name.split(' ').slice(0, 2).join(' ')} · {roiDays} days/month</p>
             <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
-              <EarningsCard label="Gross earnings" value={usd(DRIVER_DAILY_GROSS * roiDays)} />
-              <EarningsCard label="Rental cost" value={usd(heroVehicle.dailyRate * roiDays)} sub="Vehicle rental" />
-              <EarningsCard label="Net profit" value={usd((DRIVER_DAILY_GROSS - heroVehicle.dailyRate) * roiDays)} accent />
-              <EarningsCard label="Owner income" value={usd(Math.round(heroVehicle.dailyRate * OWNER_COMMISSION * roiDays))} sub="Passive income" />
+              <EarningsCard label="Driver gross" value={usd(DRIVER_DAILY_GROSS * roiDays)} />
+              <EarningsCard label="Vehicle cost" value={usd(heroVehicle.dailyRate * roiDays)} sub="Rental" />
+              <EarningsCard label="Driver net" value={usd((DRIVER_DAILY_GROSS - heroVehicle.dailyRate) * roiDays)} accent />
+              <EarningsCard label="Owner income" value={usd(Math.round(heroVehicle.dailyRate * OWNER_COMMISSION * roiDays))} sub="Passive" />
             </div>
           </div>
         </div>
@@ -242,9 +284,9 @@ export default function FleetPage() {
         <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-28 lg:px-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Marketplace</p>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Vehicles</p>
               <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-                Browse the fleet.
+                Activate a vehicle.
               </h2>
             </div>
             {/* Filters */}
@@ -285,7 +327,7 @@ export default function FleetPage() {
                   {/* Tags */}
                   <div className="flex items-center gap-2">
                     <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] ${CATEGORY_COLORS[v.category] ?? 'bg-gray-50 text-gray-500'}`}>{v.category}</span>
-                    {isTopROI && <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-600">Best ROI</span>}
+                    {isTopROI && <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-semibold text-emerald-600">Income ready</span>}
                   </div>
 
                   <p className="mt-2 text-[11px] font-medium uppercase tracking-[0.08em] text-[#A1A1A6]">{v.brand}</p>
@@ -316,7 +358,7 @@ export default function FleetPage() {
                       </div>
                     </div>
                     <button onClick={() => setBookingVehicle(v)} className="mt-4 flex w-full items-center justify-center rounded-[999px] bg-[#1D1D1F] py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#424245]">
-                      Rent &amp; start earning
+                      Start driving
                     </button>
                   </div>
                 </div>
@@ -341,10 +383,10 @@ export default function FleetPage() {
             <div>
               <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">For EV owners</p>
               <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-                Turn your EV into a revenue asset.
+                Your EV is not a car.<br />It's an asset.
               </h2>
               <div className="mt-8 space-y-4">
-                {['List once', 'Earn passively', 'Track bookings', 'Get paid securely'].map(t => (
+                {['Deploy once', 'Earn continuously', 'Managed by TakeMe', 'Withdraw anytime'].map(t => (
                   <div key={t} className="flex items-center gap-3">
                     <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     <span className="text-[16px] text-[#1D1D1F]">{t}</span>
@@ -373,16 +415,16 @@ export default function FleetPage() {
       {/* ═══ PLATFORM TRUST ════════════════════════════════════════════════ */}
       <section className="bg-white">
         <div ref={trustSection.ref} className={`mx-auto max-w-[1200px] px-6 py-24 md:py-28 lg:px-10 transition-all duration-[900ms] ease-out ${trustSection.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Infrastructure</p>
+          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Platform layer</p>
           <h2 className="mt-4 text-[clamp(1.75rem,4vw,2.75rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-            Built like a financial system.
+            The infrastructure behind the income.
           </h2>
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { title: 'Digital contracts', desc: 'Signed, hashed, immutable. Every agreement is legally structured.' },
-              { title: 'Secure payouts', desc: 'Weekly payouts. Commission auto-deducted. Full transparency.' },
-              { title: 'Driver verification', desc: 'License, age, score, payment — all verified before rental.' },
-              { title: 'Real-time operations', desc: 'Booking, handoff, return — tracked and audited end to end.' },
+              { title: 'Digital contracts', desc: 'Legally binding, hashed, immutable.' },
+              { title: 'Automated payouts', desc: 'Weekly cash flow. Commission auto-deducted.' },
+              { title: 'Driver verification', desc: 'Multi-layer KYC + risk scoring.' },
+              { title: 'Fleet orchestration', desc: 'End-to-end booking, handoff, and return.' },
             ].map(t => (
               <div key={t.title} className="rounded-2xl bg-[#FAFAFA] p-6">
                 <h3 className="text-[15px] font-semibold text-[#1D1D1F]">{t.title}</h3>
@@ -399,11 +441,14 @@ export default function FleetPage() {
           <h2 className="text-[clamp(1.5rem,3vw,2.25rem)] font-semibold tracking-[-0.02em] text-[#1D1D1F]">
             The more drivers. The more income.
           </h2>
-          <div className="mx-auto mt-8 grid max-w-2xl grid-cols-2 gap-6 md:grid-cols-4">
-            {['More drivers', 'More rentals', 'More owners', 'Stronger platform'].map((s, i) => (
-              <div key={s} className="flex flex-col items-center">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[15px] font-bold text-[#1D1D1F] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">{i + 1}</div>
-                <p className="mt-3 text-[14px] font-medium text-[#1D1D1F]">{s}</p>
+          <p className="mt-3 text-[15px] text-[#86868B]">As supply grows, utilization increases. Earnings compound.</p>
+          <div className="mx-auto mt-8 flex max-w-lg items-center justify-center gap-3">
+            {['Drivers', 'Vehicles', 'Earnings'].map((s, i) => (
+              <div key={s} className="flex items-center gap-3">
+                <div className="flex flex-col items-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-[14px] font-bold text-[#1D1D1F] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">{s}</div>
+                </div>
+                {i < 2 && <span className="text-[18px] text-[#D2D2D7]">↔</span>}
               </div>
             ))}
           </div>
@@ -437,12 +482,12 @@ export default function FleetPage() {
       <section className="bg-[#F5F5F7]">
         <div className="mx-auto max-w-xl px-6 py-20 text-center">
           <h2 className="text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
-            Start earning with TakeMe Fleet.
+            Plug into the TakeMe income network.
           </h2>
           <p className="mt-4 text-[16px] text-[#86868B]">Drivers earn. Owners earn. TakeMe runs the system.</p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white hover:bg-[#424245]">
-              Rent a vehicle
+              Start driving
             </a>
             <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] border border-[#D2D2D7] px-8 text-[16px] font-medium text-[#1D1D1F] hover:bg-white">
               List your EV
