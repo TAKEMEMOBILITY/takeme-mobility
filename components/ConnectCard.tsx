@@ -66,11 +66,12 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
         </p>
 
         {/* Price */}
-        <div className="mt-5 flex items-baseline gap-1">
+        <p className="mt-5 text-[12px] text-white/30">Drivers lose $50+ from a single dropped ride.</p>
+        <div className="mt-2 flex items-baseline gap-1">
           <span className="text-[32px] font-bold tabular-nums text-white">$29.90</span>
           <span className="text-[14px] font-medium text-white/40">/month</span>
         </div>
-        <p className="mt-1.5 text-[13px] text-white/35">Less than 1 missed ride per day.</p>
+        <p className="mt-1.5 text-[13px] text-white/35">Less than $1/day.</p>
       </div>
 
       {/* Features */}
