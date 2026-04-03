@@ -153,6 +153,17 @@ export async function GET(request: Request) {
     results.push({ name: 'circuit_breakers', status: 'fail', details: (e as Error).message });
   }
 
+  // CHECK 6: Fleet invariants
+  try {
+    const { checkFleetInvariants } = await import('@/lib/fleet/invariants');
+    const fleetResults = await checkFleetInvariants();
+    for (const fr of fleetResults) {
+      results.push({ name: fr.name, status: fr.passed ? 'pass' : 'fail', details: fr.details });
+    }
+  } catch (e) {
+    results.push({ name: 'fleet_invariants', status: 'fail', details: (e as Error).message });
+  }
+
   // Save results
   try {
     await svc.from('invariant_check_log').insert(
