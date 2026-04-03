@@ -61,6 +61,10 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
           </div>
         </div>
 
+        <p className="mt-4 text-[14px] leading-relaxed text-white/50">
+          Stay online every ride. No dropped trips. No missed income.
+        </p>
+
         {/* Price */}
         <div className="mt-5 flex items-baseline gap-1">
           <span className="text-[32px] font-bold tabular-nums text-white">$29.90</span>
@@ -89,7 +93,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
 
       {/* Loss prevention */}
       <div className="px-6">
-        <p className="text-[12px] text-white/30">One disconnect can cost more than this plan.</p>
+        <p className="text-[12px] text-white/30">One missed ride can cost more than this.</p>
       </div>
 
       {/* CTA */}
