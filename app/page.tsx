@@ -7,15 +7,15 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'Rental Cars', 'Connect', 'Students', 'Safety'] as const;
+const NAV_ITEMS = ['Rides', 'TakeMe Fleet', 'Connect', 'Students', 'Safety'] as const;
 const NAV_ROUTES: Record<string, string> = {
   Rides: '/#how-it-works',
-  'Rental Cars': '/rentals',
+  'TakeMe Fleet': '/rentals',
   Connect: '/connect',
   Students: '/students',
   Safety: '/safety',
 };
-const NAV_BADGES = new Set(['Rental Cars', 'Connect', 'Students']);
+const NAV_BADGES = new Set(['TakeMe Fleet', 'Connect', 'Students']);
 
 const TRUST_CARDS = [
   {
@@ -489,7 +489,7 @@ export default function HomePage() {
             </div>
             <div className="flex gap-16">
               {[
-                { t: 'Product', items: ['Rides', 'Rental Cars', 'Students', 'Takeme Protection', 'Business', 'Pricing'] },
+                { t: 'Product', items: ['Rides', 'TakeMe Fleet', 'Students', 'Takeme Protection', 'Business', 'Pricing'] },
                 { t: 'Company', items: ['About', 'Careers', 'Safety', 'Cities', 'Press'] },
                 { t: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
               ].map((col) => (
