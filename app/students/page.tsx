@@ -120,11 +120,11 @@ export default function StudentsPage() {
             </div>
 
             <h1 className="mt-8 text-[clamp(2.5rem,6vw,4rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-[#1D1D1F]">
-              Ride More. Pay Less.
+              Save on every ride.
             </h1>
 
             <p className="mt-5 text-[clamp(1.1rem,2.5vw,1.35rem)] leading-[1.5] text-[#86868B]">
-              Student Membership — 50% off every ride.
+              Verified student pricing. Instant activation.
             </p>
 
             {/* .edu verification badge */}
@@ -144,10 +144,10 @@ export default function StudentsPage() {
                   </div>
                   <div className="flex-1">
                     <p className="text-[13px] font-semibold text-[#1D1D1F]">
-                      {verified ? 'Email verified!' : 'Verify your student status'}
+                      {verified ? 'Verified' : 'Verify your student status'}
                     </p>
                     <p className="text-[12px] text-[#A1A1A6]">
-                      {verified ? 'You\'re eligible for student pricing' : 'Enter your .edu email to get started'}
+                      {verified ? 'Student pricing is active' : 'Enter your .edu email below'}
                     </p>
                   </div>
                 </div>
@@ -193,10 +193,10 @@ export default function StudentsPage() {
           <div className="text-center">
             <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Pricing</p>
             <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-              Plans that move with you.
+              Plans built for students.
             </h2>
             <p className="mt-4 text-[17px] leading-[1.65] text-[#86868B]">
-              Every plan includes verified student status and instant activation.
+              Every plan includes verified status and activates instantly.
             </p>
           </div>
 
@@ -212,7 +212,7 @@ export default function StudentsPage() {
               >
                 {plan.accent && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0071E3] px-4 py-1 text-[12px] font-semibold text-white">
-                    Most popular
+                    Best value
                   </span>
                 )}
                 <h3 className="text-[15px] font-semibold">{plan.name}</h3>
@@ -237,7 +237,7 @@ export default function StudentsPage() {
                       : 'bg-[#1D1D1F] text-white hover:bg-[#2C2C2E]'
                   }`}
                 >
-                  Get {plan.name}
+                  Choose {plan.name}
                 </button>
               </div>
             ))}
@@ -256,7 +256,7 @@ export default function StudentsPage() {
           <div className="text-center">
             <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Partner universities</p>
             <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-              Trusted by top Seattle campuses.
+              Partnered with Seattle campuses.
             </h2>
           </div>
 
@@ -293,17 +293,17 @@ export default function StudentsPage() {
         >
           <div className="mx-auto max-w-xl text-center">
             <h2 className="text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
-              Start saving today.
+              Ready to ride for less.
             </h2>
             <p className="mt-5 text-[17px] leading-[1.65] text-[#86868B]">
-              Verify your .edu email and unlock student pricing in seconds.
+              Verify your .edu email to activate student pricing.
             </p>
             <div className="mt-10">
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#2C2C2E]"
               >
-                Verify with .edu email
+                Verify student email
               </button>
             </div>
           </div>

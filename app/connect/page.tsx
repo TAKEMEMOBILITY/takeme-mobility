@@ -30,17 +30,17 @@ export default function ConnectPage() {
             <h1 className="mt-4 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
               Stay connected.
               <br />
-              Stay earning.
+              Keep earning.
             </h1>
             <p className="mt-5 max-w-md text-[17px] leading-[1.65] text-[#86868B]">
-              Unlimited data and calls for $29.90/month. Built for drivers who need reliable connectivity on every ride.
+              Reliable connectivity for every ride. No dropped trips, no lost income. $29.90/month.
             </p>
 
             <div className="mt-8 flex flex-wrap items-center gap-6">
               {[
-                { value: 'Unlimited', label: 'Data' },
-                { value: 'Unlimited', label: 'Calls' },
+                { value: 'Unlimited', label: 'Data & Calls' },
                 { value: '$29.90', label: 'Per month' },
+                { value: 'No', label: 'Contract' },
               ].map((stat) => (
                 <div key={stat.label}>
                   <p className="text-[24px] font-bold tabular-nums text-[#1D1D1F]">{stat.value}</p>
@@ -71,9 +71,9 @@ export default function ConnectPage() {
         <div className="mx-auto max-w-[1200px] px-6 py-20 lg:px-10">
           <div className="grid gap-5 md:grid-cols-3">
             {[
-              { title: 'Always on', desc: 'Unlimited 4G/5G data. Maps, navigation, and ride apps work without interruption.', icon: 'M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z' },
-              { title: 'No contracts', desc: 'Month-to-month billing. Cancel anytime from your driver dashboard.', icon: 'M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z' },
-              { title: 'Built for drivers', desc: 'Optimized for ride-hailing apps, GPS, and real-time communication.', icon: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z' },
+              { title: 'Always online', desc: 'Unlimited data keeps maps, navigation, and ride apps running without interruption.', icon: 'M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z' },
+              { title: 'No commitment', desc: 'Month-to-month. Cancel anytime from your dashboard.', icon: 'M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z' },
+              { title: 'Designed for driving', desc: 'Optimized for ride-hailing, GPS, and real-time communication.', icon: 'm3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z' },
             ].map((f) => (
               <div key={f.title} className="rounded-2xl bg-white p-6">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F7]">
@@ -93,17 +93,17 @@ export default function ConnectPage() {
       <section className="bg-white">
         <div className="mx-auto max-w-xl px-6 py-20 text-center">
           <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1D1D1F]">
-            Ready to connect?
+            Stay on the road.
           </h2>
           <p className="mt-4 text-[16px] text-[#86868B]">
-            Activate your plan in under a minute.
+            Activate in under a minute. Cancel anytime.
           </p>
           <div className="mt-8">
             <Link
               href="/driver/connect"
               className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#333]"
             >
-              Get TAKEME CONNECT
+              Activate plan
             </Link>
           </div>
         </div>

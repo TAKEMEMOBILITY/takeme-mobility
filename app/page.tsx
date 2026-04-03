@@ -25,8 +25,8 @@ const TRUST_CARDS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
       </svg>
     ),
-    title: 'Real-time tracking',
-    desc: 'See your driver approach on a live map. Share your trip with anyone.',
+    title: 'Live tracking',
+    desc: 'Watch your driver arrive on a live map. Share your trip instantly.',
   },
   {
     icon: (
@@ -34,8 +34,8 @@ const TRUST_CARDS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
       </svg>
     ),
-    title: 'Predictable pricing',
-    desc: 'Fare locked at confirmation. No surge surprises, no hidden fees.',
+    title: 'Upfront pricing',
+    desc: 'Fare confirmed before you ride. No surge, no hidden fees.',
   },
   {
     icon: (
@@ -43,15 +43,15 @@ const TRUST_CARDS = [
         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
       </svg>
     ),
-    title: 'Safety by design',
-    desc: 'Verified drivers, trip monitoring, and 24/7 incident support.',
+    title: 'Built for safety',
+    desc: 'Verified drivers. Trip monitoring. 24/7 support.',
   },
 ];
 
 const STEPS = [
-  { title: 'Set your destination', description: 'Enter where you\'re going. See your exact fare and arrival time before you confirm anything.' },
-  { title: 'A car arrives', description: 'Track a verified driver in real time. Name, photo, plate number — visible from the moment of match.' },
-  { title: 'Arrive and go', description: 'Payment completes automatically. No fumbling, no tipping screens, no friction. Just go.' },
+  { title: 'Enter destination', description: 'See your exact fare and arrival time before you confirm.' },
+  { title: 'Track your driver', description: 'Name, photo, plate number — visible from the moment of match.' },
+  { title: 'Arrive and go', description: 'Payment completes automatically. No screens, no friction.' },
 ];
 
 const SEATTLE_NEIGHBORHOODS = [
@@ -156,7 +156,7 @@ export default function HomePage() {
                   href={ctaHref}
                   className="inline-flex h-10 items-center rounded-[999px] bg-[#1D1D1F] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
                 >
-                  Get started
+                  Book a ride
                 </Link>
               </>
             )}
@@ -191,15 +191,15 @@ export default function HomePage() {
             {/* Left */}
             <div className="pt-2 lg:pt-4">
               <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F] animate-fade-in">
-                Your ride is already
+                Get anywhere
                 <br />
-                on the way.
+                in minutes.
               </h1>
 
               <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
-                Book in seconds. Track in real time.
+                Reliable rides across Seattle.
                 <br />
-                Arrive with confidence.
+                Book in seconds. Track in real time.
               </p>
 
               <div className="mt-7 flex items-center gap-3.5 animate-fade-in stagger-2">
@@ -207,13 +207,13 @@ export default function HomePage() {
                   href={ctaHref}
                   className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
                 >
-                  Get started
+                  Book your ride
                 </Link>
                 <Link
                   href="#how-it-works"
                   className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-[#F5F5F7]"
                 >
-                  How it works
+                  See how it works
                 </Link>
               </div>
 
@@ -223,7 +223,7 @@ export default function HomePage() {
                   <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                   </svg>
-                  Become a Driver
+                  Drive with TakeMe
                 </Link>
                 <span className="h-3.5 w-[1px] bg-[#E5E5EA]" />
                 <Link href="/driver" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
@@ -260,7 +260,7 @@ export default function HomePage() {
               </div>
 
               <p className="mt-3 text-[12px] text-[#A1A1A6] animate-fade-in stagger-5">
-                Includes optional <Link href="/driver/connect" className="underline underline-offset-2 hover:text-[#86868B]">unlimited SIM plan</Link>
+                Includes optional <Link href="/driver/connect" className="underline underline-offset-2 hover:text-[#86868B]">driver connectivity plan</Link>
               </p>
             </div>
 
@@ -320,7 +320,7 @@ export default function HomePage() {
         >
           <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">How it works</p>
           <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-            Three steps. Zero complexity.
+            Three steps. That's it.
           </h2>
           <div className="mt-16 grid gap-14 md:grid-cols-3 md:gap-10">
             {STEPS.map((step, i) => (
@@ -348,11 +348,11 @@ export default function HomePage() {
             <div>
               <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Coverage</p>
               <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
-                Where precision meets<br />the pavement.
+                Available where<br />you need us.
               </h2>
             </div>
             <p className="max-w-sm text-[15px] leading-[1.7] text-[#6E6E73]">
-              Launching in Seattle. Expanding everywhere.
+              Live in Seattle. Expanding soon.
             </p>
           </div>
 
@@ -396,14 +396,14 @@ export default function HomePage() {
                 </svg>
               </div>
               <div>
-                <h3 className="text-[17px] font-semibold text-[#1D1D1F]">Student Membership</h3>
+                <h3 className="text-[17px] font-semibold text-[#1D1D1F]">Student Plans</h3>
                 <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">
-                  50% off rides. Starting at $9.90/mo.
+                  Up to 50% off every ride. From $9.90/mo.
                 </p>
               </div>
             </div>
             <span className="text-[15px] font-medium text-[#0071E3] transition-transform duration-200 group-hover:translate-x-1">
-              Learn more &rarr;
+              View plans &rarr;
             </span>
           </Link>
         </div>
@@ -423,11 +423,11 @@ export default function HomePage() {
             </p>
 
             <h2 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
-              Download TakeMe
+              Get the app.
             </h2>
 
             <p className="mt-5 text-[17px] leading-[1.65] text-[#86868B]">
-              Your ride is one tap away. Available on iOS and Android.
+              Available on iOS and Android.
             </p>
 
             {/* Store buttons */}
@@ -467,7 +467,7 @@ export default function HomePage() {
                 href={ctaHref}
                 className="inline-flex h-[48px] items-center rounded-[999px] border border-[#D2D2D7] px-7 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-white"
               >
-                Or continue in browser
+                Continue in browser
               </Link>
             </div>
           </div>
@@ -484,7 +484,7 @@ export default function HomePage() {
                 <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
               </div>
               <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
-                Premium global transportation.<br />One standard, everywhere.
+                Reliable transportation.<br />One standard, everywhere.
               </p>
             </div>
             <div className="flex gap-16">
