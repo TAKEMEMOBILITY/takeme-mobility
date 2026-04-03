@@ -29,13 +29,13 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
   if (compact) {
     return (
       <Link href="/driver/connect" className="flex items-center gap-4 rounded-2xl border border-[#E5E5EA] bg-white p-4 transition-all duration-200 hover:border-[#C7C7CC] hover:shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#1D1D1F]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#0A0A0A]">
           <svg className="h-5 w-5 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-semibold text-[#1D1D1F]">TAKEME CONNECT</p>
+          <p className="text-[14px] font-semibold text-[#D42B2B]">TAKEME CONNECT</p>
           <p className="text-[12px] text-[#86868B]">Unlimited data & calls · $29.90/mo</p>
         </div>
         <svg className="h-4 w-4 shrink-0 text-[#C7C7CC]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -46,7 +46,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-[#1D1D1F]">
+    <div className="overflow-hidden rounded-2xl bg-[#0A0A0A]">
       {/* Header */}
       <div className="px-6 pt-6 pb-5">
         <div className="flex items-center gap-3">
@@ -102,7 +102,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
         <button
           onClick={handleActivate}
           disabled={activating}
-          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#1D1D1F] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
+          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#D42B2B] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
         >
           {activating ? 'Activating...' : 'Protect your earnings'}
         </button>

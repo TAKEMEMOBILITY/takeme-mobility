@@ -118,14 +118,14 @@ export default function HomePage() {
         scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
       }`}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1D1D1F]">
+          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#0A0A0A]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
+            <span className="ml-[5px] font-light text-[#9CA3AF]">Mobility</span>
           </Link>
 
           <div className="hidden items-center gap-10 lg:flex">
             {NAV_ITEMS.map((item) => (
-              <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
+              <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#9CA3AF] transition-colors duration-200 hover:text-[#0A0A0A]">
                 {item}
                 {NAV_BADGES.has(item) && (
                   <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
@@ -138,23 +138,23 @@ export default function HomePage() {
 
           <div className="flex items-center gap-3">
             {loading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#D2D2D7] border-t-[#1D1D1F]" />
+              <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#FECACA] border-t-[#0A0A0A]" />
             ) : (
               <>
-                <Link href="/driver" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:flex">
+                <Link href="/driver" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#9CA3AF] transition-opacity duration-200 hover:opacity-60 lg:flex">
                   Driver Hub
                   <span className="rounded-full bg-[#34C759] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
                 </Link>
-                <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 lg:block">
+                <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#9CA3AF] transition-opacity duration-200 hover:opacity-60 lg:block">
                   Drive with us
                 </Link>
-                <div className="hidden h-4 w-[1px] bg-[#E5E5EA] lg:block" />
-                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#8E8E93] transition-opacity duration-200 hover:opacity-60 sm:block">
+                <div className="hidden h-4 w-[1px] bg-[#FECACA] lg:block" />
+                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#9CA3AF] transition-opacity duration-200 hover:opacity-60 sm:block">
                   Sign in
                 </Link>
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-10 items-center rounded-[999px] bg-[#1D1D1F] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                  className="inline-flex h-10 items-center rounded-[999px] bg-[#D42B2B] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#B91C1C]"
                 >
                   Book a ride
                 </Link>
@@ -190,13 +190,13 @@ export default function HomePage() {
 
             {/* Left */}
             <div className="pt-2 lg:pt-4">
-              <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F] animate-fade-in">
+              <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#0A0A0A] animate-fade-in">
                 Get anywhere
                 <br />
                 in minutes.
               </h1>
 
-              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
+              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6B7280] animate-fade-in stagger-1">
                 Every ride, on your terms.
                 <br />
                 Ready when you are.
@@ -205,13 +205,13 @@ export default function HomePage() {
               <div className="mt-7 flex items-center gap-3.5 animate-fade-in stagger-2">
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                  className="inline-flex h-[52px] items-center rounded-[999px] bg-[#D42B2B] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#B91C1C]"
                 >
                   Book your ride
                 </Link>
                 <Link
                   href="#how-it-works"
-                  className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-[#F5F5F7]"
+                  className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#0A0A0A] transition-colors duration-200 hover:bg-[#FEF2F2]"
                 >
                   See how it works
                 </Link>
@@ -219,15 +219,15 @@ export default function HomePage() {
 
               {/* Driver CTAs */}
               <div className="mt-5 flex items-center gap-5 animate-fade-in stagger-3">
-                <Link href="/driver/apply" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
-                  <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <Link href="/driver/apply" className="group flex items-center gap-2 text-[14px] font-medium text-[#6B7280] transition-colors duration-200 hover:text-[#0A0A0A]">
+                  <svg className="h-4 w-4 text-[#9CA3AF] transition-colors group-hover:text-[#0A0A0A]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                   </svg>
                   Drive with TakeMe
                 </Link>
-                <span className="h-3.5 w-[1px] bg-[#E5E5EA]" />
-                <Link href="/driver" className="group flex items-center gap-2 text-[14px] font-medium text-[#86868B] transition-colors duration-200 hover:text-[#1D1D1F]">
-                  <svg className="h-4 w-4 text-[#A1A1A6] transition-colors group-hover:text-[#1D1D1F]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <span className="h-3.5 w-[1px] bg-[#FECACA]" />
+                <Link href="/driver" className="group flex items-center gap-2 text-[14px] font-medium text-[#6B7280] transition-colors duration-200 hover:text-[#0A0A0A]">
+                  <svg className="h-4 w-4 text-[#9CA3AF] transition-colors group-hover:text-[#0A0A0A]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
                   </svg>
                   Driver Hub
@@ -236,7 +236,7 @@ export default function HomePage() {
 
               {/* Store badges */}
               <div className="mt-5 flex flex-wrap gap-2.5 animate-fade-in stagger-4">
-                <a href="#" className="flex h-[44px] items-center gap-2.5 rounded-xl bg-[#1D1D1F] px-4 transition-colors duration-200 hover:bg-[#333]">
+                <a href="#" className="flex h-[44px] items-center gap-2.5 rounded-xl bg-[#0A0A0A] px-4 transition-colors duration-200 hover:bg-[#1a1a1a]">
                   <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
                   </svg>
@@ -245,7 +245,7 @@ export default function HomePage() {
                     <span className="mt-0.5 text-[14px] font-semibold leading-tight text-white">App Store</span>
                   </div>
                 </a>
-                <a href="#" className="flex h-[44px] items-center gap-2.5 rounded-xl bg-[#1D1D1F] px-4 transition-colors duration-200 hover:bg-[#333]">
+                <a href="#" className="flex h-[44px] items-center gap-2.5 rounded-xl bg-[#0A0A0A] px-4 transition-colors duration-200 hover:bg-[#1a1a1a]">
                   <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24">
                     <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
                     <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
@@ -259,8 +259,8 @@ export default function HomePage() {
                 </a>
               </div>
 
-              <p className="mt-3 text-[12px] text-[#A1A1A6] animate-fade-in stagger-5">
-                Includes optional <Link href="/driver/connect" className="underline underline-offset-2 hover:text-[#86868B]">driver connectivity plan</Link>
+              <p className="mt-3 text-[12px] text-[#9CA3AF] animate-fade-in stagger-5">
+                Includes optional <Link href="/driver/connect" className="underline underline-offset-2 hover:text-[#6B7280]">driver connectivity plan</Link>
               </p>
             </div>
 
@@ -273,17 +273,17 @@ export default function HomePage() {
       </section>
 
       {/* ═══ TRUST LAYER ══════════════════════════════════════════════════ */}
-      <section className="border-t border-[#F5F5F7] bg-white">
+      <section className="border-t border-[#FEF2F2] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20 lg:px-10">
           <div className="grid gap-4 md:grid-cols-3">
             {TRUST_CARDS.map((card) => (
               <div key={card.title} className="flex items-start gap-4 rounded-2xl bg-[#FAFAFA] p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#6E6E73] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-[#6B7280] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                   {card.icon}
                 </div>
                 <div>
-                  <h3 className="text-[15px] font-semibold text-[#1D1D1F]">{card.title}</h3>
-                  <p className="mt-1 text-[14px] leading-[1.6] text-[#6E6E73]">{card.desc}</p>
+                  <h3 className="text-[15px] font-semibold text-[#0A0A0A]">{card.title}</h3>
+                  <p className="mt-1 text-[14px] leading-[1.6] text-[#6B7280]">{card.desc}</p>
                 </div>
               </div>
             ))}
@@ -292,7 +292,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ STATS BAR ═════════════════════════════════════════════════════ */}
-      <section className="border-t border-[#F5F5F7] bg-white">
+      <section className="border-t border-[#FEF2F2] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
@@ -301,9 +301,9 @@ export default function HomePage() {
               { value: 'Real-time', label: 'tracking' },
               { value: 'AI-powered', label: 'safety' },
             ].map((stat, i) => (
-              <div key={i} className={`flex flex-col items-center py-6 ${i > 0 ? 'border-l border-[#F5F5F7]' : ''}`}>
-                <span className="text-[20px] font-bold tracking-[-0.02em] text-[#1D1D1F]">{stat.value}</span>
-                <span className="mt-0.5 text-[13px] font-medium text-[#A1A1A6]">{stat.label}</span>
+              <div key={i} className={`flex flex-col items-center py-6 ${i > 0 ? 'border-l border-[#FEF2F2]' : ''}`}>
+                <span className="text-[20px] font-bold tracking-[-0.02em] text-[#0A0A0A]">{stat.value}</span>
+                <span className="mt-0.5 text-[13px] font-medium text-[#9CA3AF]">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -311,25 +311,25 @@ export default function HomePage() {
       </section>
 
       {/* ═══ HOW IT WORKS ═════════════════════════════════════════════════ */}
-      <section id="how-it-works" className="bg-[#F5F5F7]">
+      <section id="how-it-works" className="bg-[#FEF2F2]">
         <div
           ref={steps.ref}
           className={`mx-auto max-w-[1200px] px-6 py-28 md:py-36 lg:px-10 transition-all duration-[900ms] ease-out ${
             steps.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">How it works</p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#9CA3AF]">How it works</p>
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#0A0A0A]">
             Three steps. That's it.
           </h2>
           <div className="mt-16 grid gap-14 md:grid-cols-3 md:gap-10">
             {STEPS.map((step, i) => (
               <div key={i}>
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-                  <span className="text-[16px] font-bold tabular-nums text-[#1D1D1F]">{i + 1}</span>
+                  <span className="text-[16px] font-bold tabular-nums text-[#0A0A0A]">{i + 1}</span>
                 </div>
-                <h3 className="mt-5 text-[17px] font-semibold text-[#1D1D1F]">{step.title}</h3>
-                <p className="mt-2 text-[15px] leading-[1.7] text-[#6E6E73]">{step.description}</p>
+                <h3 className="mt-5 text-[17px] font-semibold text-[#0A0A0A]">{step.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.7] text-[#6B7280]">{step.description}</p>
               </div>
             ))}
           </div>
@@ -346,12 +346,12 @@ export default function HomePage() {
         >
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">Coverage</p>
-              <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#9CA3AF]">Coverage</p>
+              <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#0A0A0A]">
                 Available where<br />you need us.
               </h2>
             </div>
-            <p className="max-w-sm text-[15px] leading-[1.7] text-[#6E6E73]">
+            <p className="max-w-sm text-[15px] leading-[1.7] text-[#6B7280]">
               Live in Seattle. Expanding soon.
             </p>
           </div>
@@ -359,22 +359,22 @@ export default function HomePage() {
           {/* Seattle neighborhoods */}
           <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-3">
             {SEATTLE_NEIGHBORHOODS.map((n) => (
-              <Link key={n.name} href="/cities" className="group flex items-center justify-between rounded-2xl border border-[#F5F5F7] bg-[#FAFAFA] px-5 py-5 transition-all duration-200 hover:border-[#E8E8ED]">
+              <Link key={n.name} href="/cities" className="group flex items-center justify-between rounded-2xl border border-[#FEF2F2] bg-[#FAFAFA] px-5 py-5 transition-all duration-200 hover:border-[#FECACA]">
                 <div>
-                  <span className="text-[15px] font-semibold text-[#1D1D1F]">{n.name}</span>
-                  <span className="ml-2 text-[11px] font-medium text-[#A1A1A6]">{n.tag}</span>
+                  <span className="text-[15px] font-semibold text-[#0A0A0A]">{n.name}</span>
+                  <span className="ml-2 text-[11px] font-medium text-[#9CA3AF]">{n.tag}</span>
                 </div>
-                <span className="text-[#A1A1A6] transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
+                <span className="text-[#9CA3AF] transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
               </Link>
             ))}
           </div>
 
           {/* Coming soon */}
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">Coming soon</span>
-            <span className="h-3.5 w-[1px] bg-[#E8E8ED]" />
+            <span className="text-[12px] font-semibold uppercase tracking-[0.15em] text-[#9CA3AF]">Coming soon</span>
+            <span className="h-3.5 w-[1px] bg-[#FECACA]" />
             {COMING_SOON_CITIES.map((city) => (
-              <span key={city} className="rounded-full border border-[#E8E8ED] px-3.5 py-1.5 text-[13px] font-medium text-[#C7C7CC]">
+              <span key={city} className="rounded-full border border-[#FECACA] px-3.5 py-1.5 text-[13px] font-medium text-[#C7C7CC]">
                 {city}
               </span>
             ))}
@@ -383,7 +383,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ STUDENTS ═══════════════════════════════════════════════════ */}
-      <section className="border-t border-[#F5F5F7] bg-white">
+      <section className="border-t border-[#FEF2F2] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20 lg:px-10">
           <Link
             href="/students"
@@ -391,18 +391,18 @@ export default function HomePage() {
           >
             <div className="flex items-start gap-4">
               <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
-                <svg className="h-6 w-6 text-[#6E6E73]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                <svg className="h-6 w-6 text-[#6B7280]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
                 </svg>
               </div>
               <div>
-                <h3 className="text-[17px] font-semibold text-[#1D1D1F]">Student Plans</h3>
-                <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">
+                <h3 className="text-[17px] font-semibold text-[#0A0A0A]">Student Plans</h3>
+                <p className="mt-1 text-[15px] leading-[1.6] text-[#6B7280]">
                   Up to 50% off every ride. From $9.90/mo.
                 </p>
               </div>
             </div>
-            <span className="text-[15px] font-medium text-[#0071E3] transition-transform duration-200 group-hover:translate-x-1">
+            <span className="text-[15px] font-medium text-[#D42B2B] transition-transform duration-200 group-hover:translate-x-1">
               View plans &rarr;
             </span>
           </Link>
@@ -410,7 +410,7 @@ export default function HomePage() {
       </section>
 
       {/* ═══ GET THE APP ═════════════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#FEF2F2]">
         <div
           ref={closing.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 transition-all duration-[1s] ease-out ${
@@ -418,15 +418,15 @@ export default function HomePage() {
           }`}
         >
           <div className="mx-auto max-w-xl text-center">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#9CA3AF]">
               Get the app
             </p>
 
-            <h2 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
+            <h2 className="mt-5 text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#0A0A0A]">
               Get the app.
             </h2>
 
-            <p className="mt-5 text-[17px] leading-[1.65] text-[#86868B]">
+            <p className="mt-5 text-[17px] leading-[1.65] text-[#6B7280]">
               Available on iOS and Android.
             </p>
 
@@ -434,7 +434,7 @@ export default function HomePage() {
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <a
                 href="#"
-                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#1D1D1F] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#2C2C2E] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#0A0A0A] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
               >
                 <svg className="h-7 w-7 shrink-0 text-white" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
@@ -446,7 +446,7 @@ export default function HomePage() {
               </a>
               <a
                 href="#"
-                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#1D1D1F] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#2C2C2E] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
+                className="group flex h-[60px] w-[200px] items-center justify-center gap-3.5 rounded-2xl bg-[#0A0A0A] px-6 shadow-[0_1px_3px_rgba(0,0,0,0.08)] transition-all duration-200 hover:bg-[#1a1a1a] hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] active:scale-[0.98]"
               >
                 <svg className="h-6 w-6 shrink-0" viewBox="0 0 24 24">
                   <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
@@ -465,7 +465,7 @@ export default function HomePage() {
             <div className="mt-10">
               <Link
                 href={ctaHref}
-                className="inline-flex h-[48px] items-center rounded-[999px] border border-[#D2D2D7] px-7 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-white"
+                className="inline-flex h-[48px] items-center rounded-[999px] border border-[#FECACA] px-7 text-[15px] font-medium text-[#0A0A0A] transition-colors duration-200 hover:bg-white"
               >
                 Continue in browser
               </Link>
@@ -475,15 +475,15 @@ export default function HomePage() {
       </section>
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-[#E8E8ED] bg-white">
+      <footer className="border-t border-[#FECACA] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
           <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+              <div className="text-[17px] tracking-[0.01em] text-[#0A0A0A]">
                 <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
+                <span className="ml-[4px] font-light text-[#9CA3AF]">Mobility</span>
               </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
+              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#9CA3AF]">
                 Reliable transportation.<br />One standard, everywhere.
               </p>
             </div>
@@ -494,21 +494,21 @@ export default function HomePage() {
                 { t: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
               ].map((col) => (
                 <div key={col.t}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">{col.t}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#9CA3AF]">{col.t}</p>
                   <div className="mt-4 flex flex-col gap-3.5">
                     {col.items.map((item) => (
-                      <span key={item} className="cursor-pointer text-[14px] text-[#6E6E73] transition-colors duration-200 hover:text-[#1D1D1F]">{item}</span>
+                      <span key={item} className="cursor-pointer text-[14px] text-[#6B7280] transition-colors duration-200 hover:text-[#0A0A0A]">{item}</span>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#E8E8ED] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#A1A1A6]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#FECACA] pt-8 md:flex-row md:items-center">
+            <p className="text-[13px] text-[#9CA3AF]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
             <div className="flex gap-7">
               {['Twitter', 'LinkedIn', 'Instagram'].map((s) => (
-                <span key={s} className="cursor-pointer text-[13px] text-[#A1A1A6] transition-colors duration-200 hover:text-[#6E6E73]">{s}</span>
+                <span key={s} className="cursor-pointer text-[13px] text-[#9CA3AF] transition-colors duration-200 hover:text-[#6B7280]">{s}</span>
               ))}
             </div>
           </div>
