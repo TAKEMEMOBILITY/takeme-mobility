@@ -6,6 +6,10 @@
     {
       "path": "/api/dispatch/worker",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/monitor",
+      "schedule": "* * * * *"
     }
   ]
 }
