@@ -139,7 +139,7 @@ export async function GET(request: Request) {
       },
     });
     await ses.send(new SendEmailCommand({
-      Source: process.env.SES_FROM_EMAIL ?? 'noreply@takememobility.com',
+      Source: process.env.SES_FROM_EMAIL ?? 'acilholding@gmail.com',
       Destination: { ToAddresses: [ALERT_EMAIL] },
       Message: {
         Subject: { Data: '[TakeMe E2E] System Check' },

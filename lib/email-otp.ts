@@ -9,7 +9,7 @@ const ses = new SESClient({
   },
 });
 
-const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? 'noreply@takememobility.com';
+const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? 'acilholding@gmail.com';
 
 export async function sendEmailOTP(email: string): Promise<{ success: boolean; error?: string }> {
   try {

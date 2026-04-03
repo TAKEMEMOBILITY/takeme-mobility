@@ -15,7 +15,7 @@ import { SNSClient, PublishCommand } from '@aws-sdk/client-sns';
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ALERT_EMAIL = 'acilholding@gmail.com';
-const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? 'noreply@takememobility.com';
+const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? 'acilholding@gmail.com';
 const ADMIN_PHONE = process.env.ADMIN_PHONE_NUMBER;
 const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://takememobility.com';
 const COOLDOWN_MS = 10 * 60 * 1000; // 10 minutes
