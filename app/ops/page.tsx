@@ -26,6 +26,8 @@ interface PolicyChange { who: string; action: string; resource: string; when: st
 interface PolicyData { drift_count: number; total_checks: number; status: string; checks: PolicyCheck[]; attributions: Attribution[]; recentChanges: PolicyChange[] }
 interface LogEntry { id: string; service: string; status: string; latency_ms: number; error: string | null; created_at: string }
 interface SimResult { scenario: string; description: string; status: string; checks: Check[]; failures: number; projectedMode: string; projectedReactions: string[]; rca: Hypothesis[] | null; expiresIn: number }
+interface InvMetric { name: string; violations_today: number; violations_7d: number; violations_30d: number; near_misses_today: number; shadow_violations: number; avg_recovery_time_ms: number; last_violation_at: string | null; mttr_7d: number; current_status: 'healthy' | 'near_miss' | 'violated' | 'recovering' }
+interface ShadowStatus { enabled: boolean; startedAt: number | null; hoursActive: number; readyToEnforce: boolean }
 
 type SystemMode = 'NORMAL' | 'DEGRADED' | 'DEFENSIVE' | 'LOCKDOWN';
 const MODE_COLORS: Record<SystemMode, string> = { NORMAL: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', DEGRADED: 'bg-amber-500/20 text-amber-400 border-amber-500/30', DEFENSIVE: 'bg-orange-500/20 text-orange-400 border-orange-500/30', LOCKDOWN: 'bg-red-500/20 text-red-400 border-red-500/30' };
@@ -53,6 +55,8 @@ export default function OpsPage() {
   const [simScenario, setSimScenario] = useState('ses_down');
   const [expandedRCA, setExpandedRCA] = useState(-1);
   const [expandedE2E, setExpandedE2E] = useState(-1);
+  const [invMetrics, setInvMetrics] = useState<InvMetric[]>([]);
+  const [shadowStatuses, setShadowStatuses] = useState<Record<string, ShadowStatus>>({});
 
   const fetchAll = useCallback(async () => {
     const r = await Promise.allSettled([
@@ -62,6 +66,8 @@ export default function OpsPage() {
       fetch('/api/monitor/policy').then(r => r.ok ? r.json() : null),
       fetch('/api/admin/monitoring/logs').then(r => r.ok ? r.json() : null),
       fetch('/api/ops/mode').then(r => r.ok ? r.json() : { mode: 'NORMAL' }),
+      fetch('/api/invariants/metrics').then(r => r.ok ? r.json() : { metrics: [] }),
+      fetch('/api/invariants/shadow').then(r => r.ok ? r.json() : { statuses: {} }),
     ]);
     if (r[0].status === 'fulfilled' && r[0].value) setMonitor(r[0].value);
     if (r[1].status === 'fulfilled' && r[1].value) setE2e(r[1].value);
@@ -69,6 +75,8 @@ export default function OpsPage() {
     if (r[3].status === 'fulfilled' && r[3].value) setPolicy(r[3].value);
     if (r[4].status === 'fulfilled' && r[4].value) setLogs(r[4].value);
     if (r[5].status === 'fulfilled' && r[5].value) setMode(r[5].value.mode as SystemMode);
+    if (r[6].status === 'fulfilled' && r[6].value) setInvMetrics(r[6].value.metrics ?? []);
+    if (r[7].status === 'fulfilled' && r[7].value) setShadowStatuses(r[7].value.statuses ?? {});
     setLastRefresh(new Date().toISOString());
     setLoading(false);
   }, []);
@@ -381,7 +389,62 @@ export default function OpsPage() {
           </div>
         )}
 
-        {/* ── Row 7: Live Log Stream ════════════════════════════ */}
+        {/* ── Row 7: Invariant Health + Shadow Mode ════════════ */}
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          {/* Invariant Health */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Invariant Health</p>
+            <div className="mt-3 space-y-1.5">
+              {invMetrics.length > 0 ? invMetrics.map(m => (
+                <div key={m.name} className={`flex items-center justify-between rounded-lg px-3 py-2 ${
+                  m.current_status === 'violated' ? 'bg-red-500/5' : m.current_status === 'near_miss' ? 'bg-amber-500/5' : m.current_status === 'recovering' ? 'bg-blue-500/5' : 'bg-[#0a0a0f]'
+                }`}>
+                  <div className="flex items-center gap-2">
+                    <Dot s={m.current_status === 'healthy' ? 'ok' : m.current_status === 'near_miss' ? 'warn' : 'error'} />
+                    <span className="text-[13px] font-medium text-white">{m.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-[11px]">
+                    {m.violations_today > 0 && <span className="rounded-full bg-red-500/20 px-2 py-0.5 font-bold text-red-400">{m.violations_today} today</span>}
+                    {m.near_misses_today > 0 && <span className="rounded-full bg-amber-500/20 px-2 py-0.5 font-bold text-amber-400">{m.near_misses_today} near</span>}
+                    <span className="text-[#3f3f46]">7d: {m.violations_7d}</span>
+                    {m.avg_recovery_time_ms > 0 && <span className="text-[#3f3f46]">MTTR: {m.avg_recovery_time_ms}ms</span>}
+                  </div>
+                </div>
+              )) : <p className="text-[13px] text-[#3f3f46]">No metrics data</p>}
+            </div>
+          </div>
+
+          {/* Shadow Mode */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Shadow Mode</p>
+            <div className="mt-3 space-y-1.5">
+              {Object.entries(shadowStatuses).map(([name, s]) => (
+                <div key={name} className="flex items-center justify-between rounded-lg bg-[#0a0a0f] px-3 py-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`h-2 w-2 rounded-full ${s.enabled ? 'bg-amber-400' : 'bg-[#27272a]'}`} />
+                    <span className="text-[13px] font-medium text-white">{name}</span>
+                    {s.enabled && <span className="text-[11px] text-amber-400">{s.hoursActive}h active</span>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {s.readyToEnforce && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold text-emerald-400">Ready to enforce</span>}
+                    <button
+                      onClick={async () => {
+                        await fetch('/api/invariants/shadow', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ invariant: name, enabled: !s.enabled }) });
+                        fetchAll();
+                      }}
+                      className={`rounded px-2 py-0.5 text-[10px] font-medium ${s.enabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#1e1e2e] text-[#52525b] hover:text-[#a1a1aa]'}`}
+                    >
+                      {s.enabled ? 'Promote' : 'Enable Shadow'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {Object.keys(shadowStatuses).length === 0 && <p className="text-[13px] text-[#3f3f46]">Loading...</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Row 8: Live Log Stream ════════════════════════════ */}
         <div className="mt-4 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Live Log Stream</p>
           <div className="mt-3 max-h-56 overflow-y-auto">
