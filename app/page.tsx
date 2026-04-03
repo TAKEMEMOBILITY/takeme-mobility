@@ -197,7 +197,7 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
-                Reliable rides across Seattle.
+                Every ride, on your terms.
                 <br />
                 Ready when you are.
               </p>
