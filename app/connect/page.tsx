@@ -28,18 +28,22 @@ export default function ConnectPage() {
               For drivers
             </p>
             <h1 className="mt-4 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
-              Stay connected.
+              Never lose a ride
               <br />
-              Keep earning.
+              again.
             </h1>
             <p className="mt-5 max-w-md text-[17px] leading-[1.65] text-[#86868B]">
-              Reliable connectivity for every ride. No dropped trips, no lost income. $29.90/month.
+              Zero dropped trips. Zero missed income.
+              <br />
+              Built for drivers who don't tolerate downtime.
+            </p>
+            <p className="mt-4 text-[28px] font-bold tracking-[-0.02em] text-[#1D1D1F]">
+              $29.90<span className="text-[15px] font-medium text-[#86868B]">/month</span>
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-6">
+            <div className="mt-6 flex flex-wrap items-center gap-6">
               {[
                 { value: 'Unlimited', label: 'Data & Calls' },
-                { value: '$29.90', label: 'Per month' },
                 { value: 'No', label: 'Contract' },
               ].map((stat) => (
                 <div key={stat.label}>
@@ -54,7 +58,7 @@ export default function ConnectPage() {
                 href="/driver/connect"
                 className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#333] active:scale-[0.98]"
               >
-                Activate plan
+                Start earning without interruptions
               </Link>
             </div>
           </div>
