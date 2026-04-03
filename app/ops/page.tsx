@@ -3,55 +3,37 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// /ops — Mission Control
+// /ops — Mission Control (Final Form)
 //
-// Full infrastructure monitoring dashboard for the engineering team.
-// Auth: ops_core, exec_founder, super_admin (proxy.ts → 404 for everyone else)
-// Watermarked + copy-protected via layout.tsx
-// Auto-refresh every 30 seconds.
+// Auth: ops_core, exec_founder, super_admin (proxy.ts → 404)
+// Watermarked + copy-protected via layout.
+// Auto-refresh 30s. Simulation mode available.
 // ═══════════════════════════════════════════════════════════════════════════
 
 // ── Types ────────────────────────────────────────────────────────────────
 
-interface CheckResult {
-  service: string;
-  status: 'ok' | 'warn' | 'error';
-  latency_ms: number;
-  error?: string;
-  blast_radius?: string;
-}
-interface RCA { cause: string; confidence: number; autofix_available: boolean }
-interface MonitorData {
-  status: string; timestamp: string; checks: CheckResult[];
-  failures: number; rca: RCA | null;
-}
-interface E2EStep { step: string; status: 'pass' | 'fail' | 'skip'; duration_ms: number; error?: string }
-interface E2EData {
-  status: string; timestamp: string; steps: E2EStep[];
-  summary: { passed: number; failed: number; total: number };
-}
-interface Capability { name: string; status: 'ok' | 'fail'; latency_ms: number; error?: string }
-interface CapData { timestamp: string; capabilities: Record<string, Capability>; all_operational: boolean }
+interface Check { service: string; status: 'ok' | 'warn' | 'error'; latency_ms: number; error?: string; blast_radius?: string }
+interface Hypothesis { cause: string; confidence: number; autofixAvailable: boolean; manualSteps: string }
+interface MonitorData { status: string; timestamp: string; checks: Check[]; failures: number; rca: Hypothesis[] | null }
+interface E2EStep { step: string; status: string; duration_ms: number; error?: string }
+interface E2ERun { timestamp: string; pass: boolean; totalDuration: number; steps: E2EStep[] }
+interface E2EData { status: string; timestamp: string; steps: E2EStep[]; summary: { passed: number; failed: number; total: number }; history: E2ERun[]; stats: { successRate: number; p50: number; p95: number; p99: number; failurePattern: string | null; trend: string } }
+interface Cap { name: string; status: 'ok' | 'fail'; latency_ms: number; error?: string }
+interface CapData { capabilities: Record<string, Cap>; all_operational: boolean }
 interface PolicyCheck { policy: string; expected: string; actual: string; drifted: boolean }
-interface PolicyData { timestamp: string; drift_count: number; total_checks: number; status: string; checks: PolicyCheck[] }
-interface AutofixResult { service: string; fix_applied: string; success: boolean; error?: string }
-interface AutofixData { fixed: AutofixResult[]; failed: AutofixResult[]; skipped: string[] }
+interface Attribution { policy: string; lastChangedBy: string | null; lastChangedAt: string | null; source: string; delta: string }
+interface PolicyChange { who: string; action: string; resource: string; when: string }
+interface PolicyData { drift_count: number; total_checks: number; status: string; checks: PolicyCheck[]; attributions: Attribution[]; recentChanges: PolicyChange[] }
 interface LogEntry { id: string; service: string; status: string; latency_ms: number; error: string | null; created_at: string }
+interface SimResult { scenario: string; description: string; status: string; checks: Check[]; failures: number; projectedMode: string; projectedReactions: string[]; rca: Hypothesis[] | null; expiresIn: number }
+
+type SystemMode = 'NORMAL' | 'DEGRADED' | 'DEFENSIVE' | 'LOCKDOWN';
+const MODE_COLORS: Record<SystemMode, string> = { NORMAL: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', DEGRADED: 'bg-amber-500/20 text-amber-400 border-amber-500/30', DEFENSIVE: 'bg-orange-500/20 text-orange-400 border-orange-500/30', LOCKDOWN: 'bg-red-500/20 text-red-400 border-red-500/30' };
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 
-function timeAgo(ts: string): string {
-  const d = Date.now() - new Date(ts).getTime();
-  if (d < 60_000) return `${Math.floor(d / 1000)}s ago`;
-  if (d < 3_600_000) return `${Math.floor(d / 60_000)}m ago`;
-  return `${Math.floor(d / 3_600_000)}h ago`;
-}
-
-function StatusDot({ s }: { s: string }) {
-  const c = s === 'ok' || s === 'pass' || s === 'healthy' || s === 'none' || s === 'compliant'
-    ? 'bg-emerald-400' : s === 'warn' || s === 'degraded' ? 'bg-amber-400' : 'bg-red-400';
-  return <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${c}`} />;
-}
+function timeAgo(ts: string): string { const d = Date.now() - new Date(ts).getTime(); if (d < 60_000) return `${Math.floor(d / 1000)}s ago`; if (d < 3_600_000) return `${Math.floor(d / 60_000)}m ago`; return `${Math.floor(d / 3_600_000)}h ago`; }
+function Dot({ s }: { s: string }) { const c = s === 'ok' || s === 'pass' || s === 'healthy' || s === 'none' ? 'bg-emerald-400' : s === 'warn' || s === 'degraded' ? 'bg-amber-400' : 'bg-red-400'; return <span className={`inline-block h-2 w-2 shrink-0 rounded-full ${c}`} />; }
 
 // ── Page ─────────────────────────────────────────────────────────────────
 
@@ -61,386 +43,389 @@ export default function OpsPage() {
   const [caps, setCaps] = useState<CapData | null>(null);
   const [policy, setPolicy] = useState<PolicyData | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [autofix, setAutofix] = useState<AutofixData | null>(null);
+  const [mode, setMode] = useState<SystemMode>('NORMAL');
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useState('');
   const [autofixRunning, setAutofixRunning] = useState(false);
+  const [simMode, setSimMode] = useState(false);
+  const [simResult, setSimResult] = useState<SimResult | null>(null);
+  const [simCountdown, setSimCountdown] = useState(0);
+  const [simScenario, setSimScenario] = useState('ses_down');
+  const [expandedRCA, setExpandedRCA] = useState(-1);
+  const [expandedE2E, setExpandedE2E] = useState(-1);
 
   const fetchAll = useCallback(async () => {
-    const settled = await Promise.allSettled([
+    const r = await Promise.allSettled([
       fetch('/api/monitor').then(r => r.ok ? r.json() : null),
       fetch('/api/monitor/e2e').then(r => r.ok ? r.json() : null),
       fetch('/api/monitor/capabilities').then(r => r.ok ? r.json() : null),
       fetch('/api/monitor/policy').then(r => r.ok ? r.json() : null),
       fetch('/api/admin/monitoring/logs').then(r => r.ok ? r.json() : null),
+      fetch('/api/ops/mode').then(r => r.ok ? r.json() : { mode: 'NORMAL' }),
     ]);
-    if (settled[0].status === 'fulfilled' && settled[0].value) setMonitor(settled[0].value);
-    if (settled[1].status === 'fulfilled' && settled[1].value) setE2e(settled[1].value);
-    if (settled[2].status === 'fulfilled' && settled[2].value) setCaps(settled[2].value);
-    if (settled[3].status === 'fulfilled' && settled[3].value) setPolicy(settled[3].value);
-    if (settled[4].status === 'fulfilled' && settled[4].value) setLogs(settled[4].value);
+    if (r[0].status === 'fulfilled' && r[0].value) setMonitor(r[0].value);
+    if (r[1].status === 'fulfilled' && r[1].value) setE2e(r[1].value);
+    if (r[2].status === 'fulfilled' && r[2].value) setCaps(r[2].value);
+    if (r[3].status === 'fulfilled' && r[3].value) setPolicy(r[3].value);
+    if (r[4].status === 'fulfilled' && r[4].value) setLogs(r[4].value);
+    if (r[5].status === 'fulfilled' && r[5].value) setMode(r[5].value.mode as SystemMode);
     setLastRefresh(new Date().toISOString());
     setLoading(false);
   }, []);
 
-  useEffect(() => {
-    fetchAll();
-    const id = setInterval(fetchAll, 30_000);
-    return () => clearInterval(id);
-  }, [fetchAll]);
+  useEffect(() => { fetchAll(); const id = setInterval(fetchAll, 30_000); return () => clearInterval(id); }, [fetchAll]);
 
-  const runAutofix = async () => {
-    setAutofixRunning(true);
-    try {
-      const res = await fetch('/api/monitor/autofix', { method: 'POST' });
-      if (res.ok) setAutofix(await res.json());
-      await fetchAll();
-    } finally { setAutofixRunning(false); }
+  // Simulation countdown
+  useEffect(() => {
+    if (simCountdown <= 0) { if (simResult) setSimResult(null); return; }
+    const id = setTimeout(() => setSimCountdown(c => c - 1), 1000);
+    return () => clearTimeout(id);
+  }, [simCountdown, simResult]);
+
+  const changeMode = async (newMode: SystemMode) => {
+    await fetch('/api/ops/mode', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ mode: newMode, reason: 'manual' }) });
+    setMode(newMode);
+    fetchAll();
   };
 
-  // ── Derived state ──────────────────────────────────────────────────
+  const runAutofix = async () => { setAutofixRunning(true); try { await fetch('/api/monitor/autofix', { method: 'POST' }); await fetchAll(); } finally { setAutofixRunning(false); } };
 
-  const failures = monitor?.checks.filter(c => c.status === 'error') ?? [];
-  const criticalServices = new Set(['supabase_db', 'supabase_auth', 'stripe_api', 'upstash_redis']);
-  const hasCritical = failures.some(f => criticalServices.has(f.service));
-  const impact = (monitor?.failures ?? 0) === 0 ? 'none' : hasCritical ? 'critical' : 'degraded';
+  const runSimulation = async () => {
+    const res = await fetch('/api/monitor/simulate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ scenario: simScenario }) });
+    if (res.ok) { const d = await res.json(); setSimResult(d); setSimCountdown(d.expiresIn ?? 60); }
+  };
 
+  // Active data source (real or simulated)
+  const activeChecks = simResult ? simResult.checks : (monitor?.checks ?? []);
+  const activeRCA = simResult ? simResult.rca : monitor?.rca;
+  const activeFailures = activeChecks.filter(c => c.status === 'error');
+  const activeStatus = simResult ? simResult.status : (monitor?.status ?? 'none');
+
+  const criticalSet = new Set(['supabase_db', 'supabase_auth', 'stripe_api', 'upstash_redis']);
+  const hasCritical = activeFailures.some(f => criticalSet.has(f.service));
+  const impact = activeFailures.length === 0 ? 'none' : hasCritical ? 'critical' : 'degraded';
   const impactColor = impact === 'none' ? 'text-emerald-400' : impact === 'degraded' ? 'text-amber-400' : 'text-red-400';
   const impactBg = impact === 'none' ? 'bg-emerald-500/10 border-emerald-500/20' : impact === 'degraded' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20';
+  const gateOpen = activeFailures.length === 0 && (policy?.drift_count ?? 0) === 0 && mode === 'NORMAL';
 
-  const gateOpen = (monitor?.failures ?? 0) === 0 && (policy?.drift_count ?? 0) === 0;
-
-  if (loading && !monitor) return (
-    <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-        <p className="text-[13px] text-[#71717a]">Connecting to monitoring...</p>
-      </div>
-    </div>
-  );
+  if (loading && !monitor) return <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" /></div>;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8 text-[#e4e4e7]">
-      <div className="mx-auto max-w-[1400px]">
+    <div className={`min-h-screen bg-[#0a0a0f] text-[#e4e4e7] ${simMode ? 'ring-2 ring-amber-400/40 ring-inset' : ''}`}>
+      {/* LOCKDOWN banner */}
+      {mode === 'LOCKDOWN' && (
+        <div className="animate-pulse bg-red-600 py-2 text-center text-[14px] font-bold text-white tracking-wider">
+          ⚠ SYSTEM LOCKDOWN — All non-read operations blocked ⚠
+        </div>
+      )}
 
+      <div className="mx-auto max-w-[1400px] p-6 lg:p-8">
         {/* ── Header ──────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold text-white">Mission Control</h1>
             <p className="mt-1 text-[13px] text-[#71717a]">
-              Infrastructure monitoring &middot; {lastRefresh ? `Updated ${timeAgo(lastRefresh)}` : '...'}
+              {simMode ? 'SIMULATION MODE' : 'Infrastructure monitoring'} &middot; {lastRefresh ? timeAgo(lastRefresh) : '...'}
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={runAutofix}
-              disabled={autofixRunning}
-              className="rounded-lg bg-amber-500/20 px-4 py-2 text-[13px] font-medium text-amber-400 hover:bg-amber-500/30 disabled:opacity-50"
-            >
-              {autofixRunning ? 'Fixing...' : 'Run Auto-Fix'}
+          <div className="flex items-center gap-2">
+            {/* Simulation toggle */}
+            <button onClick={() => { setSimMode(!simMode); if (simMode) { setSimResult(null); setSimCountdown(0); } }}
+              className={`rounded-lg px-3 py-1.5 text-[12px] font-medium transition-colors ${simMode ? 'bg-amber-500/30 text-amber-400' : 'bg-[#1e1e2e] text-[#52525b] hover:text-[#a1a1aa]'}`}>
+              {simMode ? 'Exit Sim' : 'Simulation'}
             </button>
-            <button
-              onClick={() => { setLoading(true); fetchAll(); }}
-              className="rounded-lg bg-[#1e1e2e] px-4 py-2 text-[13px] font-medium text-[#a1a1aa] hover:text-white"
-            >
-              Refresh
+            <button onClick={runAutofix} disabled={autofixRunning} className="rounded-lg bg-amber-500/20 px-3 py-1.5 text-[12px] font-medium text-amber-400 disabled:opacity-50">
+              {autofixRunning ? 'Fixing...' : 'Auto-Fix'}
             </button>
+            <button onClick={() => { setLoading(true); fetchAll(); }} className="rounded-lg bg-[#1e1e2e] px-3 py-1.5 text-[12px] font-medium text-[#a1a1aa] hover:text-white">Refresh</button>
+            {/* Mode badge */}
+            <span className={`rounded-lg border px-3 py-1.5 text-[12px] font-bold ${MODE_COLORS[mode]} ${mode !== 'NORMAL' ? 'animate-pulse' : ''}`}>{mode}</span>
             <div className="flex items-center gap-1.5 rounded-lg bg-emerald-500/10 px-3 py-1.5">
-              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-              <span className="text-[12px] font-medium text-emerald-400">Live</span>
+              <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" /><span className="text-[12px] font-medium text-emerald-400">Live</span>
             </div>
           </div>
         </div>
 
-        {/* ── Row 1: Impact · RCA · Deploy Gate · Rollback ────────── */}
-        <div className="mt-6 grid gap-4 lg:grid-cols-4">
-          {/* Customer Impact */}
+        {/* ── Simulation bar ──────────────────────────────────────── */}
+        {simMode && (
+          <div className="mt-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <select value={simScenario} onChange={e => setSimScenario(e.target.value)}
+                  className="rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-3 py-1.5 text-[13px] text-white outline-none">
+                  <option value="ses_down">SES Down</option>
+                  <option value="db_latency">DB High Latency</option>
+                  <option value="auth_failure">Auth Failure</option>
+                  <option value="redis_down">Redis Down</option>
+                  <option value="full_outage">Full Outage</option>
+                  <option value="ddos">DDoS Attack</option>
+                </select>
+                <button onClick={runSimulation} className="rounded-lg bg-amber-500/20 px-4 py-1.5 text-[13px] font-medium text-amber-400 hover:bg-amber-500/30">Run Simulation</button>
+              </div>
+              {simCountdown > 0 && <span className="text-[13px] tabular-nums text-amber-400">Simulation ends in: {simCountdown}s</span>}
+            </div>
+            {simResult && (
+              <div className="mt-3 flex flex-wrap gap-4 text-[12px]">
+                <span className="text-[#a1a1aa]">Scenario: <span className="text-white">{simResult.description}</span></span>
+                <span className="text-[#a1a1aa]">Projected mode: <span className={`font-bold ${simResult.projectedMode === 'LOCKDOWN' ? 'text-red-400' : simResult.projectedMode === 'DEFENSIVE' ? 'text-orange-400' : 'text-amber-400'}`}>{simResult.projectedMode}</span></span>
+                <span className="text-[#a1a1aa]">Would trigger: <span className="text-amber-400">{simResult.projectedReactions.join(', ') || 'none'}</span></span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Row 1: Automated Decision Engine ════════════════════ */}
+        <div className="mt-6 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Automated Decision Engine</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            <DecisionCard label="System Mode" value={mode} color={mode === 'NORMAL' ? 'emerald' : mode === 'DEGRADED' ? 'amber' : mode === 'DEFENSIVE' ? 'orange' : 'red'}
+              actions={(['NORMAL', 'DEGRADED', 'DEFENSIVE', 'LOCKDOWN'] as SystemMode[]).filter(m => m !== mode).map(m => ({ label: m, onClick: () => changeMode(m) }))} />
+            <DecisionCard label="Deploy" value={gateOpen ? 'CLEAR' : mode !== 'NORMAL' ? 'HOLD' : 'BLOCKED'} color={gateOpen ? 'emerald' : 'red'} />
+            <DecisionCard label="Traffic" value={mode === 'LOCKDOWN' ? 'REDIRECT' : mode === 'DEFENSIVE' ? 'HOLD' : 'ACTIVE'} color={mode === 'NORMAL' ? 'emerald' : mode === 'LOCKDOWN' ? 'red' : 'amber'} />
+            <DecisionCard label="Retry Strategy" value={mode === 'DEFENSIVE' ? 'CIRCUIT_OPEN' : mode === 'DEGRADED' ? 'AGGRESSIVE' : 'NORMAL'} color={mode === 'NORMAL' ? 'emerald' : mode === 'DEFENSIVE' ? 'red' : 'amber'} />
+            <DecisionCard label="Auto-Fix" value={mode === 'LOCKDOWN' ? 'OFF' : mode === 'DEFENSIVE' ? 'SUSPENDED' : 'ON'} color={mode === 'NORMAL' ? 'emerald' : mode === 'LOCKDOWN' ? 'red' : 'amber'} />
+          </div>
+        </div>
+
+        {/* ── Row 2: Impact · RCA · Gate · Rollback ═══════════════ */}
+        <div className="mt-4 grid gap-4 lg:grid-cols-4">
           <div className={`rounded-xl border p-5 ${impactBg}`}>
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Customer Impact</p>
-            <p className={`mt-2 text-2xl font-bold ${impactColor}`}>
-              {impact === 'none' ? 'None' : impact === 'degraded' ? 'Degraded' : 'Critical'}
-            </p>
-            <p className="mt-1 text-[13px] text-[#71717a]">
-              {monitor?.failures ?? 0} service{(monitor?.failures ?? 0) !== 1 ? 's' : ''} failing
-            </p>
+            <p className={`mt-2 text-2xl font-bold ${impactColor}`}>{impact === 'none' ? 'None' : impact === 'degraded' ? 'Degraded' : 'Critical'}</p>
+            <p className="mt-1 text-[13px] text-[#71717a]">{activeFailures.length} failing</p>
           </div>
-
-          {/* RCA */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">RCA Confidence</p>
-            {monitor?.rca ? (
-              <>
-                <p className="mt-2 text-[14px] font-medium text-white">{monitor.rca.cause}</p>
-                <div className="mt-2 flex items-center gap-3">
-                  <div className="flex-1 rounded-full bg-[#1e1e2e] h-2">
-                    <div className="h-2 rounded-full bg-amber-400" style={{ width: `${monitor.rca.confidence}%` }} />
-                  </div>
-                  <span className="text-[13px] font-bold tabular-nums text-white">{monitor.rca.confidence}%</span>
-                </div>
-                {monitor.rca.autofix_available && (
-                  <span className="mt-2 inline-block rounded-full bg-emerald-500/20 px-2 py-0.5 text-[11px] font-medium text-emerald-400">Auto-fix available</span>
-                )}
-              </>
-            ) : (
-              <p className="mt-2 text-[14px] text-emerald-400">No issues detected</p>
-            )}
-          </div>
-
-          {/* Deployment Gate */}
           <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Deployment Gate</p>
-            <p className={`mt-2 text-lg font-bold ${gateOpen ? 'text-emerald-400' : 'text-red-400'}`}>
-              {gateOpen ? 'CLEAR TO DEPLOY' : 'BLOCKED'}
-            </p>
-            <p className="mt-1 text-[13px] text-[#71717a]">
-              {policy?.drift_count ?? 0} drift · {monitor?.failures ?? 0} failures
-            </p>
+            <p className={`mt-2 text-lg font-bold ${gateOpen ? 'text-emerald-400' : 'text-red-400'}`}>{gateOpen ? 'CLEAR' : 'BLOCKED'}</p>
+            <p className="mt-1 text-[13px] text-[#71717a]">{policy?.drift_count ?? 0} drift · {activeFailures.length} fails · mode: {mode}</p>
           </div>
-
-          {/* Rollback Readiness */}
           <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Rollback Readiness</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Rollback</p>
             <p className="mt-2 text-[14px] font-medium text-emerald-400">Ready</p>
-            <p className="mt-1 text-[12px] text-[#52525b]">
-              Vercel instant rollback available
-            </p>
-            <a
-              href="https://vercel.com/takememobility/takeme-mobility/deployments"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-2 inline-block text-[12px] text-blue-400 hover:underline"
-            >
-              View deployments &rarr;
-            </a>
+            <a href="https://vercel.com/takememobility/takeme-mobility/deployments" target="_blank" rel="noopener noreferrer" className="mt-1 text-[12px] text-blue-400 hover:underline">Vercel deployments &rarr;</a>
           </div>
-        </div>
-
-        {/* ── Row 2: Service Health Grid ───────────────────────────── */}
-        <div className="mt-6 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Service Health</p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {(monitor?.checks ?? []).map(c => (
-              <div
-                key={c.service}
-                className={`rounded-lg border p-3.5 ${
-                  c.status === 'ok' ? 'border-[#1e1e2e] bg-[#0a0a0f]'
-                  : c.status === 'warn' ? 'border-amber-500/30 bg-amber-500/5'
-                  : 'border-red-500/30 bg-red-500/5'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <StatusDot s={c.status} />
-                    <span className="text-[13px] font-medium text-white">{c.service}</span>
-                  </div>
-                  <span className="text-[12px] tabular-nums text-[#71717a]">{c.latency_ms}ms</span>
-                </div>
-                {c.error && <p className="mt-2 truncate text-[12px] text-red-400">{c.error}</p>}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Row 3: Capabilities · E2E · Auto-fix ────────────────── */}
-        <div className="mt-6 grid gap-4 lg:grid-cols-3">
-          {/* Capability Checks */}
+          {/* E2E Quick Stats */}
           <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Capability Checks</p>
-            <div className="mt-4 space-y-2">
-              {caps ? Object.values(caps.capabilities).map(c => (
-                <div key={c.name} className="flex items-center justify-between rounded-lg bg-[#0a0a0f] px-3 py-2.5">
-                  <div className="flex items-center gap-2">
-                    <StatusDot s={c.status} />
-                    <span className="text-[13px] font-medium text-[#e4e4e7]">{c.name}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] tabular-nums text-[#52525b]">{c.latency_ms}ms</span>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                      c.status === 'ok' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                    }`}>{c.status === 'ok' ? 'OK' : 'FAIL'}</span>
-                  </div>
-                </div>
-              )) : <p className="text-[13px] text-[#52525b]">Loading...</p>}
-            </div>
-          </div>
-
-          {/* Last E2E Transaction */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Last E2E Transaction</p>
-              {e2e && <span className="text-[11px] text-[#52525b]">{timeAgo(e2e.timestamp)}</span>}
-            </div>
-            {e2e ? (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">E2E Health</p>
+            {e2e?.stats ? (
               <>
-                <div className="mt-3 flex items-center gap-2">
-                  <StatusDot s={e2e.status} />
-                  <span className={`text-lg font-bold ${e2e.status === 'pass' ? 'text-emerald-400' : 'text-red-400'}`}>
-                    {e2e.summary.passed}/{e2e.summary.total} passed
-                  </span>
-                </div>
-                <div className="mt-4 space-y-1.5">
-                  {e2e.steps.map(s => (
-                    <div key={s.step} className="flex items-center justify-between text-[13px]">
-                      <div className="flex items-center gap-2">
-                        <span className={s.status === 'pass' ? 'text-emerald-400' : 'text-red-400'}>
-                          {s.status === 'pass' ? '✓' : '✗'}
-                        </span>
-                        <span className="text-[#a1a1aa]">{s.step.replace(/_/g, ' ')}</span>
-                      </div>
-                      <span className="tabular-nums text-[#52525b]">{s.duration_ms}ms</span>
-                    </div>
-                  ))}
-                </div>
+                <p className={`mt-2 text-lg font-bold ${e2e.stats.successRate >= 80 ? 'text-emerald-400' : e2e.stats.successRate >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{e2e.stats.successRate}% pass</p>
+                <p className="mt-1 text-[12px] text-[#52525b]">P50: {e2e.stats.p50}ms · P95: {e2e.stats.p95}ms · Trend: {e2e.stats.trend === 'improving' ? '↑' : e2e.stats.trend === 'degrading' ? '↓' : '→'} {e2e.stats.trend}</p>
               </>
-            ) : <p className="mt-3 text-[13px] text-[#52525b]">No E2E data</p>}
-          </div>
-
-          {/* Auto-Fix Engine */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Auto-Fix Engine</p>
-            {autofix ? (
-              <div className="mt-4 space-y-3">
-                {autofix.fixed.length > 0 && (
-                  <div>
-                    <p className="text-[12px] font-medium text-emerald-400">Fixed ({autofix.fixed.length})</p>
-                    {autofix.fixed.map((f, i) => (
-                      <p key={i} className="mt-1 text-[12px] text-[#a1a1aa]">✓ {f.service}: {f.fix_applied}</p>
-                    ))}
-                  </div>
-                )}
-                {autofix.failed.length > 0 && (
-                  <div>
-                    <p className="text-[12px] font-medium text-red-400">Failed ({autofix.failed.length})</p>
-                    {autofix.failed.map((f, i) => (
-                      <p key={i} className="mt-1 text-[12px] text-red-400/70">✗ {f.service}: {f.error}</p>
-                    ))}
-                  </div>
-                )}
-                {autofix.skipped.length > 0 && (
-                  <p className="text-[12px] text-[#52525b]">
-                    Skipped: {autofix.skipped.join(', ')}
-                  </p>
-                )}
-              </div>
-            ) : (
-              <div className="mt-4">
-                <p className="text-[13px] text-[#52525b]">No auto-fix run this session</p>
-                <p className="mt-2 text-[12px] text-[#3f3f46]">
-                  Runs automatically every minute via cron.
-                  <br />Manual trigger available above.
-                </p>
-              </div>
-            )}
+            ) : <p className="mt-2 text-[13px] text-[#52525b]">No data</p>}
           </div>
         </div>
 
-        {/* ── Row 4: Blast Radius · Policy Drift ──────────────────── */}
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {/* Blast Radius */}
-          {failures.length > 0 ? (
-            <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-red-400">Blast Radius</p>
-              <div className="mt-3 space-y-2">
-                {failures.map(c => (
-                  <div key={c.service} className="flex items-start gap-3 text-[13px]">
-                    <span className="mt-0.5 shrink-0 font-medium text-red-400">{c.service}</span>
-                    <span className="text-[#a1a1aa]">{c.blast_radius ?? 'Impact unknown'}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-emerald-400">Blast Radius</p>
-              <p className="mt-3 text-[14px] text-emerald-400">No active incidents — zero blast radius</p>
-            </div>
-          )}
-
-          {/* Policy Drift */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Policy Drift</p>
-              {policy && (
-                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
-                  policy.status === 'compliant' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
-                }`}>
-                  {policy.drift_count} / {policy.total_checks}
-                </span>
-              )}
-            </div>
-            {policy ? (
-              <div className="mt-3 max-h-48 space-y-1 overflow-y-auto">
-                {policy.checks.filter(c => c.drifted).length > 0 ? (
-                  policy.checks.filter(c => c.drifted).map((c, i) => (
-                    <div key={i} className="flex items-start gap-2 rounded-lg bg-red-500/5 px-3 py-2 text-[12px]">
-                      <span className="mt-0.5 text-red-400">⚠</span>
-                      <div>
-                        <span className="font-medium text-white">{c.policy}</span>
-                        <p className="text-[11px] text-[#52525b]">Expected: {c.expected} · Got: <span className="text-red-400">{c.actual}</span></p>
-                      </div>
+        {/* ── Row 3: Alternative Hypotheses (RCA) ════════════════ */}
+        {activeRCA && activeRCA.length > 0 && (
+          <div className="mt-4 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Root Cause Analysis — Alternative Hypotheses</p>
+            <div className="mt-4 space-y-2">
+              {activeRCA.map((h, i) => (
+                <div key={i} className={`rounded-lg border p-3 ${i === 0 ? 'border-amber-500/30 bg-amber-500/5' : 'border-[#1e1e2e] bg-[#0a0a0f]'}`}>
+                  <div className="flex items-center justify-between cursor-pointer" onClick={() => setExpandedRCA(expandedRCA === i ? -1 : i)}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-[12px] font-bold tabular-nums text-[#52525b] shrink-0">{i === 0 ? 'Root Cause' : `Alt ${i}`}</span>
+                      <span className="text-[13px] font-medium text-white truncate">{h.cause}</span>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-[13px] text-emerald-400">All policies compliant</p>
-                )}
-              </div>
-            ) : <p className="mt-3 text-[13px] text-[#52525b]">Loading...</p>}
-          </div>
-        </div>
-
-        {/* ── Row 5: Active Incidents ─────────────────────────────── */}
-        {failures.length > 0 && (
-          <div className="mt-6 rounded-xl border border-red-500/30 bg-red-500/5 p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-red-400">
-              Active Incidents ({failures.length})
-            </p>
-            <div className="mt-3 divide-y divide-red-500/10">
-              {failures.map(f => (
-                <div key={f.service} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
-                  <div>
-                    <p className="text-[14px] font-medium text-white">{f.service}</p>
-                    <p className="mt-0.5 text-[12px] text-red-400/80">{f.error}</p>
+                    <div className="flex items-center gap-2 shrink-0 ml-3">
+                      <div className="w-20 rounded-full bg-[#1e1e2e] h-1.5"><div className={`h-1.5 rounded-full ${h.confidence >= 50 ? 'bg-amber-400' : h.confidence >= 20 ? 'bg-blue-400' : 'bg-[#3f3f46]'}`} style={{ width: `${h.confidence}%` }} /></div>
+                      <span className="text-[12px] font-bold tabular-nums text-white w-10 text-right">{h.confidence}%</span>
+                      <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${h.autofixAvailable ? 'bg-emerald-500/20 text-emerald-400' : 'bg-[#1e1e2e] text-[#3f3f46]'}`}>{h.autofixAvailable ? 'AUTO' : 'MANUAL'}</span>
+                      <span className="text-[#3f3f46]">{expandedRCA === i ? '▾' : '▸'}</span>
+                    </div>
                   </div>
-                  <span className="text-[12px] tabular-nums text-[#52525b]">{f.latency_ms}ms</span>
+                  {expandedRCA === i && (
+                    <div className="mt-2 rounded bg-[#0a0a0f] p-2 text-[12px] font-mono text-[#52525b]">
+                      {h.manualSteps}
+                      {h.autofixAvailable && <button onClick={runAutofix} className="ml-3 rounded bg-emerald-500/20 px-2 py-0.5 text-[11px] font-medium text-emerald-400">Apply Fix</button>}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* ── Row 6: Live Log Stream ──────────────────────────────── */}
-        <div className="mt-6 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+        {/* ── Row 4: Service Grid ════════════════════════════════ */}
+        <div className="mt-4 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Service Health</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {activeChecks.map(c => (
+              <div key={c.service} className={`rounded-lg border p-3 ${c.status === 'ok' ? 'border-[#1e1e2e] bg-[#0a0a0f]' : c.status === 'warn' ? 'border-amber-500/30 bg-amber-500/5' : 'border-red-500/30 bg-red-500/5'}`}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2"><Dot s={c.status} /><span className="text-[13px] font-medium text-white">{c.service}</span></div>
+                  <span className="text-[12px] tabular-nums text-[#52525b]">{c.latency_ms}ms</span>
+                </div>
+                {c.error && <p className="mt-1.5 truncate text-[11px] text-red-400">{c.error}</p>}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Row 5: Caps · E2E History · Policy Drift ═══════════ */}
+        <div className="mt-4 grid gap-4 lg:grid-cols-3">
+          {/* Capabilities */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Capabilities</p>
+            <div className="mt-3 space-y-1.5">
+              {caps ? Object.values(caps.capabilities).map(c => (
+                <div key={c.name} className="flex items-center justify-between rounded bg-[#0a0a0f] px-3 py-2">
+                  <div className="flex items-center gap-2"><Dot s={c.status} /><span className="text-[13px] text-[#e4e4e7]">{c.name}</span></div>
+                  <span className="text-[11px] tabular-nums text-[#3f3f46]">{c.latency_ms}ms</span>
+                </div>
+              )) : <p className="text-[13px] text-[#3f3f46]">Loading...</p>}
+            </div>
+          </div>
+
+          {/* E2E Transaction History */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">E2E Transaction History</p>
+            {e2e?.stats ? (
+              <>
+                <div className="mt-3 flex items-center gap-4 text-[12px]">
+                  <span className="text-[#a1a1aa]">Rate: <span className="font-bold text-white">{e2e.stats.successRate}%</span></span>
+                  <span className="text-[#52525b]">P50: {e2e.stats.p50}ms</span>
+                  <span className="text-[#52525b]">P95: {e2e.stats.p95}ms</span>
+                  <span className="text-[#52525b]">P99: {e2e.stats.p99}ms</span>
+                </div>
+                {e2e.stats.failurePattern && <p className="mt-1 text-[11px] text-red-400/80">{e2e.stats.failurePattern}</p>}
+                <div className="mt-3 space-y-1">
+                  {(e2e.history ?? []).slice(0, 8).map((run, i) => (
+                    <div key={i}>
+                      <div className="flex items-center justify-between cursor-pointer rounded bg-[#0a0a0f] px-3 py-1.5 text-[12px]" onClick={() => setExpandedE2E(expandedE2E === i ? -1 : i)}>
+                        <div className="flex items-center gap-2">
+                          <span className={run.pass ? 'text-emerald-400' : 'text-red-400'}>{run.pass ? '✓' : '✗'}</span>
+                          <span className="tabular-nums text-[#52525b]">{timeAgo(run.timestamp)}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="tabular-nums text-[#3f3f46]">{run.totalDuration}ms</span>
+                          <span className="text-[#27272a]">{expandedE2E === i ? '▾' : '▸'}</span>
+                        </div>
+                      </div>
+                      {expandedE2E === i && (
+                        <div className="ml-6 mt-1 space-y-0.5 text-[11px]">
+                          {run.steps.map(s => (
+                            <div key={s.step} className="flex items-center justify-between text-[#52525b]">
+                              <span><span className={s.status === 'pass' ? 'text-emerald-400' : 'text-red-400'}>{s.status === 'pass' ? '✓' : '✗'}</span> {s.step.replace(/_/g, ' ')}</span>
+                              <span className="tabular-nums">{s.duration_ms}ms</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : <p className="mt-3 text-[13px] text-[#3f3f46]">No E2E data</p>}
+          </div>
+
+          {/* Policy Drift with Attribution */}
+          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Policy Drift</p>
+              {policy && <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${policy.status === 'compliant' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>{policy.drift_count}/{policy.total_checks}</span>}
+            </div>
+            {policy ? (
+              <div className="mt-3 max-h-52 space-y-2 overflow-y-auto">
+                {policy.attributions.length > 0 ? policy.attributions.map((a, i) => (
+                  <div key={i} className="rounded bg-red-500/5 p-2 text-[12px]">
+                    <p className="font-medium text-white">{a.policy}</p>
+                    <p className="mt-0.5 text-[11px] text-[#52525b]">{a.delta}</p>
+                    <p className="mt-0.5 text-[11px] text-[#3f3f46]">
+                      Changed by: <span className="text-[#71717a]">{a.lastChangedBy ?? 'unknown'}</span>
+                      {a.lastChangedAt && <> · {timeAgo(a.lastChangedAt)}</>}
+                      · Source: {a.source}
+                    </p>
+                  </div>
+                )) : policy.drift_count === 0 ? (
+                  <p className="text-[13px] text-emerald-400">All compliant</p>
+                ) : (
+                  policy.checks.filter(c => c.drifted).slice(0, 5).map((c, i) => (
+                    <div key={i} className="rounded bg-red-500/5 p-2 text-[12px]">
+                      <span className="font-medium text-white">{c.policy}</span>
+                      <p className="text-[11px] text-[#52525b]">Expected: {c.expected} → Got: <span className="text-red-400">{c.actual}</span></p>
+                    </div>
+                  ))
+                )}
+                {/* Recent changes timeline */}
+                {policy.recentChanges && policy.recentChanges.length > 0 && (
+                  <div className="mt-3 border-t border-[#1e1e2e] pt-2">
+                    <p className="text-[10px] font-semibold uppercase text-[#3f3f46]">Recent Changes</p>
+                    {policy.recentChanges.map((c, i) => (
+                      <p key={i} className="mt-1 text-[11px] text-[#52525b]">{c.who ?? '?'} · {c.action} · {timeAgo(c.when)}</p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : <p className="mt-3 text-[13px] text-[#3f3f46]">Loading...</p>}
+          </div>
+        </div>
+
+        {/* ── Row 6: Blast Radius + Incidents ════════════════════ */}
+        {activeFailures.length > 0 && (
+          <div className="mt-4 rounded-xl border border-red-500/20 bg-red-500/5 p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-red-400">Active Incidents — Blast Radius</p>
+            <div className="mt-3 divide-y divide-red-500/10">
+              {activeFailures.map(f => (
+                <div key={f.service} className="flex items-start justify-between py-2.5 first:pt-0 last:pb-0">
+                  <div>
+                    <p className="text-[13px] font-medium text-white">{f.service}</p>
+                    <p className="mt-0.5 text-[11px] text-red-400/80">{f.error}</p>
+                    {f.blast_radius && <p className="mt-0.5 text-[11px] text-[#52525b]">{f.blast_radius}</p>}
+                  </div>
+                  <span className="text-[12px] tabular-nums text-[#3f3f46]">{f.latency_ms}ms</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* ── Row 7: Live Log Stream ════════════════════════════ */}
+        <div className="mt-4 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Live Log Stream</p>
-          <div className="mt-4 max-h-72 overflow-y-auto">
+          <div className="mt-3 max-h-56 overflow-y-auto">
             {logs.length > 0 ? (
-              <table className="w-full text-left text-[13px]">
-                <thead>
-                  <tr className="border-b border-[#1e1e2e] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3f3f46]">
-                    <th className="pb-2 pr-4">Time</th>
-                    <th className="pb-2 pr-4">Service</th>
-                    <th className="pb-2 pr-4">Status</th>
-                    <th className="pb-2 pr-4">Latency</th>
-                    <th className="pb-2">Error</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[#1e1e2e]/30">
-                  {logs.slice(0, 40).map(l => (
-                    <tr key={l.id} className="text-[#a1a1aa]">
-                      <td className="py-1.5 pr-4 tabular-nums text-[11px] text-[#3f3f46]">
-                        {new Date(l.created_at).toLocaleTimeString()}
-                      </td>
-                      <td className="py-1.5 pr-4 font-medium text-white">{l.service}</td>
-                      <td className="py-1.5 pr-4"><StatusDot s={l.status} /></td>
-                      <td className="py-1.5 pr-4 tabular-nums text-[12px]">{l.latency_ms}ms</td>
-                      <td className="max-w-[200px] truncate py-1.5 text-[11px] text-red-400/60">{l.error ?? '—'}</td>
+              <table className="w-full text-left text-[12px]">
+                <thead><tr className="border-b border-[#1e1e2e] text-[10px] font-semibold uppercase text-[#27272a]">
+                  <th className="pb-1.5 pr-3">Time</th><th className="pb-1.5 pr-3">Service</th><th className="pb-1.5 pr-3">Status</th><th className="pb-1.5 pr-3">Latency</th><th className="pb-1.5">Error</th>
+                </tr></thead>
+                <tbody className="divide-y divide-[#1e1e2e]/20">
+                  {logs.slice(0, 30).map(l => (
+                    <tr key={l.id} className="text-[#71717a]">
+                      <td className="py-1 pr-3 tabular-nums text-[11px] text-[#27272a]">{new Date(l.created_at).toLocaleTimeString()}</td>
+                      <td className="py-1 pr-3 text-white">{l.service}</td>
+                      <td className="py-1 pr-3"><Dot s={l.status} /></td>
+                      <td className="py-1 pr-3 tabular-nums">{l.latency_ms}ms</td>
+                      <td className="max-w-[180px] truncate py-1 text-[11px] text-red-400/50">{l.error ?? '—'}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            ) : <p className="text-[13px] text-[#52525b]">No log entries yet</p>}
+            ) : <p className="text-[13px] text-[#3f3f46]">No entries</p>}
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Sub-components ───────────────────────────────────────────────────────
+
+function DecisionCard({ label, value, color, actions }: { label: string; value: string; color: string; actions?: { label: string; onClick: () => void }[] }) {
+  const tc: Record<string, string> = { emerald: 'text-emerald-400', amber: 'text-amber-400', orange: 'text-orange-400', red: 'text-red-400' };
+  const bg: Record<string, string> = { emerald: 'bg-emerald-500/10', amber: 'bg-amber-500/10', orange: 'bg-orange-500/10', red: 'bg-red-500/10' };
+  return (
+    <div className={`rounded-lg border border-[#1e1e2e] ${bg[color] ?? 'bg-[#0a0a0f]'} p-3`}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-[#52525b]">{label}</p>
+      <p className={`mt-1.5 text-[15px] font-bold ${tc[color] ?? 'text-white'}`}>{value}</p>
+      {actions && actions.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1">
+          {actions.map(a => (
+            <button key={a.label} onClick={a.onClick} className="rounded bg-[#1e1e2e] px-2 py-0.5 text-[10px] font-medium text-[#52525b] hover:text-white">{a.label}</button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

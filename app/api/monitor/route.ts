@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
+import { checkModeEscalation } from '@/lib/security/reactionEngine';
 import { SESClient, ListIdentitiesCommand } from '@aws-sdk/client-ses';
 import { SNSClient, GetSMSAttributesCommand } from '@aws-sdk/client-sns';
 
@@ -20,11 +21,7 @@ interface CheckResult {
   error?: string;
 }
 
-interface RCA {
-  cause: string;
-  confidence: number;
-  autofix_available: boolean;
-}
+// RCA type is now Hypothesis[] — see analyzeRCA below
 
 async function timed(service: string, fn: () => Promise<void>): Promise<CheckResult> {
   const start = Date.now();
@@ -159,66 +156,102 @@ function checkQStash() {
   });
 }
 
-// ── RCA Engine ───────────────────────────────────────────────────────────
+// ── RCA Engine — Alternative Hypotheses ──────────────────────────────────
 
-function analyzeRCA(results: CheckResult[]): RCA | null {
+interface Hypothesis {
+  cause: string;
+  confidence: number;
+  autofixAvailable: boolean;
+  manualSteps: string;
+}
+
+function analyzeRCA(results: CheckResult[]): Hypothesis[] | null {
   const failed = results.filter((r) => r.status === 'error');
   if (failed.length === 0) return null;
 
   const failedNames = new Set(failed.map((f) => f.service));
 
-  // Single-service failures
-  if (failed.length === 1) {
-    const f = failed[0];
-    if (f.service === 'aws_ses') {
-      return { cause: 'IAM policy missing ses:SendEmail on takeme-sms user', confidence: 87, autofix_available: true };
-    }
-    if (f.service === 'aws_sns') {
-      return { cause: 'AWS SNS permissions or sandbox restriction', confidence: 80, autofix_available: false };
-    }
-    if (f.service === 'stripe_api') {
-      return { cause: 'Stripe API key invalid or rate limited', confidence: 78, autofix_available: false };
-    }
-    if (f.service === 'stripe_webhook') {
-      return { cause: 'Stripe webhook endpoint unreachable or misconfigured', confidence: 75, autofix_available: false };
-    }
-    if (f.service === 'upstash_redis') {
-      return { cause: 'Upstash Redis connection dropped or token expired', confidence: 85, autofix_available: true };
-    }
-    if (f.service === 'ably') {
-      return { cause: 'Ably API key invalid or service degraded', confidence: 72, autofix_available: false };
-    }
-    if (f.service === 'qstash') {
-      return { cause: 'QStash token expired or region misconfigured', confidence: 76, autofix_available: false };
-    }
+  // SES failure
+  if (failedNames.has('aws_ses') && !failedNames.has('aws_sns')) {
+    return [
+      { cause: 'IAM policy missing ses:SendEmail on takeme-sms', confidence: 60, autofixAvailable: true, manualSteps: 'aws iam put-user-policy --user-name takeme-sms' },
+      { cause: 'SES sandbox restriction — production access not enabled', confidence: 25, autofixAvailable: false, manualSteps: 'Request production access in SES console' },
+      { cause: 'Email identity unverified for sender domain', confidence: 10, autofixAvailable: false, manualSteps: 'aws ses verify-email-identity --email' },
+      { cause: 'Network egress policy blocking SES endpoint', confidence: 5, autofixAvailable: false, manualSteps: 'Check VPC/security group outbound rules' },
+    ];
   }
 
-  // Correlated failures
-  if (failedNames.has('supabase_db') && failedNames.has('supabase_auth')) {
-    return { cause: 'Supabase project connectivity issue — check project status', confidence: 92, autofix_available: false };
+  // SNS failure
+  if (failedNames.has('aws_sns') && !failedNames.has('aws_ses')) {
+    return [
+      { cause: 'AWS SNS SMS permissions missing', confidence: 65, autofixAvailable: false, manualSteps: 'Add sns:Publish to IAM policy' },
+      { cause: 'SNS sandbox — phone number not verified', confidence: 25, autofixAvailable: false, manualSteps: 'Verify phone in SNS sandbox console' },
+      { cause: 'SMS spending limit reached', confidence: 10, autofixAvailable: false, manualSteps: 'Increase spend limit in SNS settings' },
+    ];
   }
-  if (failedNames.has('supabase_db') && !failedNames.has('supabase_auth')) {
-    return { cause: 'Supabase DB overloaded or service role key invalid', confidence: 84, autofix_available: false };
-  }
+
+  // SES + SNS both down
   if (failedNames.has('aws_ses') && failedNames.has('aws_sns')) {
-    return { cause: 'AWS IAM credentials expired or revoked for takeme-sms', confidence: 90, autofix_available: false };
-  }
-  if (failedNames.has('stripe_api') && failedNames.has('stripe_webhook')) {
-    return { cause: 'Stripe integration broken — check API key rotation', confidence: 82, autofix_available: false };
-  }
-
-  // Page failures
-  const pageFailures = failed.filter((f) => f.service.startsWith('page_'));
-  if (pageFailures.length > 0 && failed.length === pageFailures.length) {
-    return { cause: 'Vercel deployment issue — app not responding', confidence: 88, autofix_available: false };
+    return [
+      { cause: 'AWS IAM credentials expired or revoked for takeme-sms', confidence: 70, autofixAvailable: false, manualSteps: 'Rotate AWS_ACCESS_KEY_ID in Vercel env' },
+      { cause: 'AWS region misconfiguration', confidence: 20, autofixAvailable: false, manualSteps: 'Verify AWS_REGION matches SES/SNS region' },
+      { cause: 'Account suspended by AWS', confidence: 10, autofixAvailable: false, manualSteps: 'Check AWS billing and account status' },
+    ];
   }
 
-  // Multi-service outage
+  // Supabase DB + Auth
+  if (failedNames.has('supabase_db') && failedNames.has('supabase_auth')) {
+    return [
+      { cause: 'Supabase project connectivity issue', confidence: 65, autofixAvailable: false, manualSteps: 'Check status.supabase.com and project dashboard' },
+      { cause: 'DNS resolution failure for supabase.co', confidence: 20, autofixAvailable: false, manualSteps: 'Verify DNS from Vercel edge function region' },
+      { cause: 'Service role key rotated without env update', confidence: 10, autofixAvailable: false, manualSteps: 'Copy new key from Supabase dashboard → Vercel env' },
+      { cause: 'Vercel edge function region connectivity', confidence: 5, autofixAvailable: false, manualSteps: 'Check Vercel function region settings' },
+    ];
+  }
+
+  // DB only
+  if (failedNames.has('supabase_db') && !failedNames.has('supabase_auth')) {
+    return [
+      { cause: 'Supabase DB connection pool exhausted', confidence: 55, autofixAvailable: false, manualSteps: 'Check active connections in Supabase dashboard' },
+      { cause: 'Service role key invalid', confidence: 30, autofixAvailable: false, manualSteps: 'Verify SUPABASE_SERVICE_ROLE_KEY in Vercel' },
+      { cause: 'Database storage limit reached', confidence: 15, autofixAvailable: false, manualSteps: 'Check storage usage, upgrade plan if needed' },
+    ];
+  }
+
+  // Stripe
+  if (failedNames.has('stripe_api')) {
+    return [
+      { cause: 'Stripe API key invalid or rotated', confidence: 55, autofixAvailable: false, manualSteps: 'Verify STRIPE_SECRET_KEY in Vercel env' },
+      { cause: 'Stripe rate limiting (too many requests)', confidence: 30, autofixAvailable: false, manualSteps: 'Check Stripe dashboard for rate limit status' },
+      { cause: 'Stripe service degradation', confidence: 15, autofixAvailable: false, manualSteps: 'Check status.stripe.com' },
+    ];
+  }
+
+  // Redis
+  if (failedNames.has('upstash_redis')) {
+    return [
+      { cause: 'Upstash Redis connection dropped or token expired', confidence: 60, autofixAvailable: true, manualSteps: 'Verify UPSTASH_REDIS_REST_TOKEN in Vercel' },
+      { cause: 'Redis memory limit reached', confidence: 25, autofixAvailable: false, manualSteps: 'Check Upstash dashboard for memory usage' },
+      { cause: 'Upstash service outage', confidence: 15, autofixAvailable: false, manualSteps: 'Check status.upstash.com' },
+    ];
+  }
+
+  // Multi-service
   if (failed.length >= 3) {
-    return { cause: 'Infrastructure outage — check Vercel deployment and DNS', confidence: 70, autofix_available: false };
+    return [
+      { cause: 'Infrastructure outage — Vercel deployment or DNS failure', confidence: 55, autofixAvailable: false, manualSteps: 'Check Vercel status, DNS, and deployment logs' },
+      { cause: 'Environment variables wiped during deployment', confidence: 25, autofixAvailable: false, manualSteps: 'Verify all env vars in Vercel project settings' },
+      { cause: 'Upstream provider outage (AWS/Supabase/Stripe)', confidence: 20, autofixAvailable: false, manualSteps: 'Check status pages for all providers' },
+    ];
   }
 
-  return { cause: `${failed.length} service(s) degraded — manual investigation needed`, confidence: 50, autofix_available: false };
+  // Generic fallback
+  const svc = failed[0]?.service ?? 'unknown';
+  return [
+    { cause: `${svc} service failure — check configuration`, confidence: 60, autofixAvailable: false, manualSteps: 'Review service logs and credentials' },
+    { cause: 'Transient network error', confidence: 25, autofixAvailable: false, manualSteps: 'Retry check in 60 seconds' },
+    { cause: 'Configuration drift', confidence: 15, autofixAvailable: false, manualSteps: 'Run /api/monitor/policy to identify drift' },
+  ];
 }
 
 // ── Blast radius ─────────────────────────────────────────────────────────
@@ -312,7 +345,10 @@ export async function GET(request: Request) {
       }).catch((e) => console.error('[monitor] Alert failed:', e))
     : Promise.resolve();
 
-  await Promise.all([logPromise, alertPromise]);
+  // Auto-mode escalation (non-blocking)
+  const modePromise = checkModeEscalation(results, Math.max(0, ...results.map(() => 0))).catch(() => {});
+
+  await Promise.all([logPromise, alertPromise, modePromise]);
 
   console.log(`[monitor] ${timestamp} | ${impact.toUpperCase()} | ${failures.length} failures | ${results.map((r) => `${r.service}:${r.status}(${r.latency_ms}ms)`).join(' ')}`);
 

@@ -174,10 +174,65 @@ export async function GET(request: Request) {
 
   console.log(`[e2e] ${passed} passed, ${failed} failed | ${steps.map((s) => `${s.step}:${s.status}(${s.duration_ms}ms)`).join(' ')}`);
 
+  // ── History, percentiles, trends ────────────────────────────────────
+  const { data: historyRows } = await sb
+    .from('monitoring_e2e')
+    .select('step, status, duration_ms, created_at')
+    .order('created_at', { ascending: false })
+    .limit(500); // ~100 runs × 5 steps
+
+  // Group into runs by timestamp (entries within 10s = same run)
+  const runs: Array<{ timestamp: string; steps: Array<{ step: string; status: string; duration_ms: number }> }> = [];
+  let currentRun: typeof runs[0] | null = null;
+
+  for (const row of historyRows ?? []) {
+    if (!currentRun || Math.abs(new Date(row.created_at).getTime() - new Date(currentRun.timestamp).getTime()) > 10_000) {
+      currentRun = { timestamp: row.created_at, steps: [] };
+      runs.push(currentRun);
+    }
+    if (row.step !== '_e2e_synthetic_test') {
+      currentRun.steps.push({ step: row.step, status: row.status, duration_ms: row.duration_ms });
+    }
+  }
+
+  // Only keep runs with actual steps
+  const validRuns = runs.filter(r => r.steps.length > 0).slice(0, 10);
+
+  // Calculate success rate
+  const passedRuns = validRuns.filter(r => r.steps.every(s => s.status === 'pass')).length;
+  const successRate = validRuns.length > 0 ? Math.round((passedRuns / validRuns.length) * 100) : 0;
+
+  // Percentiles from all step durations
+  const allDurations = validRuns.flatMap(r => r.steps.map(s => s.duration_ms)).sort((a, b) => a - b);
+  const percentile = (arr: number[], p: number) => arr.length === 0 ? 0 : arr[Math.min(Math.floor(arr.length * p / 100), arr.length - 1)];
+  const p50 = percentile(allDurations, 50);
+  const p95 = percentile(allDurations, 95);
+  const p99 = percentile(allDurations, 99);
+
+  // Failure pattern: which step fails most consistently
+  const stepFailCounts: Record<string, number> = {};
+  validRuns.forEach(r => r.steps.forEach(s => { if (s.status === 'fail') stepFailCounts[s.step] = (stepFailCounts[s.step] ?? 0) + 1; }));
+  const topFailing = Object.entries(stepFailCounts).sort(([, a], [, b]) => b - a)[0];
+  const failurePattern = topFailing ? `${topFailing[0].replace(/_/g, ' ')} failing (${topFailing[1]}/${validRuns.length} runs)` : null;
+
+  // Trend: compare last 3 vs previous 3
+  const last3 = validRuns.slice(0, 3);
+  const prev3 = validRuns.slice(3, 6);
+  const last3Pass = last3.filter(r => r.steps.every(s => s.status === 'pass')).length;
+  const prev3Pass = prev3.filter(r => r.steps.every(s => s.status === 'pass')).length;
+  const trend = prev3.length === 0 ? 'stable' : last3Pass > prev3Pass ? 'improving' : last3Pass < prev3Pass ? 'degrading' : 'stable';
+
   return NextResponse.json({
     status: failed === 0 ? 'pass' : 'fail',
     timestamp: new Date().toISOString(),
     steps,
     summary: { passed, failed, total: steps.length },
+    history: validRuns.map(r => ({
+      timestamp: r.timestamp,
+      pass: r.steps.every(s => s.status === 'pass'),
+      totalDuration: r.steps.reduce((a, s) => a + s.duration_ms, 0),
+      steps: r.steps,
+    })),
+    stats: { successRate, p50, p95, p99, failurePattern, trend },
   });
 }

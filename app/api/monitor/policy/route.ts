@@ -146,11 +146,57 @@ export async function GET(request: Request) {
 
   const driftCount = checks.filter((c) => c.drifted).length;
 
+  // ── Who changed it? Attribution from audit_logs ─────────────────────
+  const driftedChecks = checks.filter(c => c.drifted);
+  const attributions: Array<{
+    policy: string; lastChangedBy: string | null; lastChangedAt: string | null;
+    source: string; delta: string;
+  }> = [];
+
+  if (driftedChecks.length > 0) {
+    const sb = createServiceClient();
+    for (const dc of driftedChecks.slice(0, 10)) {
+      // Search audit_logs for recent changes to this resource
+      const resourceSearch = dc.policy.replace('env:', '').replace('iam:', '').replace('rls:', '');
+      const { data: auditEntries } = await sb
+        .from('audit_logs')
+        .select('user_email, created_at, action, metadata')
+        .or(`resource.ilike.%${resourceSearch}%,action.ilike.%change%,action.ilike.%update%,action.ilike.%delete%`)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      const entry = auditEntries?.[0];
+      attributions.push({
+        policy: dc.policy,
+        lastChangedBy: entry?.user_email ?? null,
+        lastChangedAt: entry?.created_at ?? null,
+        source: entry ? (entry.action.includes('pipeline') ? 'pipeline' : 'manual') : 'unknown (pre-audit)',
+        delta: `Expected: ${dc.expected} → Actual: ${dc.actual}`,
+      });
+    }
+  }
+
+  // Recent policy change timeline (last 5 changes)
+  const sb2 = createServiceClient();
+  const { data: recentChanges } = await sb2
+    .from('audit_logs')
+    .select('user_email, action, resource, created_at, metadata')
+    .or('action.ilike.%MODE_CHANGE%,action.ilike.%change_role%,action.ilike.%policy%,action.ilike.%allowlist%')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
   return NextResponse.json({
     timestamp: new Date().toISOString(),
     drift_count: driftCount,
     total_checks: checks.length,
     status: driftCount === 0 ? 'compliant' : 'drifted',
     checks,
+    attributions,
+    recentChanges: (recentChanges ?? []).map(c => ({
+      who: c.user_email,
+      action: c.action,
+      resource: c.resource,
+      when: c.created_at,
+    })),
   });
 }

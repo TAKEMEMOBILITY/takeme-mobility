@@ -353,3 +353,66 @@ export async function react(
     } catch { /* truly last resort — just console */ }
   }
 }
+
+// ── Auto-mode escalation (called from /api/monitor after health checks) ──
+
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+async function getSystemMode(): Promise<string> {
+  if (!REDIS_URL || !REDIS_TOKEN) return 'NORMAL';
+  try {
+    const res = await fetch(`${REDIS_URL}/get/system:mode`, { headers: { 'Authorization': `Bearer ${REDIS_TOKEN}` } });
+    const body = await res.json();
+    return body.result ?? 'NORMAL';
+  } catch { return 'NORMAL'; }
+}
+
+async function setSystemMode(mode: string): Promise<void> {
+  if (!REDIS_URL || !REDIS_TOKEN) return;
+  await fetch(`${REDIS_URL}/set/system:mode/${mode}/ex/86400`, { headers: { 'Authorization': `Bearer ${REDIS_TOKEN}` } });
+}
+
+export async function checkModeEscalation(
+  failures: Array<{ service: string; status: string }>,
+  maxRiskScore: number,
+): Promise<void> {
+  try {
+    const currentMode = await getSystemMode();
+    const failedServices = new Set(failures.filter(f => f.status === 'error').map(f => f.service));
+    let newMode: string | null = null;
+
+    // Rule: risk_score > 90 → LOCKDOWN
+    if (maxRiskScore > 90 && currentMode !== 'LOCKDOWN') {
+      newMode = 'LOCKDOWN';
+    }
+    // Rule: DB or Auth fails → DEFENSIVE
+    else if ((failedServices.has('supabase_db') || failedServices.has('supabase_auth')) && currentMode !== 'LOCKDOWN' && currentMode !== 'DEFENSIVE') {
+      newMode = 'DEFENSIVE';
+    }
+    // Rule: 3+ services fail → DEGRADED
+    else if (failedServices.size >= 3 && currentMode === 'NORMAL') {
+      newMode = 'DEGRADED';
+    }
+
+    if (newMode && newMode !== currentMode) {
+      await setSystemMode(newMode);
+
+      const svc = createServiceClient();
+      await logReaction(svc, undefined, undefined, 'AUTO_MODE_CHANGE', {
+        from: currentMode,
+        to: newMode,
+        trigger: maxRiskScore > 90 ? 'high_risk_score' : failedServices.size >= 3 ? 'multi_service_failure' : 'critical_service_failure',
+        failedServices: [...failedServices],
+      });
+
+      await sendAlertEmail(
+        `[TakeMe] AUTO MODE CHANGE: ${currentMode} → ${newMode}`,
+        `System automatically escalated from ${currentMode} to ${newMode}.\n\nFailing services: ${[...failedServices].join(', ')}\nMax risk score: ${maxRiskScore}\nTime: ${new Date().toISOString()}\n\nReview: ${APP_URL}/ops`,
+      );
+      await sendAlertSMS(`[TakeMe] MODE: ${currentMode} → ${newMode}. ${failedServices.size} services down. Check /ops NOW`);
+    }
+  } catch (e) {
+    console.error('[reaction] Mode escalation error:', (e as Error).message);
+  }
+}
