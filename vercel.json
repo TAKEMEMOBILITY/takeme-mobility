@@ -10,6 +10,14 @@
     {
       "path": "/api/monitor",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/monitor/autofix",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/monitor/e2e",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

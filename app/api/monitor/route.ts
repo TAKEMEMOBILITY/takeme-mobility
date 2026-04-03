@@ -1,48 +1,61 @@
 import { NextResponse } from 'next/server';
 import { createServiceClient } from '@/lib/supabase/service';
-import { SESClient, SendEmailCommand, ListIdentitiesCommand } from '@aws-sdk/client-ses';
+import { SESClient, ListIdentitiesCommand } from '@aws-sdk/client-ses';
+import { SNSClient, GetSMSAttributesCommand } from '@aws-sdk/client-sns';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET /api/monitor
 //
-// Production monitoring — deep health checks against all critical services.
-// Runs every minute via Vercel Cron. Sends email alert on any failure.
-// Auth: Vercel cron header or CRON_SECRET bearer token.
+// Master health check — tests every critical service, logs to DB,
+// triggers alerts on failure, includes RCA engine.
+// Runs every minute via Vercel Cron.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const ALERT_EMAIL = 'acilholding@gmail.com';
-const FROM_EMAIL = process.env.SES_FROM_EMAIL ?? 'noreply@takememobility.com';
 const APP_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://takememobility.com';
 
 interface CheckResult {
-  name: string;
-  status: 'ok' | 'fail';
-  latencyMs: number;
+  service: string;
+  status: 'ok' | 'warn' | 'error';
+  latency_ms: number;
   error?: string;
 }
 
-async function timed(name: string, fn: () => Promise<void>): Promise<CheckResult> {
+interface RCA {
+  cause: string;
+  confidence: number;
+  autofix_available: boolean;
+}
+
+async function timed(service: string, fn: () => Promise<void>): Promise<CheckResult> {
   const start = Date.now();
   try {
     await fn();
-    return { name, status: 'ok', latencyMs: Date.now() - start };
+    return { service, status: 'ok', latency_ms: Date.now() - start };
   } catch (e: unknown) {
-    return { name, status: 'fail', latencyMs: Date.now() - start, error: (e as Error).message };
+    return { service, status: 'error', latency_ms: Date.now() - start, error: (e as Error).message };
   }
 }
 
-// ── Page route checks ────────────────────────────────────────────────────
+function getAWSCredentials() {
+  return {
+    region: process.env.AWS_REGION ?? 'us-east-1',
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  };
+}
 
-function checkPage(name: string, path: string) {
-  return timed(name, async () => {
+// ── Checks ───────────────────────────────────────────────────────────────
+
+function checkPage(service: string, path: string) {
+  return timed(service, async () => {
     const res = await fetch(`${APP_URL}${path}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
   });
 }
 
-// ── Service checks ───────────────────────────────────────────────────────
-
-function checkHealthEndpoint() {
+function checkHealthAPI() {
   return timed('api_health', async () => {
     const res = await fetch(`${APP_URL}/api/health`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -53,8 +66,8 @@ function checkHealthEndpoint() {
 
 function checkSupabaseDB() {
   return timed('supabase_db', async () => {
-    const supabase = createServiceClient();
-    const { error } = await supabase.from('profiles').select('id').limit(1);
+    const sb = createServiceClient();
+    const { error } = await sb.from('profiles').select('id').limit(1);
     if (error) throw new Error(error.message);
   });
 }
@@ -70,11 +83,11 @@ function checkSupabaseAuth() {
   });
 }
 
-function checkStripe() {
+function checkStripeAPI() {
   return timed('stripe_api', async () => {
     const key = process.env.STRIPE_SECRET_KEY;
     if (!key) throw new Error('STRIPE_SECRET_KEY not set');
-    const res = await fetch('https://api.stripe.com/v1/balance', {
+    const res = await fetch('https://api.stripe.com/v1/payment_intents?limit=1', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -84,36 +97,28 @@ function checkStripe() {
 function checkStripeWebhook() {
   return timed('stripe_webhook', async () => {
     if (!process.env.STRIPE_WEBHOOK_SECRET) throw new Error('STRIPE_WEBHOOK_SECRET not set');
-    // Verify the webhook endpoint is reachable (POST without signature → 400 expected, not 404/500)
     const res = await fetch(`${APP_URL}/api/stripe/webhook`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: '{}',
     });
-    // 400 = endpoint exists and rejected bad signature (expected)
-    // 404 or 500 = broken
-    if (res.status === 404 || res.status >= 500) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-  });
-}
-
-function getSESClient() {
-  return new SESClient({
-    region: process.env.AWS_REGION ?? 'us-east-1',
-    credentials: {
-      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
-    },
+    if (res.status === 404 || res.status >= 500) throw new Error(`HTTP ${res.status}`);
   });
 }
 
 function checkSES() {
   return timed('aws_ses', async () => {
-    if (!process.env.AWS_ACCESS_KEY_ID || !process.env.AWS_SECRET_ACCESS_KEY) {
-      throw new Error('AWS credentials not set');
-    }
-    await getSESClient().send(new ListIdentitiesCommand({ MaxItems: 1 }));
+    if (!process.env.AWS_ACCESS_KEY_ID) throw new Error('AWS credentials not set');
+    const ses = new SESClient(getAWSCredentials());
+    await ses.send(new ListIdentitiesCommand({ MaxItems: 1 }));
+  });
+}
+
+function checkSNS() {
+  return timed('aws_sns', async () => {
+    if (!process.env.AWS_ACCESS_KEY_ID) throw new Error('AWS credentials not set');
+    const sns = new SNSClient(getAWSCredentials());
+    await sns.send(new GetSMSAttributesCommand({ attributes: ['DefaultSMSType'] }));
   });
 }
 
@@ -132,10 +137,9 @@ function checkRedis() {
 }
 
 function checkAbly() {
-  return timed('ably_realtime', async () => {
+  return timed('ably', async () => {
     const key = process.env.ABLY_KEY;
     if (!key) throw new Error('ABLY_KEY not set');
-    // Ably REST API status check
     const res = await fetch('https://rest.ably.io/time', {
       headers: { 'Authorization': `Basic ${Buffer.from(key).toString('base64')}` },
     });
@@ -155,47 +159,87 @@ function checkQStash() {
   });
 }
 
-// ── Alert email ──────────────────────────────────────────────────────────
+// ── RCA Engine ───────────────────────────────────────────────────────────
 
-async function sendAlert(failures: CheckResult[], allResults: CheckResult[]) {
-  try {
-    const failList = failures
-      .map((f) => `  FAIL  ${f.name}: ${f.error} (${f.latencyMs}ms)`)
-      .join('\n');
+function analyzeRCA(results: CheckResult[]): RCA | null {
+  const failed = results.filter((r) => r.status === 'error');
+  if (failed.length === 0) return null;
 
-    const okList = allResults
-      .filter((r) => r.status === 'ok')
-      .map((r) => `  OK    ${r.name} (${r.latencyMs}ms)`)
-      .join('\n');
+  const failedNames = new Set(failed.map((f) => f.service));
 
-    await getSESClient().send(
-      new SendEmailCommand({
-        Source: FROM_EMAIL,
-        Destination: { ToAddresses: [ALERT_EMAIL] },
-        Message: {
-          Subject: { Data: `[TakeMe] ALERT: ${failures.length} service(s) down` },
-          Body: {
-            Text: {
-              Data: [
-                `Production monitoring detected failures at ${new Date().toISOString()}`,
-                '',
-                'FAILED:',
-                failList,
-                '',
-                'HEALTHY:',
-                okList,
-                '',
-                `Dashboard: ${APP_URL}/admin`,
-                `Monitor:   ${APP_URL}/api/monitor`,
-              ].join('\n'),
-            },
-          },
-        },
-      }),
-    );
-  } catch (e) {
-    console.error('[monitor] Failed to send alert email:', (e as Error).message);
+  // Single-service failures
+  if (failed.length === 1) {
+    const f = failed[0];
+    if (f.service === 'aws_ses') {
+      return { cause: 'IAM policy missing ses:SendEmail on takeme-sms user', confidence: 87, autofix_available: true };
+    }
+    if (f.service === 'aws_sns') {
+      return { cause: 'AWS SNS permissions or sandbox restriction', confidence: 80, autofix_available: false };
+    }
+    if (f.service === 'stripe_api') {
+      return { cause: 'Stripe API key invalid or rate limited', confidence: 78, autofix_available: false };
+    }
+    if (f.service === 'stripe_webhook') {
+      return { cause: 'Stripe webhook endpoint unreachable or misconfigured', confidence: 75, autofix_available: false };
+    }
+    if (f.service === 'upstash_redis') {
+      return { cause: 'Upstash Redis connection dropped or token expired', confidence: 85, autofix_available: true };
+    }
+    if (f.service === 'ably') {
+      return { cause: 'Ably API key invalid or service degraded', confidence: 72, autofix_available: false };
+    }
+    if (f.service === 'qstash') {
+      return { cause: 'QStash token expired or region misconfigured', confidence: 76, autofix_available: false };
+    }
   }
+
+  // Correlated failures
+  if (failedNames.has('supabase_db') && failedNames.has('supabase_auth')) {
+    return { cause: 'Supabase project connectivity issue — check project status', confidence: 92, autofix_available: false };
+  }
+  if (failedNames.has('supabase_db') && !failedNames.has('supabase_auth')) {
+    return { cause: 'Supabase DB overloaded or service role key invalid', confidence: 84, autofix_available: false };
+  }
+  if (failedNames.has('aws_ses') && failedNames.has('aws_sns')) {
+    return { cause: 'AWS IAM credentials expired or revoked for takeme-sms', confidence: 90, autofix_available: false };
+  }
+  if (failedNames.has('stripe_api') && failedNames.has('stripe_webhook')) {
+    return { cause: 'Stripe integration broken — check API key rotation', confidence: 82, autofix_available: false };
+  }
+
+  // Page failures
+  const pageFailures = failed.filter((f) => f.service.startsWith('page_'));
+  if (pageFailures.length > 0 && failed.length === pageFailures.length) {
+    return { cause: 'Vercel deployment issue — app not responding', confidence: 88, autofix_available: false };
+  }
+
+  // Multi-service outage
+  if (failed.length >= 3) {
+    return { cause: 'Infrastructure outage — check Vercel deployment and DNS', confidence: 70, autofix_available: false };
+  }
+
+  return { cause: `${failed.length} service(s) degraded — manual investigation needed`, confidence: 50, autofix_available: false };
+}
+
+// ── Blast radius ─────────────────────────────────────────────────────────
+
+function getBlastRadius(service: string): string {
+  const map: Record<string, string> = {
+    supabase_db: 'All reads/writes, user profiles, ride history, bookings',
+    supabase_auth: 'Login, signup, session refresh — all auth flows blocked',
+    stripe_api: 'Payments, refunds, driver payouts — revenue impacted',
+    stripe_webhook: 'Payment confirmations, subscription events — silent failures',
+    aws_ses: 'Email OTP, verification emails, alerts — login via email broken',
+    aws_sns: 'SMS OTP — login via phone broken',
+    upstash_redis: 'Dispatch queue, driver matching, rate limiting — rides broken',
+    ably: 'Live driver tracking — riders see stale map',
+    qstash: 'Async dispatch scheduling — delayed ride matching',
+    page_home: 'Homepage down — new users cannot access site',
+    page_login: 'Login page down — existing users locked out',
+    page_students: 'Student page down — student signups blocked',
+    api_health: 'Health endpoint down — external monitors may fire false alarms',
+  };
+  return map[service] ?? 'Unknown impact';
 }
 
 // ── Main handler ─────────────────────────────────────────────────────────
@@ -211,39 +255,72 @@ export async function GET(request: Request) {
 
   const timestamp = new Date().toISOString();
 
-  // Run all checks in parallel
   const results = await Promise.all([
-    // Page routes
-    checkHealthEndpoint(),
     checkPage('page_home', '/'),
     checkPage('page_login', '/auth/login'),
     checkPage('page_students', '/students'),
-    // Infrastructure
+    checkHealthAPI(),
     checkSupabaseDB(),
     checkSupabaseAuth(),
-    checkStripe(),
+    checkStripeAPI(),
     checkStripeWebhook(),
     checkSES(),
+    checkSNS(),
     checkRedis(),
     checkAbly(),
     checkQStash(),
   ]);
 
-  const failures = results.filter((r) => r.status === 'fail');
-  const allOk = failures.length === 0;
+  const failures = results.filter((r) => r.status === 'error');
+  const rca = analyzeRCA(results);
 
-  console.log(
-    `[monitor] ${timestamp} | ${allOk ? 'ALL OK' : `${failures.length} FAILED`} | ${results.map((r) => `${r.name}:${r.status}(${r.latencyMs}ms)`).join(' ')}`,
-  );
+  // Determine customer impact level
+  const criticalServices = new Set(['supabase_db', 'supabase_auth', 'stripe_api', 'upstash_redis']);
+  const hasCritical = failures.some((f) => criticalServices.has(f.service));
+  const impact = failures.length === 0 ? 'none' : hasCritical ? 'critical' : 'degraded';
 
-  if (!allOk) {
-    await sendAlert(failures, results);
-  }
+  // Log to DB (non-blocking)
+  const logPromise = (async () => {
+    try {
+      const sb = createServiceClient();
+      await sb.from('monitoring_logs').insert(
+        results.map((r) => ({
+          service: r.service,
+          status: r.status,
+          latency_ms: r.latency_ms,
+          error: r.error ?? null,
+        })),
+      );
+    } catch (e) {
+      console.error('[monitor] DB log failed:', (e as Error).message);
+    }
+  })();
+
+  // Trigger alert if failures (non-blocking)
+  const alertPromise = failures.length > 0
+    ? fetch(`${APP_URL}/api/monitor/alert`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${cronSecret}`,
+        },
+        body: JSON.stringify({
+          service: failures.map((f) => f.service).join(', '),
+          error: failures.map((f) => `${f.service}: ${f.error}`).join('\n'),
+          severity: hasCritical ? 'critical' : 'high',
+        }),
+      }).catch((e) => console.error('[monitor] Alert failed:', e))
+    : Promise.resolve();
+
+  await Promise.all([logPromise, alertPromise]);
+
+  console.log(`[monitor] ${timestamp} | ${impact.toUpperCase()} | ${failures.length} failures | ${results.map((r) => `${r.service}:${r.status}(${r.latency_ms}ms)`).join(' ')}`);
 
   return NextResponse.json({
-    status: allOk ? 'healthy' : 'degraded',
+    status: impact,
     timestamp,
-    checks: results,
+    checks: results.map((r) => ({ ...r, blast_radius: r.status === 'error' ? getBlastRadius(r.service) : undefined })),
     failures: failures.length,
+    rca,
   });
 }
