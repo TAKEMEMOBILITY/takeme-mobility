@@ -7,12 +7,12 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'Rental Cars', 'Connect', 'Technology', 'Safety'] as const;
+const NAV_ITEMS = ['Rides', 'Rental Cars', 'Connect', 'Students', 'Safety'] as const;
 const NAV_ROUTES: Record<string, string> = {
   Rides: '/#how-it-works',
   'Rental Cars': '/rentals',
   Connect: '/connect',
-  Technology: '/technology',
+  Students: '/students',
   Safety: '/safety',
 };
 const NAV_BADGES = new Set(['Rental Cars', 'Connect']);
@@ -382,6 +382,33 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ═══ STUDENTS ═══════════════════════════════════════════════════ */}
+      <section className="border-t border-[#F5F5F7] bg-white">
+        <div className="mx-auto max-w-[1200px] px-6 py-16 md:py-20 lg:px-10">
+          <Link
+            href="/students"
+            className="group flex flex-col items-start gap-6 rounded-2xl bg-[#FAFAFA] p-8 transition-all duration-200 hover:bg-[#F0F0F3] md:flex-row md:items-center md:justify-between"
+          >
+            <div className="flex items-start gap-4">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-[0_1px_4px_rgba(0,0,0,0.06)]">
+                <svg className="h-6 w-6 text-[#6E6E73]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-[17px] font-semibold text-[#1D1D1F]">Student Membership</h3>
+                <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">
+                  50% off rides. Starting at $9.90/mo.
+                </p>
+              </div>
+            </div>
+            <span className="text-[15px] font-medium text-[#0071E3] transition-transform duration-200 group-hover:translate-x-1">
+              Learn more &rarr;
+            </span>
+          </Link>
+        </div>
+      </section>
+
       {/* ═══ GET THE APP ═════════════════════════════════════════════════ */}
       <section className="bg-[#F5F5F7]">
         <div
@@ -462,7 +489,7 @@ export default function HomePage() {
             </div>
             <div className="flex gap-16">
               {[
-                { t: 'Product', items: ['Rides', 'Rental Cars', 'Takeme Protection', 'Business', 'Pricing'] },
+                { t: 'Product', items: ['Rides', 'Rental Cars', 'Students', 'Takeme Protection', 'Business', 'Pricing'] },
                 { t: 'Company', items: ['About', 'Careers', 'Safety', 'Cities', 'Press'] },
                 { t: 'Legal', items: ['Privacy', 'Terms', 'Cookies'] },
               ].map((col) => (
