@@ -18,6 +18,10 @@
     {
       "path": "/api/monitor/e2e",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/invariants/check",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
