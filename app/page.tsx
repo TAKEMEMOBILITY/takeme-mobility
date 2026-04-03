@@ -15,7 +15,7 @@ const NAV_ROUTES: Record<string, string> = {
   Students: '/students',
   Safety: '/safety',
 };
-const NAV_BADGES = new Set(['Rental Cars', 'Connect']);
+const NAV_BADGES = new Set(['Rental Cars', 'Connect', 'Students']);
 
 const TRUST_CARDS = [
   {
