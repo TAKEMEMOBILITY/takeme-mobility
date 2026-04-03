@@ -72,12 +72,13 @@ export default function FleetPage() {
 
   // Hero earning form
   const [heroVehicleType, setHeroVehicleType] = useState('sedan');
-  const [heroDuration, setHeroDuration] = useState<'daily' | 'weekly'>('daily');
+  const [heroCommitment, setHeroCommitment] = useState<'weekly' | 'monthly'>('monthly');
   const heroVehicle = FLEET.find(v => v.category === heroVehicleType) ?? FLEET[0];
-  const heroRental = heroDuration === 'weekly' ? Math.round(heroVehicle.weeklyRate / 7) : heroVehicle.dailyRate;
+  const heroRental = heroCommitment === 'monthly' ? Math.round(heroVehicle.weeklyRate / 7 * 0.85) : Math.round(heroVehicle.weeklyRate / 7); // monthly gets ~15% better effective rate
   const heroDriverNet = DRIVER_DAILY_GROSS - heroRental;
   const heroOwnerEarnings = Math.round(heroRental * OWNER_COMMISSION);
   const heroTakemeFee = Math.round(heroRental * TAKEME_FEE);
+  const commitmentHint = heroCommitment === 'monthly' ? 'Best for consistent income' : 'Flexible, lower commitment';
 
   return (
     <div className="min-h-screen bg-white">
@@ -143,15 +144,19 @@ export default function FleetPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[12px] font-medium text-[#6E6E73]">Duration</label>
-                  <select value={heroDuration} onChange={e => setHeroDuration(e.target.value as 'daily' | 'weekly')} className="mt-1 w-full rounded-lg border border-[#E8E8ED] bg-[#FAFAFA] px-3 py-2 text-[14px] text-[#1D1D1F] outline-none focus:border-[#0071E3]">
-                    <option value="daily">Daily</option>
+                  <label className="text-[12px] font-medium text-[#6E6E73]">Commitment</label>
+                  <select value={heroCommitment} onChange={e => setHeroCommitment(e.target.value as 'weekly' | 'monthly')} className="mt-1 w-full rounded-lg border border-[#E8E8ED] bg-[#FAFAFA] px-3 py-2 text-[14px] text-[#1D1D1F] outline-none focus:border-[#0071E3]">
                     <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
                   </select>
+                  <p className="mt-1.5 text-[11px] text-[#A1A1A6]">Longer commitment → higher earnings stability</p>
                 </div>
               </div>
 
-              <div className="mt-5 space-y-3">
+              {/* Commitment hint */}
+              <p className="mt-3 text-[12px] text-[#6E6E73]">{commitmentHint}</p>
+
+              <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between rounded-lg bg-[#FAFAFA] px-4 py-3">
                   <span className="text-[13px] text-[#6E6E73]">Vehicle</span>
                   <span className="text-[14px] font-semibold text-[#1D1D1F]">{heroVehicle.brand} {heroVehicle.name.split(' ').slice(0, 2).join(' ')}</span>
@@ -174,6 +179,9 @@ export default function FleetPage() {
                 <span>Owner earns {usd(heroOwnerEarnings)}/day</span>
                 <span>TakeMe fee {usd(heroTakemeFee)}/day</span>
               </div>
+              {heroCommitment === 'monthly' && (
+                <p className="mt-3 text-center text-[11px] font-medium text-emerald-600">Recommended for maximum earnings</p>
+              )}
             </div>
           </div>
         </div>
