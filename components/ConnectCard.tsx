@@ -56,29 +56,26 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
             </svg>
           </div>
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40">Driver add-on</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40">Driver Essential</p>
             <p className="mt-0.5 text-[17px] font-semibold text-white">TAKEME CONNECT</p>
           </div>
         </div>
-
-        <p className="mt-4 text-[14px] leading-relaxed text-white/50">
-          Stay connected on every ride. Unlimited data and calls, built for drivers.
-        </p>
 
         {/* Price */}
         <div className="mt-5 flex items-baseline gap-1">
           <span className="text-[32px] font-bold tabular-nums text-white">$29.90</span>
           <span className="text-[14px] font-medium text-white/40">/month</span>
         </div>
+        <p className="mt-1.5 text-[13px] text-white/35">Less than 1 missed ride per day.</p>
       </div>
 
       {/* Features */}
       <div className="border-t border-white/10 px-6 py-5">
         <div className="space-y-3">
           {[
-            'Unlimited internet',
-            'Unlimited calls',
-            'Built for driver apps',
+            'Stay online every ride',
+            'No dropped trips',
+            'Works with all driver apps',
           ].map((feature) => (
             <div key={feature} className="flex items-center gap-3">
               <svg className="h-4 w-4 shrink-0 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -90,14 +87,19 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
         </div>
       </div>
 
+      {/* Loss prevention */}
+      <div className="px-6">
+        <p className="text-[12px] text-white/30">One disconnect can cost more than this plan.</p>
+      </div>
+
       {/* CTA */}
-      <div className="px-6 pb-6">
+      <div className="px-6 pt-4 pb-6">
         <button
           onClick={handleActivate}
           disabled={activating}
           className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#1D1D1F] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
         >
-          {activating ? 'Activating...' : 'Activate plan'}
+          {activating ? 'Activating...' : 'Protect your earnings'}
         </button>
       </div>
     </div>
