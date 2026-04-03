@@ -199,7 +199,7 @@ export default function HomePage() {
               <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6E6E73] animate-fade-in stagger-1">
                 Reliable rides across Seattle.
                 <br />
-                Book in seconds. Track in real time.
+                Ready when you are.
               </p>
 
               <div className="mt-7 flex items-center gap-3.5 animate-fade-in stagger-2">
