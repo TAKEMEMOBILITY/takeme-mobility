@@ -94,7 +94,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
 
       {/* Loss prevention */}
       <div className="px-6">
-        <p className="text-[12px] text-white/30">One missed ride can cost more than this.</p>
+        <p className="text-[13px] text-white/45">One missed ride can cost $20–$50.</p>
       </div>
 
       {/* CTA */}
