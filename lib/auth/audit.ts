@@ -1,4 +1,5 @@
 import { createServiceClient } from '@/lib/supabase/service';
+import { react as triggerReaction } from '@/lib/security/reactionEngine';
 import type { NextRequest } from 'next/server';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -86,6 +87,16 @@ export async function auditLog(params: AuditParams): Promise<void> {
       risk_score: risk,
       metadata: params.metadata ?? {},
     });
+
+    // Fire reaction engine async — never blocks the caller
+    if (risk >= 60) {
+      triggerReaction(params.userId, risk, {
+        action: params.action,
+        resource: params.resource,
+        ip,
+        userEmail: params.userEmail,
+      }).catch((e) => console.error('[audit] Reaction engine failed:', e));
+    }
   } catch (err) {
     console.error('[audit] CRITICAL: Failed to write audit log:', err);
   }
