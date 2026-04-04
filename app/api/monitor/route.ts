@@ -113,9 +113,14 @@ function checkSES() {
 
 function checkSNS() {
   return timed('aws_sns', async () => {
-    if (!process.env.AWS_ACCESS_KEY_ID) throw new Error('AWS credentials not set');
-    const sns = new SNSClient(getAWSCredentials());
-    await sns.send(new GetSMSAttributesCommand({ attributes: ['DefaultSMSType'] }));
+    // SMS OTP now handled by Supabase + Twilio Verify, not AWS SNS
+    // Check that Supabase is reachable (phone auth depends on it)
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    if (!url) throw new Error('Supabase URL not set');
+    const res = await fetch(`${url}/auth/v1/health`, {
+      headers: { 'apikey': process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '' },
+    });
+    if (!res.ok) throw new Error(`Supabase auth health: HTTP ${res.status}`);
   });
 }
 
@@ -263,7 +268,7 @@ function getBlastRadius(service: string): string {
     stripe_api: 'Payments, refunds, driver payouts — revenue impacted',
     stripe_webhook: 'Payment confirmations, subscription events — silent failures',
     aws_ses: 'Email OTP, verification emails, alerts — login via email broken',
-    aws_sns: 'SMS OTP — login via phone broken',
+    aws_sns: 'SMS OTP (Supabase+Twilio) — login via phone broken',
     upstash_redis: 'Dispatch queue, driver matching, rate limiting — rides broken',
     ably: 'Live driver tracking — riders see stale map',
     qstash: 'Async dispatch scheduling — delayed ride matching',
