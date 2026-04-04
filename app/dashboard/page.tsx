@@ -124,7 +124,7 @@ export default function DashboardPage() {
   const { user, signOut: logOut, loading: authLoading } = useAuth();
   const router = useRouter();
   const supabase = createClient();
-  const { snapshot: tripSnapshot, setPickup: engineSetPickup, setDropoff: engineSetDropoff } = useTripEngine();
+  const { snapshot: tripSnapshot, setPickup: engineSetPickup, setDropoff: engineSetDropoff, startTrip: engineStartTrip } = useTripEngine();
 
   // ── Geolocation — production hook ──────────────────────────────────
   const { position: geoPosition, status: geoStatus, requestPermission } = useGeolocation();
@@ -191,7 +191,7 @@ export default function DashboardPage() {
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.from('ride_requests').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
+      const { data, error } = await supabase.from('rides').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
       if (error) {
         console.warn('Could not fetch rides:', error.message);
         setRides([]);
@@ -365,25 +365,28 @@ export default function DashboardPage() {
     setBookingLoading(true);
     setUserMessage('');
 
+    // Start the trip simulation (driver approaching → arrived → on_trip)
+    engineStartTrip(pickupLocation, dropoffLocation);
+
     setBookingSuccess(true);
     setConfirmationMessage(`Ride booked: ${distanceFormatter.format(distance)} km, ${duration} min, ${currencyFormatter.format(estimatedPrice)}`);
     setTimeout(() => setBookingSuccess(false), 4500);
     setBookingLoading(false);
 
     try {
-      await supabase.from('ride_requests').insert({
+      await supabase.from('rides').insert({
         user_id: user.id,
-        pickup_location: pickupLocation,
-        dropoff_location: dropoffLocation,
-        ride_type: selectedRideType,
-        estimated_fare: estimatedPrice,
-        estimated_time: duration,
+        pickup_location: JSON.stringify(pickupLocation),
+        dropoff_location: JSON.stringify(dropoffLocation),
+        distance: distance,
+        duration: duration,
+        price: estimatedPrice,
         status: 'pending',
       });
     } catch (err) {
       console.warn('Background DB write failed (trip still running):', err);
     }
-  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, router, distanceFormatter, currencyFormatter, supabase, showMessage]);
+  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, router, distanceFormatter, currencyFormatter, supabase, showMessage, engineStartTrip]);
 
   const handleCancelRide = useCallback(
     async (rideId: string) => {
@@ -391,7 +394,7 @@ export default function DashboardPage() {
 
       try {
         await withRetry(async () => {
-          const { error } = await supabase.from('ride_requests').update({ status: 'cancelled' }).eq('id', rideId).eq('user_id', user.id);
+          const { error } = await supabase.from('rides').update({ status: 'cancelled' }).eq('id', rideId).eq('user_id', user.id);
           if (error) throw error;
         }, 3, 500);
 
@@ -448,8 +451,11 @@ export default function DashboardPage() {
     setShowPayment(false);
   }, []);
 
-  // ── Derived: active trip check ──────────────────────────────────────
-  const tripActive = tripSnapshot.trip && tripSnapshot.trip.status !== 'idle' && tripSnapshot.trip.status !== 'completed';
+  // ── Derived: active trip check (only genuine, non-stale trips) ──────
+  const tripActive = tripSnapshot.trip
+    && tripSnapshot.trip.status !== 'idle'
+    && tripSnapshot.trip.status !== 'completed'
+    && tripSnapshot.trip.id.startsWith('trip-'); // Only engine-created trips, not DB ghosts
 
   // ── Derived: per-tier price preview ───────────────────────────────
   const tierPrices = useMemo(() => {

@@ -143,7 +143,7 @@ export class TripEngine {
     };
   }
 
-  /** Call when pickup changes. Generates fleet + assigns nearest driver. */
+  /** Call when pickup changes. Generates fleet for map display only — does NOT start a trip. */
   setPickup(pickup: LatLng | null): void {
     this.stop();
 
@@ -156,6 +156,14 @@ export class TripEngine {
       return;
     }
 
+    // Generate fleet markers for the map but do NOT create a trip
+    this.fleet = generateFleet(pickup);
+    this.emit();
+  }
+
+  /** Explicitly start a trip — call only when user confirms a ride. */
+  startTrip(pickup: LatLng, dropoff: LatLng | null): void {
+    this.stop();
     this.fleet = generateFleet(pickup);
     const nearest = findNearest(this.fleet, pickup);
     const dist = haversineKm(nearest.position, pickup);
@@ -163,7 +171,7 @@ export class TripEngine {
     this.trip = {
       id: `trip-${++tripCounter}`,
       pickup,
-      dropoff: this.trip?.dropoff ?? null,
+      dropoff,
       driverId: nearest.id,
       status: 'arriving',
       eta: etaFromDist(dist),

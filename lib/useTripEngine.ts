@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { TripEngine, type TripSnapshot, type LatLng } from './tripEngine';
+export type { LatLng } from './tripEngine';
 
 const EMPTY_SNAPSHOT: TripSnapshot = {
   trip: null,
@@ -33,5 +34,9 @@ export function useTripEngine() {
     engineRef.current?.setDropoff(dropoff);
   }, []);
 
-  return { snapshot, setPickup, setDropoff };
+  const startTrip = useCallback((pickup: LatLng, dropoff: LatLng | null) => {
+    engineRef.current?.startTrip(pickup, dropoff);
+  }, []);
+
+  return { snapshot, setPickup, setDropoff, startTrip };
 }
