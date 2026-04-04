@@ -536,8 +536,147 @@ export default function DashboardPage() {
       )}
 
       <main className="mx-auto max-w-[1280px] px-6 pb-16 lg:px-10">
-        {/* ── Map ───────────────────────────────────────────────────────── */}
-        <section className="relative mt-4 h-[72vh] md:h-[80vh] overflow-hidden rounded-2xl">
+        {/* ── Two-column layout: booking panel + map ───────────────────── */}
+        <section className="mt-4 grid gap-6 lg:grid-cols-[440px_1fr]">
+
+          {/* ── LEFT: Booking panel ─────────────────────────────────────── */}
+          <div className="order-2 lg:order-1">
+            <div className="rounded-2xl border border-[#d2d2d7] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+
+              {/* User-safe messages */}
+              {userMessage && (
+                <div className={`mb-4 flex items-start gap-2.5 rounded-xl px-4 py-3 animate-fade-in ${
+                  userMessageType === 'warning' ? 'bg-[#fff8e1]' : 'bg-[#f5f5f7]'
+                }`}>
+                  <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
+                    userMessageType === 'warning' ? 'bg-[#ff9f0a]' : 'bg-[#86868b]'
+                  }`} />
+                  <p className="text-sm font-medium text-[#1d1d1f]">{userMessage}</p>
+                </div>
+              )}
+
+              {routeError && (
+                <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-[#f5f5f7] px-4 py-3 animate-fade-in">
+                  <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-[#86868b]" />
+                  <p className="text-sm font-medium text-[#6e6e73]">{routeError}</p>
+                </div>
+              )}
+
+              {/* Trip active state */}
+              {tripActive ? (
+                <div className="animate-fade-in">
+                  {(() => {
+                    const phase = tripSnapshot.trip!.status;
+                    const eta = tripSnapshot.trip!.eta;
+                    const cfg: Record<string, { color: string; label: string; sub: string }> = {
+                      searching: { color: 'bg-[#86868b]', label: 'Finding your driver',       sub: 'This usually takes a moment' },
+                      assigned:  { color: 'bg-[#1D6AE5]', label: 'Driver assigned',            sub: 'Preparing for pickup' },
+                      arriving:  { color: 'bg-[#1D6AE5]', label: `Arriving in ${eta} min`,     sub: 'Your driver is on the way' },
+                      arrived:   { color: 'bg-[#34c759]', label: 'Driver has arrived',         sub: 'Head to the pickup point' },
+                      on_trip:   { color: 'bg-[#1D6AE5]', label: `${eta} min remaining`,       sub: 'Enjoy your ride' },
+                    };
+                    const s = cfg[phase] ?? cfg.arriving;
+                    return (
+                      <div className="flex items-center gap-4 py-1">
+                        <div className="relative flex h-10 w-10 items-center justify-center">
+                          <span className={`h-3 w-3 rounded-full ${s.color}`} />
+                          {(phase === 'arriving' || phase === 'on_trip' || phase === 'searching') && (
+                            <span className={`absolute inset-0 rounded-full ${s.color} animate-ping opacity-20`} />
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-base font-semibold text-[#1d1d1f] tabular-nums">{s.label}</p>
+                          <p className="text-xs text-[#86868b]">{s.sub}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                  <div className="mt-4 flex items-baseline justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
+                    <div className="flex items-baseline gap-4">
+                      <span className="text-xs text-[#86868b]">{distance !== null ? `${distanceFormatter.format(distance)} km` : ''}</span>
+                      <span className="text-xs text-[#86868b]">{duration !== null ? `${duration} min` : ''}</span>
+                    </div>
+                    <span className="text-base font-bold tabular-nums text-[#1d1d1f]">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : ''}</span>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Booking mode */}
+                  <h2 className="mb-4 text-[20px] font-semibold text-[#1d1d1f]">Where to?</h2>
+
+                  <LocationBanner geoStatus={geoStatus} onRequestPermission={requestPermission} />
+
+                  {/* Location inputs */}
+                  <div className="space-y-2">
+                    <LocationInput placeholder="Pickup location" value={pickup} onChange={setPickup} onPlaceSelect={handlePickupSelect} icon="pickup" />
+                    <LocationInput placeholder="Where to?" value={dropoff} onChange={setDropoff} onPlaceSelect={handleDropoffSelect} icon="dropoff" />
+                  </div>
+
+                  {/* Ride type selector */}
+                  <p className="mt-5 mb-2 text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Vehicle</p>
+                  <div className="flex gap-2">
+                    {rideTypes.map((rideType) => {
+                      const isSelected = selectedRideType === rideType.id;
+                      const tierPrice = tierPrices?.[rideType.id];
+                      return (
+                        <button
+                          key={rideType.id}
+                          type="button"
+                          onClick={() => {
+                            setSelectedRideType(rideType.id);
+                            if (pickupLocation && dropoffLocation) {
+                              calculateDistanceAndPrice(pickupLocation, dropoffLocation);
+                            }
+                          }}
+                          className={`flex-1 rounded-xl px-3 py-3 text-center transition-all duration-150 ${
+                            isSelected
+                              ? 'bg-[#1D6AE5] text-white shadow-lg shadow-[#1D6AE5]/20'
+                              : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                          }`}
+                        >
+                          <p className="text-lg leading-none">{rideType.icon}</p>
+                          <p className={`mt-1.5 text-xs font-semibold ${isSelected ? 'text-white' : 'text-[#1d1d1f]'}`}>{rideType.name}</p>
+                          {tierPrice && (
+                            <p className={`mt-0.5 text-[11px] tabular-nums ${isSelected ? 'text-white/70' : 'text-[#86868b]'}`}>
+                              {currencyFormatter.format(tierPrice)}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Trip details */}
+                  <div className="mt-5 grid grid-cols-3 gap-4 rounded-xl bg-[#f5f5f7] p-4">
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Distance</p>
+                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{distance !== null ? `${distanceFormatter.format(distance)} km` : '--'}</p>
+                    </div>
+                    <div>
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Duration</p>
+                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{duration !== null ? `${duration} min` : '--'}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Fare</p>
+                      <p className="mt-1 text-xl font-bold tabular-nums text-[#1d1d1f]">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : '--'}</p>
+                    </div>
+                  </div>
+
+                  {/* CTA */}
+                  <button
+                    onClick={handleRequestRide}
+                    disabled={bookingLoading || !pickupLocation || !dropoffLocation || !distance || !estimatedPrice}
+                    className="mt-5 w-full rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-[#1558C0] active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
+                  >
+                    {bookingLoading ? 'Booking...' : estimatedPrice ? `Confirm ride · ${currencyFormatter.format(estimatedPrice)}` : 'Confirm ride'}
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* ── RIGHT: Map ──────────────────────────────────────────────── */}
+          <div className="order-1 h-[50vh] overflow-hidden rounded-2xl border border-[#d2d2d7] lg:order-2 lg:h-[75vh] lg:sticky lg:top-[80px]">
           <Map
             currentLocation={currentLocation || undefined}
             pickupLocation={pickupLocation || undefined}
@@ -545,144 +684,7 @@ export default function DashboardPage() {
             onRouteError={(message) => setRouteError(message)}
             tripSnapshot={tripSnapshot}
           />
-
-          {/* ── Booking panel ───────────────────────────────────────────── */}
-          <aside className="absolute inset-x-4 bottom-4 z-20 mx-auto w-auto max-w-lg rounded-2xl border border-white/20 bg-white/85 p-5 shadow-[0_8px_40px_rgba(0,0,0,0.12)] backdrop-blur-2xl sm:inset-x-6 animate-fade-in">
-
-            {/* User-safe messages — calm, non-technical */}
-            {userMessage && (
-              <div className={`mb-4 flex items-start gap-2.5 rounded-xl px-4 py-3 animate-fade-in ${
-                userMessageType === 'warning'
-                  ? 'bg-warning/8'
-                  : 'bg-surface-secondary'
-              }`}>
-                <span className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
-                  userMessageType === 'warning' ? 'bg-warning' : 'bg-ink-tertiary'
-                }`} />
-                <p className="text-sm font-medium text-ink">{userMessage}</p>
-              </div>
-            )}
-
-            {/* Route-level guidance */}
-            {routeError && (
-              <div className="mb-4 flex items-start gap-2.5 rounded-xl bg-surface-secondary px-4 py-3 animate-fade-in">
-                <span className="mt-0.5 h-2 w-2 shrink-0 rounded-full bg-ink-tertiary" />
-                <p className="text-sm font-medium text-ink-secondary">{routeError}</p>
-              </div>
-            )}
-
-            {/* ── Trip active state ── replaces booking UI with trip focus ── */}
-            {tripActive ? (
-              <div className="animate-fade-in">
-                {(() => {
-                  const phase = tripSnapshot.trip!.status;
-                  const eta = tripSnapshot.trip!.eta;
-                  const cfg: Record<string, { color: string; label: string; sub: string }> = {
-                    searching: { color: 'bg-ink-tertiary', label: 'Finding your driver',       sub: 'This usually takes a moment' },
-                    assigned:  { color: 'bg-accent',       label: 'Driver assigned',            sub: 'Preparing for pickup' },
-                    arriving:  { color: 'bg-accent',       label: `Arriving in ${eta} min`,     sub: 'Your driver is on the way' },
-                    arrived:   { color: 'bg-success',      label: 'Driver has arrived',         sub: 'Head to the pickup point' },
-                    on_trip:   { color: 'bg-accent',       label: `${eta} min remaining`,       sub: 'Enjoy your ride' },
-                  };
-                  const s = cfg[phase] ?? cfg.arriving;
-                  return (
-                    <div className="flex items-center gap-4 py-1">
-                      <div className="relative flex h-10 w-10 items-center justify-center">
-                        <span className={`h-3 w-3 rounded-full ${s.color}`} />
-                        {(phase === 'arriving' || phase === 'on_trip' || phase === 'searching') && (
-                          <span className={`absolute inset-0 rounded-full ${s.color} animate-ping opacity-20`} />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-base font-semibold text-ink tabular-nums">{s.label}</p>
-                        <p className="text-xs text-ink-tertiary">{s.sub}</p>
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Mini fare display during trip */}
-                <div className="mt-4 flex items-baseline justify-between rounded-xl bg-surface-secondary px-4 py-3">
-                  <div className="flex items-baseline gap-4">
-                    <span className="text-xs text-ink-tertiary">{distance !== null ? `${distanceFormatter.format(distance)} km` : ''}</span>
-                    <span className="text-xs text-ink-tertiary">{duration !== null ? `${duration} min` : ''}</span>
-                  </div>
-                  <span className="text-base font-bold tabular-nums text-ink">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : ''}</span>
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* ── Booking mode ─────────────────────────────────────────── */}
-
-                {/* Location status banner — permission or fallback */}
-                <LocationBanner geoStatus={geoStatus} onRequestPermission={requestPermission} />
-
-                {/* Location inputs */}
-                <div className="space-y-2">
-                  <LocationInput placeholder="Pickup location" value={pickup} onChange={setPickup} onPlaceSelect={handlePickupSelect} icon="pickup" />
-                  <LocationInput placeholder="Where to?" value={dropoff} onChange={setDropoff} onPlaceSelect={handleDropoffSelect} icon="dropoff" />
-                </div>
-
-                {/* Ride type selector — with live price per tier */}
-                <div className="mt-4 flex gap-2">
-                  {rideTypes.map((rideType) => {
-                    const isSelected = selectedRideType === rideType.id;
-                    const tierPrice = tierPrices?.[rideType.id];
-                    return (
-                      <button
-                        key={rideType.id}
-                        type="button"
-                        onClick={() => {
-                          setSelectedRideType(rideType.id);
-                          if (pickupLocation && dropoffLocation) {
-                            calculateDistanceAndPrice(pickupLocation, dropoffLocation);
-                          }
-                        }}
-                        className={`flex-1 rounded-xl px-3 py-3 text-center transition-all duration-150 ${
-                          isSelected
-                            ? 'bg-[#1D6AE5] text-white shadow-lg shadow-[#1D6AE5]/20'
-                            : 'bg-surface-secondary text-ink hover:bg-surface-tertiary'
-                        }`}
-                      >
-                        <p className="text-lg leading-none">{rideType.icon}</p>
-                        <p className={`mt-1.5 text-xs font-semibold ${isSelected ? 'text-white' : 'text-ink'}`}>{rideType.name}</p>
-                        {tierPrice && (
-                          <p className={`mt-0.5 text-[11px] tabular-nums ${isSelected ? 'text-white/70' : 'text-ink-tertiary'}`}>
-                            {currencyFormatter.format(tierPrice)}
-                          </p>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* Trip details */}
-                <div className="mt-4 grid grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">Distance</p>
-                    <p className="mt-1 text-base font-semibold tabular-nums text-ink">{distance !== null ? `${distanceFormatter.format(distance)} km` : '--'}</p>
-                  </div>
-                  <div>
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">Duration</p>
-                    <p className="mt-1 text-base font-semibold tabular-nums text-ink">{duration !== null ? `${duration} min` : '--'}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">Fare</p>
-                    <p className="mt-1 text-xl font-bold tabular-nums text-ink">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : '--'}</p>
-                  </div>
-                </div>
-
-                {/* CTA */}
-                <button
-                  onClick={handleRequestRide}
-                  disabled={bookingLoading || !pickupLocation || !dropoffLocation || !distance || !estimatedPrice}
-                  className="mt-4 w-full rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-[#1558C0] active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
-                >
-                  {bookingLoading ? 'Booking...' : estimatedPrice ? `Book Ride \u00B7 ${currencyFormatter.format(estimatedPrice)}` : 'Book Ride'}
-                </button>
-              </>
-            )}
-          </aside>
+          </div>
         </section>
 
         {/* ── Stats ────────────────────────────────────────────────────── */}

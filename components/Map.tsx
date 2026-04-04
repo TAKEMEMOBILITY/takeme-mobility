@@ -466,7 +466,7 @@ export default function Map({
     <GoogleMap
       mapContainerStyle={containerStyle}
       center={initialPosition}
-      zoom={14}
+      zoom={12}
       onLoad={onLoad}
       onUnmount={onUnmount}
       onClick={onMapClick}
