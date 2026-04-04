@@ -76,7 +76,7 @@ const STATUS_CLASSES: Record<string, string> = {
   driver_arriving: 'bg-violet-500/15 text-violet-400',
   arrived: 'bg-indigo-500/15 text-indigo-400',
   in_progress: 'bg-emerald-500/15 text-emerald-400',
-  completed: 'bg-green-500/15 text-green-400',
+  completed: 'bg-[#0071e3]/10 text-[#0071e3]',
   cancelled: 'bg-red-500/15 text-red-400',
 };
 

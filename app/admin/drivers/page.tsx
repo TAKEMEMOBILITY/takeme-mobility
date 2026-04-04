@@ -97,7 +97,7 @@ const STATUS_CLASSES: Record<string, string> = {
 };
 
 const RIDE_STATUS_CLASSES: Record<string, string> = {
-  completed: 'bg-green-500/15 text-green-400',
+  completed: 'bg-[#0071e3]/10 text-[#0071e3]',
   cancelled: 'bg-red-500/15 text-red-400',
   in_progress: 'bg-emerald-500/15 text-emerald-400',
   driver_assigned: 'bg-blue-500/15 text-blue-400',

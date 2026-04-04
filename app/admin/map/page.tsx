@@ -462,7 +462,7 @@ function StatusBadge({ status }: { status: string }) {
     driver_arriving: 'bg-violet-500/20 text-violet-400',
     arrived: 'bg-indigo-500/20 text-indigo-400',
     in_progress: 'bg-emerald-500/20 text-emerald-400',
-    completed: 'bg-green-500/20 text-green-400',
+    completed: 'bg-[#0071e3]/10 text-[#0071e3]',
     cancelled: 'bg-red-500/20 text-red-400',
   };
   const cls = colors[status] ?? 'bg-zinc-500/20 text-[#86868b]';
