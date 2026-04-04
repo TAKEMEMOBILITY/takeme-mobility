@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, memo } from 'react';
 import { GoogleMap, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { useGoogleMaps, type MapLoadStatus } from './GoogleMapsProvider';
 import type { TripSnapshot, TripPhase } from '@/lib/tripEngine';
@@ -332,7 +332,7 @@ interface MapProps {
   tripSnapshot: TripSnapshot;
 }
 
-export default function Map({
+function MapComponent({
   pickupLocation,
   dropoffLocation,
   currentLocation,
@@ -578,3 +578,5 @@ export default function Map({
     </GoogleMap>
   );
 }
+
+export default memo(MapComponent);
