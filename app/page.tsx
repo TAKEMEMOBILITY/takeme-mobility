@@ -7,15 +7,14 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['TakeMe Fleet', 'Business', 'Connect', 'Students', 'Safety'] as const;
-const NAV_ROUTES: Record<string, string> = {
-  'TakeMe Fleet': '/fleet',
-  Business: '/business',
-  Connect: '/connect',
-  Students: '/students',
-  Safety: '/safety',
-};
-const NAV_BADGES = new Set(['TakeMe Fleet', 'Business', 'Connect', 'Students']);
+const NAV_LINKS = [
+  { label: 'Fleet', href: '/fleet' },
+  { label: 'Business', href: '/business' },
+  { label: 'Connect', href: '/connect' },
+  { label: 'Students', href: '/students' },
+  { label: 'Safety', href: '/safety' },
+  { label: 'Driver Hub', href: '/driver-hub' },
+];
 
 const TRUST_CARDS = [
   {
@@ -117,44 +116,34 @@ export default function HomePage() {
       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
         scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
       }`}>
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1d1d1f]">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
+          {/* LEFT — Logo */}
+          <Link href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[5px] font-light text-[#86868b]">Mobility</span>
+            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
           </Link>
 
-          <div className="hidden items-center gap-10 lg:flex">
-            {NAV_ITEMS.map((item) => (
-              <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
-                {item}
-                {NAV_BADGES.has(item) && (
-                  <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
-                    New
-                  </span>
-                )}
+          {/* CENTER — Nav links */}
+          <div className="hidden items-center gap-6 lg:flex">
+            {NAV_LINKS.map(({ label, href }) => (
+              <Link key={href} href={href} className="whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
+                {label}
               </Link>
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* RIGHT — Auth + CTA */}
+          <div className="flex shrink-0 items-center gap-4">
             {loading ? (
               <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#d2d2d7] border-t-[#1d1d1f]" />
             ) : (
               <>
-                <Link href="/driver-hub" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:flex">
-                  Driver Hub
-                  <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
-                </Link>
-                <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:block">
-                  Drive with us
-                </Link>
-                <div className="hidden h-4 w-[1px] bg-[#d2d2d7] lg:block" />
-                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 sm:block">
+                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f] sm:block">
                   Sign in
                 </Link>
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-10 items-center rounded-[999px] bg-[#1D6AE5] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                  className="inline-flex h-9 items-center rounded-[999px] bg-[#1D6AE5] px-5 text-[13px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0]"
                 >
                   Book a ride
                 </Link>
