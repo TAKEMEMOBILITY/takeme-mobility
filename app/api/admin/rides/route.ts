@@ -1,86 +1,94 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/admin-auth';
-import { createServiceClient } from '@/lib/supabase/service';
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAdmin } from '@/lib/admin-auth'
+import { createServiceClient } from '@/lib/supabase/service'
 
 // GET /api/admin/rides — List rides with filters
+//
+// Schema: rides(id, user_id, pickup_location, dropoff_location, distance, duration, price, status, created_at)
+// pickup_location/dropoff_location are JSON strings: {"lat":..., "lng":..., "address":"..."}
+// FK: rides.user_id → riders.id
+
 export async function GET(request: NextRequest) {
-  const auth = await requireAdmin();
-  if (auth.error) return auth.error;
+  const auth = await requireAdmin()
+  if (auth.error) return auth.error
 
-  const url = request.nextUrl;
-  const status = url.searchParams.get('status');
-  const from = url.searchParams.get('from');
-  const to = url.searchParams.get('to');
-  const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 200);
-  const offset = Number(url.searchParams.get('offset') ?? 0);
+  const url = request.nextUrl
+  const status = url.searchParams.get('status')
+  const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), 200)
+  const offset = Number(url.searchParams.get('offset') ?? 0)
 
-  const svc = createServiceClient();
+  const svc = createServiceClient()
 
   try {
     let query = svc
       .from('rides')
-      .select(`
-        id, status, pickup_address, pickup_lat, pickup_lng,
-        dropoff_address, dropoff_lat, dropoff_lng,
-        vehicle_class, distance_km, duration_min,
-        estimated_fare, final_fare, surge_multiplier,
-        cancel_reason, cancelled_by, cancelled_at,
-        requested_at, driver_assigned_at, driver_arrived_at,
-        trip_started_at, trip_completed_at,
-        rider_id, assigned_driver_id,
-        riders!rides_rider_id_fkey ( full_name, email, phone ),
-        drivers!rides_assigned_driver_id_fkey ( full_name, email )
-      `, { count: 'exact' })
-      .order('requested_at', { ascending: false })
-      .range(offset, offset + limit - 1);
+      .select('id, user_id, pickup_location, dropoff_location, distance, duration, price, status, created_at', { count: 'exact' })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1)
 
     if (status && status !== 'all') {
-      // Support grouped filters
-      const activeStatuses = ['searching_driver', 'driver_assigned', 'driver_arriving', 'arrived', 'in_progress'];
+      const activeStatuses = ['searching_driver', 'driver_assigned', 'driver_arriving', 'arrived', 'in_progress']
       if (status === 'active') {
-        query = query.in('status', activeStatuses);
-      } else if (status === 'completed') {
-        query = query.eq('status', 'completed');
-      } else if (status === 'cancelled') {
-        query = query.eq('status', 'cancelled');
+        query = query.in('status', activeStatuses)
       } else {
-        query = query.eq('status', status);
+        query = query.eq('status', status)
       }
     }
 
-    if (from) {
-      query = query.gte('requested_at', new Date(from).toISOString());
-    }
-    if (to) {
-      query = query.lte('requested_at', new Date(to).toISOString());
-    }
-
-    const { data, count, error } = await query;
+    const { data, count, error } = await query
 
     if (error) {
-      console.error('[admin/rides]', error);
-      return NextResponse.json({ error: 'Failed to fetch rides' }, { status: 500 });
+      console.error('[admin/rides] Query error:', error.message)
+      return NextResponse.json({ error: 'Failed to fetch rides' }, { status: 500 })
     }
 
-    // Flatten joined data for easier client consumption
+    // Parse JSON location strings and look up rider names
+    const userIds = [...new Set((data ?? []).map((r: Record<string, unknown>) => r.user_id as string).filter(Boolean))]
+    let riderMap: Record<string, { full_name: string | null; email: string | null }> = {}
+
+    if (userIds.length > 0) {
+      const { data: riders } = await svc
+        .from('riders')
+        .select('id, full_name, email')
+        .in('id', userIds)
+
+      for (const rider of riders ?? []) {
+        riderMap[rider.id] = { full_name: rider.full_name, email: rider.email }
+      }
+    }
+
     const rides = (data ?? []).map((r: Record<string, unknown>) => {
-      const rider = r.riders as Record<string, unknown> | null;
-      const driver = r.drivers as Record<string, unknown> | null;
+      let pickup: { lat?: number; lng?: number; address?: string } = {}
+      let dropoff: { lat?: number; lng?: number; address?: string } = {}
+      try { pickup = typeof r.pickup_location === 'string' ? JSON.parse(r.pickup_location) : (r.pickup_location as typeof pickup) ?? {} } catch {}
+      try { dropoff = typeof r.dropoff_location === 'string' ? JSON.parse(r.dropoff_location) : (r.dropoff_location as typeof dropoff) ?? {} } catch {}
+
+      const rider = riderMap[r.user_id as string]
+
       return {
-        ...r,
+        id: r.id,
+        status: r.status,
+        pickup_address: pickup.address ?? null,
+        pickup_lat: pickup.lat ?? null,
+        pickup_lng: pickup.lng ?? null,
+        dropoff_address: dropoff.address ?? null,
+        dropoff_lat: dropoff.lat ?? null,
+        dropoff_lng: dropoff.lng ?? null,
+        distance_km: r.distance ? Number(r.distance) : null,
+        duration_min: r.duration ? Number(r.duration) : null,
+        estimated_fare: r.price ? Number(r.price) : null,
+        final_fare: r.price ? Number(r.price) : null,
+        rider_id: r.user_id,
         rider_name: rider?.full_name ?? null,
         rider_email: rider?.email ?? null,
-        rider_phone: rider?.phone ?? null,
-        driver_name: driver?.full_name ?? null,
-        driver_email: driver?.email ?? null,
-        riders: undefined,
-        drivers: undefined,
-      };
-    });
+        requested_at: r.created_at,
+        created_at: r.created_at,
+      }
+    })
 
-    return NextResponse.json({ rides, total: count ?? 0, limit, offset });
+    return NextResponse.json({ rides, total: count ?? 0, limit, offset })
   } catch (err) {
-    console.error('[admin/rides]', err);
-    return NextResponse.json({ error: 'Failed to fetch rides' }, { status: 500 });
+    console.error('[admin/rides] Unhandled:', err)
+    return NextResponse.json({ error: 'Failed to fetch rides' }, { status: 500 })
   }
 }
