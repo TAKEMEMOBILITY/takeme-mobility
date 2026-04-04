@@ -7,15 +7,15 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
-const NAV_ITEMS = ['Rides', 'TakeMe Fleet', 'Connect', 'Students', 'Safety'] as const;
+const NAV_ITEMS = ['TakeMe Fleet', 'Business', 'Connect', 'Students', 'Safety'] as const;
 const NAV_ROUTES: Record<string, string> = {
-  Rides: '/#how-it-works',
   'TakeMe Fleet': '/fleet',
+  Business: '/business',
   Connect: '/connect',
   Students: '/students',
   Safety: '/safety',
 };
-const NAV_BADGES = new Set(['TakeMe Fleet', 'Connect', 'Students']);
+const NAV_BADGES = new Set(['TakeMe Fleet', 'Business', 'Connect', 'Students']);
 
 const TRUST_CARDS = [
   {
@@ -141,7 +141,7 @@ export default function HomePage() {
               <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#d2d2d7] border-t-[#1d1d1f]" />
             ) : (
               <>
-                <Link href="/driver" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:flex">
+                <Link href="/driver-hub" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:flex">
                   Driver Hub
                   <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
                 </Link>
