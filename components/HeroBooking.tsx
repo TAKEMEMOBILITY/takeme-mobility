@@ -257,7 +257,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
             <div className="text-right">
               <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Distance</p>
               <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-[#1D1D1F]">
-                {rideData.distanceKm} km
+                {(rideData.distanceKm * 0.621371).toFixed(1)} mi
               </p>
             </div>
           </div>
@@ -278,7 +278,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
               setBookingError('Payment cancelled. Your ride has been saved — you can pay later from your dashboard.');
             }}
             formatCurrency={(amount: number) => `$${amount.toFixed(2)}`}
-            formatDistance={(km: number) => `${km} km`}
+            formatDistance={(km: number) => `${(km * 0.621371).toFixed(1)} mi`}
           />
         </div>
       </div>
@@ -355,7 +355,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1D6AE5] opacity-40" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-[#1D6AE5]" />
             </span>
-            <span className="text-[12px] font-semibold text-[#1D1D1F]">{route!.durationMin} min · {route!.distanceKm} km</span>
+            <span className="text-[12px] font-semibold text-[#1D1D1F]">{route!.durationMin} min · {(route!.distanceKm * 0.621371).toFixed(1)} mi</span>
           </div>
         )}
       </div>
@@ -426,7 +426,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           <div className="text-right">
             <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Distance</p>
             <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-[#1D1D1F]">
-              {route ? `${route.distanceKm} km` : '—'}
+              {route ? `${(route.distanceKm * 0.621371).toFixed(1)} mi` : '—'}
             </p>
           </div>
         </div>

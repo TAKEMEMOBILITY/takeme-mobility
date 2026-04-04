@@ -273,28 +273,29 @@ export default function DashboardPage() {
         if (!leg) throw new Error('No route data');
 
         const distanceKm = (leg.distance?.value ?? 0) / 1000;
+        const distanceMi = distanceKm * 0.621371;
         const durationMin = Math.ceil((leg.duration?.value ?? 0) / 60);
         const polyline = result.routes?.[0]?.overview_polyline;
 
-        if (distanceKm <= 0 || durationMin <= 0) {
+        if (distanceMi <= 0 || durationMin <= 0) {
           throw new Error('Invalid route metrics');
         }
 
         const routeData: Route = {
-          distance: distanceKm,
+          distance: distanceMi,
           duration: durationMin,
           polyline: polyline || undefined,
         };
 
         routeSchema.parse(routeData);
 
-        setDistance(distanceKm);
+        setDistance(distanceMi);
         setDuration(durationMin);
 
         const basePrices = { economy: 2.0, comfort: 3.0, premium: 4.0 };
         const perKmPrices = { economy: 1.5, comfort: 2.2, premium: 3.0 };
 
-        const fare = basePrices[selectedRideType] + distanceKm * perKmPrices[selectedRideType];
+        const fare = basePrices[selectedRideType] + distanceMi * perKmPrices[selectedRideType];
         setEstimatedPrice(Number(fare.toFixed(2)));
       } catch (err) {
         console.error('Route calculation failed:', err);
@@ -345,6 +346,9 @@ export default function DashboardPage() {
     [calculateDistanceAndPrice, pickupLocation, engineSetDropoff, showMessage]
   );
 
+  // Ride data for payment modal
+  const [pendingRide, setPendingRide] = useState<{ id: string; fare: number } | null>(null);
+
   const handleRequestRide = useCallback(async () => {
     if (!user) {
       showMessage(USER_MESSAGES.sessionExpired, 'warning');
@@ -365,28 +369,38 @@ export default function DashboardPage() {
     setBookingLoading(true);
     setUserMessage('');
 
-    // Start the trip simulation (driver approaching → arrived → on_trip)
-    engineStartTrip(pickupLocation, dropoffLocation);
-
-    setBookingSuccess(true);
-    setConfirmationMessage(`Ride booked: ${distanceFormatter.format(distance)} km, ${duration} min, ${currencyFormatter.format(estimatedPrice)}`);
-    setTimeout(() => setBookingSuccess(false), 4500);
-    setBookingLoading(false);
-
     try {
-      await supabase.from('rides').insert({
-        user_id: user.id,
-        pickup_location: JSON.stringify(pickupLocation),
-        dropoff_location: JSON.stringify(dropoffLocation),
-        distance: distance,
-        duration: duration,
-        price: estimatedPrice,
-        status: 'pending',
+      // Create ride via API (also creates Stripe PaymentIntent)
+      const res = await fetch('/api/rides/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickupAddress: pickupLocation.address, pickupLat: pickupLocation.lat, pickupLng: pickupLocation.lng,
+          dropoffAddress: dropoffLocation.address, dropoffLat: dropoffLocation.lat, dropoffLng: dropoffLocation.lng,
+          distanceKm: distance / 0.621371, durationMin: duration,
+          vehicleClass: selectedRideType,
+          totalFare: estimatedPrice, currency: locale.currency,
+        }),
       });
+
+      if (!res.ok) {
+        if (res.status === 401) { router.push('/auth/login'); return; }
+        const errData = await res.json();
+        throw new Error(errData.error || 'Booking failed');
+      }
+
+      const data = await res.json();
+      const rideId = data.ride?.id || data.id || 'unknown';
+
+      // Show payment modal
+      setPendingRide({ id: rideId, fare: estimatedPrice });
+      setShowPayment(true);
     } catch (err) {
-      console.warn('Background DB write failed (trip still running):', err);
+      showMessage(err instanceof Error ? err.message : USER_MESSAGES.tryAgain, 'warning');
+    } finally {
+      setBookingLoading(false);
     }
-  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, router, distanceFormatter, currencyFormatter, supabase, showMessage, engineStartTrip]);
+  }, [user, pickupLocation, dropoffLocation, distance, duration, estimatedPrice, selectedRideType, locale, router, showMessage]);
 
   const handleCancelRide = useCallback(
     async (rideId: string) => {
@@ -432,20 +446,18 @@ export default function DashboardPage() {
 
   const handlePaymentComplete = useCallback(() => {
     setShowPayment(false);
+    setPendingRide(null);
     setBookingSuccess(true);
-    setConfirmationMessage('Payment confirmed. Thank you for riding with us!');
-    setPickup('');
-    setDropoff('');
-    setPickupLocation(null);
-    setDropoffLocation(null);
-    engineSetPickup(null);
-    engineSetDropoff(null);
-    setDistance(null);
-    setDuration(null);
-    setEstimatedPrice(null);
-    fetchRides();
+    setConfirmationMessage('Payment confirmed. Your driver is on the way!');
+
+    // NOW start the trip simulation after payment succeeds
+    if (pickupLocation && dropoffLocation) {
+      engineStartTrip(pickupLocation, dropoffLocation);
+    }
+
     setTimeout(() => setBookingSuccess(false), 4500);
-  }, [engineSetPickup, engineSetDropoff, fetchRides]);
+    fetchRides();
+  }, [pickupLocation, dropoffLocation, engineStartTrip, fetchRides]);
 
   const handlePaymentDismiss = useCallback(() => {
     setShowPayment(false);
@@ -599,7 +611,7 @@ export default function DashboardPage() {
                   })()}
                   <div className="mt-4 flex items-baseline justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
                     <div className="flex items-baseline gap-4">
-                      <span className="text-xs text-[#86868b]">{distance !== null ? `${distanceFormatter.format(distance)} km` : ''}</span>
+                      <span className="text-xs text-[#86868b]">{distance !== null ? `${distanceFormatter.format(distance)} mi` : ''}</span>
                       <span className="text-xs text-[#86868b]">{duration !== null ? `${duration} min` : ''}</span>
                     </div>
                     <span className="text-base font-bold tabular-nums text-[#1d1d1f]">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : ''}</span>
@@ -656,7 +668,7 @@ export default function DashboardPage() {
                   <div className="mt-5 grid grid-cols-3 gap-4 rounded-xl bg-[#f5f5f7] p-4">
                     <div>
                       <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Distance</p>
-                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{distance !== null ? `${distanceFormatter.format(distance)} km` : '--'}</p>
+                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{distance !== null ? `${distanceFormatter.format(distance)} mi` : '--'}</p>
                     </div>
                     <div>
                       <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Duration</p>
@@ -763,20 +775,20 @@ export default function DashboardPage() {
       </main>
     </div>
 
-    {/* Post-trip payment modal */}
-    {showPayment && estimatedPrice && tripSnapshot.trip && (
+    {/* Payment modal — shown after ride creation, before trip starts */}
+    {showPayment && pendingRide && (
       <PaymentModal
         trip={{
-          tripId: tripSnapshot.trip.id,
+          tripId: pendingRide.id,
           distance: distance ?? 0,
           duration: duration ?? 0,
-          fare: estimatedPrice,
+          fare: pendingRide.fare,
           currency: locale.currency.toLowerCase(),
         }}
         onComplete={handlePaymentComplete}
         onDismiss={handlePaymentDismiss}
         formatCurrency={(amount) => currencyFormatter.format(amount)}
-        formatDistance={(km) => distanceFormatter.format(km)}
+        formatDistance={(mi) => `${distanceFormatter.format(mi)} mi`}
       />
     )}
     </GoogleMapsProvider>
