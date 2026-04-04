@@ -537,7 +537,7 @@ export default function DashboardPage() {
 
       <main className="mx-auto max-w-[1280px] px-6 pb-16 lg:px-10">
         {/* ── Two-column layout: booking panel + map ───────────────────── */}
-        <section className="mt-4 grid gap-6 lg:grid-cols-[440px_1fr]">
+        <section className="mt-4 grid gap-6 overflow-hidden lg:grid-cols-[440px_minmax(0,1fr)]">
 
           {/* ── LEFT: Booking panel ─────────────────────────────────────── */}
           <div className="order-2 lg:order-1">
@@ -676,7 +676,7 @@ export default function DashboardPage() {
           </div>
 
           {/* ── RIGHT: Map ──────────────────────────────────────────────── */}
-          <div className="order-1 h-[50vh] overflow-hidden rounded-2xl border border-[#d2d2d7] lg:order-2 lg:h-[75vh] lg:sticky lg:top-[80px]">
+          <div className="order-1 h-[50vh] w-full min-w-0 overflow-hidden rounded-2xl border border-[#d2d2d7] lg:order-2 lg:h-[75vh] lg:sticky lg:top-[80px]">
           <Map
             currentLocation={currentLocation || undefined}
             pickupLocation={pickupLocation || undefined}

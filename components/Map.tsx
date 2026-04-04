@@ -395,7 +395,13 @@ export default function Map({
           onRouteErrorRef.current?.('');
           const bounds = result.routes?.[0]?.bounds;
           if (mapRef.current && bounds) {
-            mapRef.current.fitBounds(bounds, { bottom: 260, top: 20, left: 20, right: 20 });
+            mapRef.current.fitBounds(bounds, { bottom: 120, top: 20, left: 20, right: 20 });
+            // Cap zoom to prevent over-zooming during active rides
+            google.maps.event.addListenerOnce(mapRef.current, 'idle', () => {
+              if (mapRef.current && (mapRef.current.getZoom() ?? 15) > 14) {
+                mapRef.current.setZoom(14);
+              }
+            });
           }
         } else {
           setDirections(null);
@@ -419,7 +425,12 @@ export default function Map({
     if (dropoffLocation) bounds.extend(dropoffLocation);
 
     if (!bounds.isEmpty()) {
-      mapRef.current.fitBounds(bounds, { bottom: 260, top: 20, left: 20, right: 20 });
+      mapRef.current.fitBounds(bounds, { bottom: 120, top: 20, left: 20, right: 20 });
+      google.maps.event.addListenerOnce(mapRef.current, 'idle', () => {
+        if (mapRef.current && (mapRef.current.getZoom() ?? 15) > 14) {
+          mapRef.current.setZoom(14);
+        }
+      });
     }
   }, [currentLocation, pickupLocation, dropoffLocation, directions]);
 
