@@ -476,11 +476,32 @@ export default function DashboardPage() {
   return (
     <GoogleMapsProvider>
     <div className="min-h-screen bg-background text-ink">
-      {/* ── Nav ─────────────────────────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-border/50 bg-surface/80 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 py-3 md:px-8">
-          <span className="text-[22px] font-bold tracking-tight text-ink">Ride</span>
-          <div className="flex items-center gap-2">
+      {/* ── Nav — matches main site ────────────────────────────────────── */}
+      <nav className="sticky top-0 z-50 border-b border-[#d2d2d7] bg-white/80 backdrop-blur-2xl">
+        <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
+          {/* Logo */}
+          <a href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">
+            <span className="font-semibold">TakeMe</span>
+            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
+          </a>
+
+          {/* Center links */}
+          <div className="hidden items-center gap-6 lg:flex">
+            {[
+              { label: 'TakeMe Fleet', href: '/fleet' },
+              { label: 'Business', href: '/business' },
+              { label: 'TakeMe Connect', href: '/connect' },
+              { label: 'Students Membership', href: '/students' },
+              { label: 'Driver Hub', href: '/driver-hub' },
+            ].map(({ label, href }) => (
+              <a key={href} href={href} className="whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
+                {label}
+              </a>
+            ))}
+          </div>
+
+          {/* Right — user actions */}
+          <div className="flex shrink-0 items-center gap-3">
             <select
               aria-label="Locale"
               value={locale.code}
@@ -488,7 +509,7 @@ export default function DashboardPage() {
                 const selected = localeOptions.find((opt) => opt.code === event.target.value);
                 if (selected) setLocale(selected);
               }}
-              className="rounded-lg bg-surface-secondary px-3 py-2 text-xs font-medium text-ink-secondary outline-none transition-colors hover:bg-surface-tertiary"
+              className="hidden rounded-lg border border-[#d2d2d7] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#6e6e73] outline-none sm:block"
             >
               {localeOptions.map((option) => (
                 <option key={option.code} value={option.code}>{option.label}</option>
@@ -496,9 +517,9 @@ export default function DashboardPage() {
             </select>
             <button
               onClick={handleSignOut}
-              className="rounded-lg px-3 py-2 text-sm font-medium text-ink-tertiary transition-colors hover:bg-surface-secondary hover:text-ink"
+              className="text-[13px] font-medium text-[#86868b] transition-colors hover:text-[#1d1d1f]"
             >
-              Sign Out
+              Sign out
             </button>
           </div>
         </div>
@@ -514,7 +535,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className="mx-auto max-w-7xl px-5 pb-16 md:px-8">
+      <main className="mx-auto max-w-[1280px] px-6 pb-16 lg:px-10">
         {/* ── Map ───────────────────────────────────────────────────────── */}
         <section className="relative mt-4 h-[72vh] md:h-[80vh] overflow-hidden rounded-2xl">
           <Map
@@ -619,7 +640,7 @@ export default function DashboardPage() {
                         }}
                         className={`flex-1 rounded-xl px-3 py-3 text-center transition-all duration-150 ${
                           isSelected
-                            ? 'bg-ink text-white shadow-lg shadow-ink/20'
+                            ? 'bg-[#1D6AE5] text-white shadow-lg shadow-[#1D6AE5]/20'
                             : 'bg-surface-secondary text-ink hover:bg-surface-tertiary'
                         }`}
                       >
@@ -655,7 +676,7 @@ export default function DashboardPage() {
                 <button
                   onClick={handleRequestRide}
                   disabled={bookingLoading || !pickupLocation || !dropoffLocation || !distance || !estimatedPrice}
-                  className="mt-4 w-full rounded-xl bg-ink py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-ink/90 active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
+                  className="mt-4 w-full rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-[#1558C0] active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
                 >
                   {bookingLoading ? 'Booking...' : estimatedPrice ? `Book Ride \u00B7 ${currencyFormatter.format(estimatedPrice)}` : 'Book Ride'}
                 </button>
@@ -671,20 +692,20 @@ export default function DashboardPage() {
             { label: 'Spend', value: currencyFormatter.format(stats.totalSpent), icon: '◆' },
             { label: 'Rating', value: `${stats.rating.toFixed(1)}`, icon: '★' },
           ].map((stat) => (
-            <article key={stat.label} className="rounded-2xl bg-surface p-5">
+            <article key={stat.label} className="rounded-xl border border-[#d2d2d7] bg-white p-5">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-ink-tertiary">{stat.label}</p>
-                <span className="text-ink-tertiary text-xs">{stat.icon}</span>
+                <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">{stat.label}</p>
+                <span className="text-[#86868b] text-xs">{stat.icon}</span>
               </div>
-              <p className="mt-2 text-2xl font-bold tabular-nums text-ink">{stat.value}</p>
+              <p className="mt-2 text-2xl font-bold tabular-nums text-[#1d1d1f]">{stat.value}</p>
             </article>
           ))}
         </section>
 
         {/* ── Ride history ─────────────────────────────────────────────── */}
-        <section className="mt-6 rounded-2xl bg-surface p-5">
+        <section className="mt-6 rounded-xl border border-[#d2d2d7] bg-white p-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-ink">Recent Rides</h3>
+            <h3 className="text-base font-semibold text-[#1d1d1f]">Recent Rides</h3>
             {rides.length > 0 && (
               <span className="text-xs text-ink-tertiary">{rides.length} ride{rides.length !== 1 ? 's' : ''}</span>
             )}
