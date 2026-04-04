@@ -26,7 +26,7 @@ export default function LocationInput({ placeholder, value, onChange, onPlaceSel
     }
   };
 
-  const dotColor = icon === 'pickup' ? 'bg-success' : 'bg-danger';
+  const dotColor = icon === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1d1d1f]';
 
   const inputEl = (
     <div className="group flex items-center gap-3 rounded-xl bg-surface-secondary px-4 py-3.5 transition-colors duration-150 focus-within:bg-surface-tertiary focus-within:ring-1 focus-within:ring-ink/10">

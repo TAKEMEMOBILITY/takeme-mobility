@@ -20,7 +20,7 @@ export function RidesPerHourChart({
 }) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-[#71717a]">
+      <div className="flex h-full items-center justify-center text-sm text-[#9CA3AF]">
         No ride data available
       </div>
     );
@@ -35,29 +35,29 @@ export function RidesPerHourChart({
             <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e1e2e" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
         <XAxis
           dataKey="label"
-          tick={{ fill: '#71717a', fontSize: 11 }}
-          axisLine={{ stroke: '#1e1e2e' }}
+          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+          axisLine={{ stroke: '#E5E7EB' }}
           tickLine={false}
           interval="preserveStartEnd"
         />
         <YAxis
-          tick={{ fill: '#71717a', fontSize: 11 }}
-          axisLine={{ stroke: '#1e1e2e' }}
+          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+          axisLine={{ stroke: '#E5E7EB' }}
           tickLine={false}
           allowDecimals={false}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#1e1e2e',
-            border: '1px solid #2e2e3e',
+            backgroundColor: '#E5E7EB',
+            border: '1px solid #E5E7EB',
             borderRadius: 8,
             fontSize: 12,
-            color: '#e4e4e7',
+            color: '#111111',
           }}
-          labelStyle={{ color: '#71717a' }}
+          labelStyle={{ color: '#9CA3AF' }}
         />
         <Area
           type="monotone"
@@ -82,7 +82,7 @@ export function RevenueChart({
 }) {
   if (!data || data.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-[#71717a]">
+      <div className="flex h-full items-center justify-center text-sm text-[#9CA3AF]">
         No revenue data available
       </div>
     );
@@ -91,28 +91,28 @@ export function RevenueChart({
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#1e1e2e" />
+        <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
         <XAxis
           dataKey="label"
-          tick={{ fill: '#71717a', fontSize: 11 }}
-          axisLine={{ stroke: '#1e1e2e' }}
+          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+          axisLine={{ stroke: '#E5E7EB' }}
           tickLine={false}
         />
         <YAxis
-          tick={{ fill: '#71717a', fontSize: 11 }}
-          axisLine={{ stroke: '#1e1e2e' }}
+          tick={{ fill: '#9CA3AF', fontSize: 11 }}
+          axisLine={{ stroke: '#E5E7EB' }}
           tickLine={false}
           tickFormatter={(v: number) => `$${v >= 1000 ? `${(v / 1000).toFixed(1)}k` : v}`}
         />
         <Tooltip
           contentStyle={{
-            backgroundColor: '#1e1e2e',
-            border: '1px solid #2e2e3e',
+            backgroundColor: '#E5E7EB',
+            border: '1px solid #E5E7EB',
             borderRadius: 8,
             fontSize: 12,
-            color: '#e4e4e7',
+            color: '#111111',
           }}
-          labelStyle={{ color: '#71717a' }}
+          labelStyle={{ color: '#9CA3AF' }}
           formatter={(value: unknown) => [usd(Number(value ?? 0)), 'Revenue']}
         />
         <Bar dataKey="revenue" fill="#3b82f6" radius={[4, 4, 0, 0]} />

@@ -126,17 +126,17 @@ export default function TechnologyPage() {
   let refIndex = 0;
 
   return (
-    <div className="min-h-screen bg-white text-[#1D1D1F]">
+    <div className="min-h-screen bg-white text-[#1d1d1f]">
       {/* ── Header ──────────────────────────────────────────────────── */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#E8E8ED]/60 bg-white/80 backdrop-blur-xl">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#d2d2d7]/60 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-4 lg:px-10">
           <Link href="/" className="text-[17px] tracking-[0.01em]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
+            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-[14px] text-[#6E6E73] transition-colors duration-200 hover:text-[#1D1D1F]"
+            className="flex items-center gap-1.5 text-[14px] text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -150,16 +150,16 @@ export default function TechnologyPage() {
       <section className="pb-20 pt-36 md:pb-28 md:pt-44">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Technology
             </p>
             <h1
-              className="mt-4 font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2.5rem, 5vw, 4rem)' }}
             >
               The infrastructure behind every ride.
             </h1>
-            <p className="mt-6 max-w-[600px] text-[19px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 max-w-[600px] text-[19px] leading-[1.6] text-[#6e6e73]">
               TakeMe Mobility is built on a vertically integrated technology stack purpose-engineered
               for all-electric rideshare. From sub-second dispatch to real-time fraud scoring,
               every layer is designed to move people safely, efficiently, and transparently.
@@ -169,19 +169,19 @@ export default function TechnologyPage() {
       </section>
 
       {/* ── Section 1: Intelligent Dispatch ─────────────────────────── */}
-      <section className="bg-[#F5F5F7] py-24 md:py-32">
+      <section className="bg-[#f5f5f7] py-24 md:py-32">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Real-time Matching
             </p>
             <h2
-              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Sub-5-second driver matching.
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 text-[17px] leading-[1.6] text-[#6e6e73]">
               Every ride request triggers a QStash event-driven dispatch pipeline that evaluates
               all eligible drivers in parallel. Candidates are scored across four weighted
               dimensions — proximity via PostGIS spatial queries, lifetime rating, rolling
@@ -200,8 +200,8 @@ export default function TechnologyPage() {
               { value: '99.7%', label: 'Dispatch success rate' },
             ].map((stat) => (
               <div key={stat.label} className="rounded-2xl bg-white p-6">
-                <p className="text-[32px] font-bold tracking-[-0.02em] text-[#1D1D1F]">{stat.value}</p>
-                <p className="mt-1 text-[15px] text-[#6E6E73]">{stat.label}</p>
+                <p className="text-[32px] font-bold tracking-[-0.02em] text-[#1d1d1f]">{stat.value}</p>
+                <p className="mt-1 text-[15px] text-[#6e6e73]">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -239,11 +239,11 @@ export default function TechnologyPage() {
               },
             ].map((f) => (
               <div key={f.title} className="rounded-2xl bg-white p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {f.icon}
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{f.title}</p>
-                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6E6E73]">{f.desc}</p>
+                <p className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{f.title}</p>
+                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6e6e73]">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -254,16 +254,16 @@ export default function TechnologyPage() {
       <section className="bg-white py-24 md:py-32">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Real-time Location
             </p>
             <h2
-              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Sub-200ms location streaming.
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 text-[17px] leading-[1.6] text-[#6e6e73]">
               Every active driver publishes GPS coordinates at 1Hz over dedicated Ably WebSocket
               channels, including heading and speed vectors. The server authenticates and relays
               each update in under 200 milliseconds. On the rider side, the client subscribes
@@ -303,12 +303,12 @@ export default function TechnologyPage() {
                 desc: 'Automatic arrival notifications triggered when the driver enters a configurable radius around the pickup point.',
               },
             ].map((f) => (
-              <div key={f.title} className="rounded-2xl bg-[#FAFAFA] p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F0F2] text-[#1D1D1F]">
+              <div key={f.title} className="rounded-2xl bg-[#f5f5f7] p-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {f.icon}
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{f.title}</p>
-                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6E6E73]">{f.desc}</p>
+                <p className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{f.title}</p>
+                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6e6e73]">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -316,19 +316,19 @@ export default function TechnologyPage() {
       </section>
 
       {/* ── Section 3: Fraud & Safety AI ────────────────────────────── */}
-      <section className="bg-[#F5F5F7] py-24 md:py-32">
+      <section className="bg-[#f5f5f7] py-24 md:py-32">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Safety Intelligence
             </p>
             <h2
-              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Eight layers of fraud detection.
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 text-[17px] leading-[1.6] text-[#6e6e73]">
               A unified scoring engine evaluates every completed trip across eight independent checks,
               each running in parallel and returning a weighted sub-score. The results are aggregated
               into a single fraud score from 0 to 100. Trips scoring above 70 are flagged for manual
@@ -341,11 +341,11 @@ export default function TechnologyPage() {
           <div ref={setRef(refIndex++)} className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FRAUD_CHECKS.map((check) => (
               <div key={check.name} className="rounded-2xl bg-white p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {check.icon}
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{check.name}</p>
-                <p className="mt-1.5 text-[13px] leading-[1.6] text-[#6E6E73]">{check.desc}</p>
+                <p className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{check.name}</p>
+                <p className="mt-1.5 text-[13px] leading-[1.6] text-[#6e6e73]">{check.desc}</p>
               </div>
             ))}
           </div>
@@ -356,16 +356,16 @@ export default function TechnologyPage() {
       <section className="bg-white py-24 md:py-32">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Electric Fleet
             </p>
             <h2
-              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Built for electric from day one.
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 text-[17px] leading-[1.6] text-[#6e6e73]">
               TakeMe operates a 100% electric fleet. Our vehicle class system is architected around
               EV categories — Economy, Comfort, Premium, and SUV Electric — each with distinct
               performance profiles and range characteristics. The dispatch engine factors in real-time
@@ -405,12 +405,12 @@ export default function TechnologyPage() {
                 desc: 'Direct API integrations with major charging networks surface real-time charger availability to drivers.',
               },
             ].map((f) => (
-              <div key={f.title} className="rounded-2xl bg-[#FAFAFA] p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F0F0F2] text-[#1D1D1F]">
+              <div key={f.title} className="rounded-2xl bg-[#f5f5f7] p-6">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {f.icon}
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{f.title}</p>
-                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6E6E73]">{f.desc}</p>
+                <p className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{f.title}</p>
+                <p className="mt-1.5 text-[14px] leading-[1.6] text-[#6e6e73]">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -418,19 +418,19 @@ export default function TechnologyPage() {
       </section>
 
       {/* ── Section 5: Privacy & Security ───────────────────────────── */}
-      <section className="bg-[#F5F5F7] py-24 md:py-32">
+      <section className="bg-[#f5f5f7] py-24 md:py-32">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div ref={setRef(refIndex++)} className="max-w-[720px]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
               Privacy & Security
             </p>
             <h2
-              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]"
+              className="mt-4 font-bold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Your data stays yours.
             </h2>
-            <p className="mt-6 text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mt-6 text-[17px] leading-[1.6] text-[#6e6e73]">
               Row-level security is enforced on every database table, ensuring users can only access
               their own records. Service-role separation guarantees that no client-side request can
               read another user&apos;s data. Payment processing runs entirely through Stripe for full
@@ -480,11 +480,11 @@ export default function TechnologyPage() {
               },
             ].map((f) => (
               <div key={f.title} className="rounded-2xl bg-white p-6">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {f.icon}
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{f.title}</p>
-                <p className="mt-1.5 text-[13px] leading-[1.6] text-[#6E6E73]">{f.desc}</p>
+                <p className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{f.title}</p>
+                <p className="mt-1.5 text-[13px] leading-[1.6] text-[#6e6e73]">{f.desc}</p>
               </div>
             ))}
           </div>
@@ -496,25 +496,25 @@ export default function TechnologyPage() {
         <div className="mx-auto max-w-[1200px] px-6 text-center lg:px-10">
           <div ref={setRef(refIndex++)}>
             <h2
-              className="font-bold leading-[1.08] tracking-[-0.03em] text-[#1D1D1F]"
+              className="font-bold leading-[1.08] tracking-[-0.03em] text-[#1d1d1f]"
               style={{ fontSize: 'clamp(2rem, 4vw, 3rem)' }}
             >
               Experience the technology.
             </h2>
-            <p className="mx-auto mt-5 max-w-[480px] text-[17px] leading-[1.6] text-[#6E6E73]">
+            <p className="mx-auto mt-5 max-w-[480px] text-[17px] leading-[1.6] text-[#6e6e73]">
               Request your first ride and see the entire stack in action — from dispatch
               to tracking to seamless payment.
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/"
-                className="inline-flex items-center justify-center rounded-[999px] bg-[#1D1D1F] px-8 py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                className="inline-flex items-center justify-center rounded-[999px] bg-[#0071e3] px-8 py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Get started
               </Link>
               <Link
                 href="/safety"
-                className="inline-flex items-center justify-center rounded-[999px] border border-[#E8E8ED] bg-white px-8 py-3.5 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-[#F5F5F7]"
+                className="inline-flex items-center justify-center rounded-[999px] border border-[#d2d2d7] bg-white px-8 py-3.5 text-[15px] font-medium text-[#1d1d1f] transition-colors duration-200 hover:bg-[#f5f5f7]"
               >
                 Learn about safety
               </Link>
@@ -524,15 +524,15 @@ export default function TechnologyPage() {
       </section>
 
       {/* ── Footer ──────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#E8E8ED] bg-white">
+      <footer className="border-t border-[#d2d2d7] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
           <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+              <div className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
                 <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
+                <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
               </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
+              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#86868b]">
                 Premium global transportation.<br />One standard, everywhere.
               </p>
             </div>
@@ -543,18 +543,18 @@ export default function TechnologyPage() {
                 { t: 'Legal', items: [{l:'Privacy',h:'#'},{l:'Terms',h:'#'},{l:'Cookies',h:'#'}] },
               ].map((col) => (
                 <div key={col.t}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">{col.t}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">{col.t}</p>
                   <div className="mt-4 flex flex-col gap-3.5">
                     {col.items.map((item) => (
-                      <Link key={item.l} href={item.h} className="text-[14px] text-[#6E6E73] transition-colors duration-200 hover:text-[#1D1D1F]">{item.l}</Link>
+                      <Link key={item.l} href={item.h} className="text-[14px] text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]">{item.l}</Link>
                     ))}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#E8E8ED] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#A1A1A6]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#d2d2d7] pt-8 md:flex-row md:items-center">
+            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
           </div>
         </div>
       </footer>

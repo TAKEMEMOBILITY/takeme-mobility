@@ -163,8 +163,8 @@ export default function MonitoringPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-white">Mission Control</h1>
-          <p className="mt-1 text-[13px] text-[#71717a]">
+          <h1 className="text-xl font-semibold text-[#1d1d1f]">Mission Control</h1>
+          <p className="mt-1 text-[13px] text-[#86868b]">
             Production monitoring &middot; {lastRefresh ? `Updated ${timeAgo(lastRefresh)}` : 'Loading...'}
           </p>
         </div>
@@ -178,7 +178,7 @@ export default function MonitoringPage() {
           </button>
           <button
             onClick={() => { setLoading(true); fetchAll(); }}
-            className="rounded-lg bg-[#1e1e2e] px-4 py-2 text-[13px] font-medium text-[#a1a1aa] transition-colors hover:text-white"
+            className="rounded-lg bg-[#d2d2d7] px-4 py-2 text-[13px] font-medium text-[#6e6e73] transition-colors hover:text-[#1d1d1f]"
           >
             Refresh
           </button>
@@ -186,7 +186,7 @@ export default function MonitoringPage() {
       </div>
 
       {loading && !monitor ? (
-        <div className="mt-20 text-center text-[#71717a]">Loading monitoring data...</div>
+        <div className="mt-20 text-center text-[#86868b]">Loading monitoring data...</div>
       ) : (
         <div className="mt-6 space-y-6">
 
@@ -194,24 +194,24 @@ export default function MonitoringPage() {
           <div className="grid gap-4 lg:grid-cols-3">
             {/* Customer Impact */}
             <div className={`rounded-xl border p-5 ${impactBg}`}>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Customer Impact</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Customer Impact</p>
               <p className={`mt-2 text-2xl font-bold ${impactColor}`}>
                 {monitor?.status === 'none' || monitor?.status === 'healthy' ? 'None' : monitor?.status === 'degraded' ? 'Degraded' : 'Critical'}
               </p>
-              <p className="mt-1 text-[13px] text-[#71717a]">
+              <p className="mt-1 text-[13px] text-[#86868b]">
                 {monitor?.failures ?? 0} service{(monitor?.failures ?? 0) !== 1 ? 's' : ''} failing
               </p>
             </div>
 
             {/* RCA */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Root Cause Analysis</p>
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Root Cause Analysis</p>
               {monitor?.rca ? (
                 <>
-                  <p className="mt-2 text-[14px] font-medium text-white">{monitor.rca.cause}</p>
+                  <p className="mt-2 text-[14px] font-medium text-[#1d1d1f]">{monitor.rca.cause}</p>
                   <div className="mt-2 flex items-center gap-3">
-                    <span className="text-[13px] text-[#71717a]">
-                      Confidence: <span className="font-medium text-white">{monitor.rca.confidence}%</span>
+                    <span className="text-[13px] text-[#86868b]">
+                      Confidence: <span className="font-medium text-[#1d1d1f]">{monitor.rca.confidence}%</span>
                     </span>
                     {monitor.rca.autofix_available && (
                       <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[11px] font-medium text-emerald-400">
@@ -226,26 +226,26 @@ export default function MonitoringPage() {
             </div>
 
             {/* Deployment Gate */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Deployment Gate</p>
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Deployment Gate</p>
               <p className={`mt-2 text-lg font-bold ${(monitor?.failures ?? 0) === 0 && (policy?.drift_count ?? 0) === 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                 {(monitor?.failures ?? 0) === 0 && (policy?.drift_count ?? 0) === 0 ? 'CLEAR TO DEPLOY' : 'BLOCKED'}
               </p>
-              <p className="mt-1 text-[13px] text-[#71717a]">
+              <p className="mt-1 text-[13px] text-[#86868b]">
                 {policy?.drift_count ?? 0} policy drift{(policy?.drift_count ?? 0) !== 1 ? 's' : ''} &middot; {monitor?.failures ?? 0} failures
               </p>
             </div>
           </div>
 
           {/* ═══ SERVICE HEALTH GRID ═══════════════════════════════════ */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Service Health</p>
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Service Health</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {(monitor?.checks ?? []).map((c) => (
                 <div
                   key={c.service}
                   className={`rounded-lg border p-3.5 ${
-                    c.status === 'ok' ? 'border-[#1e1e2e] bg-[#0a0a0f]'
+                    c.status === 'ok' ? 'border-[#d2d2d7] bg-[#FFFFFF]'
                     : c.status === 'warn' ? 'border-amber-500/30 bg-amber-500/5'
                     : 'border-red-500/30 bg-red-500/5'
                   }`}
@@ -253,15 +253,15 @@ export default function MonitoringPage() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <StatusDot status={c.status} />
-                      <span className="text-[13px] font-medium text-white">{c.service}</span>
+                      <span className="text-[13px] font-medium text-[#1d1d1f]">{c.service}</span>
                     </div>
-                    <span className="text-[12px] tabular-nums text-[#71717a]">{c.latency_ms}ms</span>
+                    <span className="text-[12px] tabular-nums text-[#86868b]">{c.latency_ms}ms</span>
                   </div>
                   {c.error && (
                     <p className="mt-2 truncate text-[12px] text-red-400">{c.error}</p>
                   )}
                   {c.blast_radius && (
-                    <p className="mt-1 text-[11px] text-[#52525b]">{c.blast_radius}</p>
+                    <p className="mt-1 text-[11px] text-[#86868b]">{c.blast_radius}</p>
                   )}
                 </div>
               ))}
@@ -271,17 +271,17 @@ export default function MonitoringPage() {
           {/* ═══ CAPABILITIES + E2E ROW ════════════════════════════════ */}
           <div className="grid gap-4 lg:grid-cols-2">
             {/* Capability Checks */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Capability Checks</p>
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Capability Checks</p>
               <div className="mt-4 space-y-2">
                 {caps ? Object.values(caps.capabilities).map((c) => (
-                  <div key={c.name} className="flex items-center justify-between rounded-lg bg-[#0a0a0f] px-4 py-2.5">
+                  <div key={c.name} className="flex items-center justify-between rounded-lg bg-[#FFFFFF] px-4 py-2.5">
                     <div className="flex items-center gap-2.5">
                       <StatusDot status={c.status} />
-                      <span className="text-[13px] font-medium text-[#e4e4e7]">{c.name}</span>
+                      <span className="text-[13px] font-medium text-[#1d1d1f]">{c.name}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[12px] tabular-nums text-[#71717a]">{c.latency_ms}ms</span>
+                      <span className="text-[12px] tabular-nums text-[#86868b]">{c.latency_ms}ms</span>
                       <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
                         c.status === 'ok' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
                       }`}>
@@ -290,16 +290,16 @@ export default function MonitoringPage() {
                     </div>
                   </div>
                 )) : (
-                  <p className="text-[13px] text-[#71717a]">Loading...</p>
+                  <p className="text-[13px] text-[#86868b]">Loading...</p>
                 )}
               </div>
             </div>
 
             {/* Last E2E Transaction */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Last E2E Transaction</p>
-                {e2e && <span className="text-[12px] text-[#52525b]">{timeAgo(e2e.timestamp)}</span>}
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Last E2E Transaction</p>
+                {e2e && <span className="text-[12px] text-[#86868b]">{timeAgo(e2e.timestamp)}</span>}
               </div>
               {e2e ? (
                 <>
@@ -316,23 +316,23 @@ export default function MonitoringPage() {
                           <span className={s.status === 'pass' ? 'text-emerald-400' : 'text-red-400'}>
                             {s.status === 'pass' ? '✓' : '✗'}
                           </span>
-                          <span className="text-[#a1a1aa]">{s.step}</span>
+                          <span className="text-[#6e6e73]">{s.step}</span>
                         </div>
-                        <span className="tabular-nums text-[#52525b]">{s.duration_ms}ms</span>
+                        <span className="tabular-nums text-[#86868b]">{s.duration_ms}ms</span>
                       </div>
                     ))}
                   </div>
                 </>
               ) : (
-                <p className="mt-3 text-[13px] text-[#71717a]">No E2E data yet</p>
+                <p className="mt-3 text-[13px] text-[#86868b]">No E2E data yet</p>
               )}
             </div>
           </div>
 
           {/* ═══ POLICY DRIFT ══════════════════════════════════════════ */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
             <div className="flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Policy Drift Report</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Policy Drift Report</p>
               {policy && (
                 <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
                   policy.status === 'compliant' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'
@@ -348,8 +348,8 @@ export default function MonitoringPage() {
                     <div key={i} className="flex items-start gap-3 rounded-lg bg-red-500/5 px-4 py-2.5 text-[13px]">
                       <span className="mt-0.5 text-red-400">⚠</span>
                       <div className="min-w-0 flex-1">
-                        <span className="font-medium text-white">{c.policy}</span>
-                        <p className="mt-0.5 text-[12px] text-[#71717a]">
+                        <span className="font-medium text-[#1d1d1f]">{c.policy}</span>
+                        <p className="mt-0.5 text-[12px] text-[#86868b]">
                           Expected: {c.expected} &middot; Actual: <span className="text-red-400">{c.actual}</span>
                         </p>
                       </div>
@@ -360,18 +360,18 @@ export default function MonitoringPage() {
                 )}
               </div>
             ) : (
-              <p className="mt-3 text-[13px] text-[#71717a]">Loading...</p>
+              <p className="mt-3 text-[13px] text-[#86868b]">Loading...</p>
             )}
           </div>
 
           {/* ═══ LIVE LOG STREAM ═══════════════════════════════════════ */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">Live Log Stream</p>
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">Live Log Stream</p>
             <div className="mt-4 max-h-80 overflow-y-auto">
               {logs.length > 0 ? (
                 <table className="w-full text-left text-[13px]">
                   <thead>
-                    <tr className="border-b border-[#1e1e2e] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#52525b]">
+                    <tr className="border-b border-[#d2d2d7] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
                       <th className="pb-2 pr-4">Time</th>
                       <th className="pb-2 pr-4">Service</th>
                       <th className="pb-2 pr-4">Status</th>
@@ -379,13 +379,13 @@ export default function MonitoringPage() {
                       <th className="pb-2">Error</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#1e1e2e]/50">
+                  <tbody className="divide-y divide-[#d2d2d7]/50">
                     {logs.map((log) => (
-                      <tr key={log.id} className="text-[#a1a1aa]">
-                        <td className="py-1.5 pr-4 tabular-nums text-[12px] text-[#52525b]">
+                      <tr key={log.id} className="text-[#6e6e73]">
+                        <td className="py-1.5 pr-4 tabular-nums text-[12px] text-[#86868b]">
                           {new Date(log.created_at).toLocaleTimeString()}
                         </td>
-                        <td className="py-1.5 pr-4 font-medium text-white">{log.service}</td>
+                        <td className="py-1.5 pr-4 font-medium text-[#1d1d1f]">{log.service}</td>
                         <td className="py-1.5 pr-4">
                           <StatusDot status={log.status} />
                         </td>
@@ -396,7 +396,7 @@ export default function MonitoringPage() {
                   </tbody>
                 </table>
               ) : (
-                <p className="text-[13px] text-[#71717a]">No log entries yet</p>
+                <p className="text-[13px] text-[#86868b]">No log entries yet</p>
               )}
             </div>
           </div>
@@ -409,7 +409,7 @@ export default function MonitoringPage() {
                 {monitor.checks.filter((c) => c.blast_radius).map((c) => (
                   <div key={c.service} className="flex items-start gap-3 text-[13px]">
                     <span className="mt-0.5 font-medium text-red-400">{c.service}</span>
-                    <span className="text-[#a1a1aa]">{c.blast_radius}</span>
+                    <span className="text-[#6e6e73]">{c.blast_radius}</span>
                   </div>
                 ))}
               </div>

@@ -219,14 +219,14 @@ export default function SafetyPage() {
         scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
       }`}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1D1D1F]">
+          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
+            <span className="ml-[5px] font-light text-[#86868b]">Mobility</span>
           </Link>
 
           <Link
             href="/"
-            className="flex items-center gap-2 text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]"
+            className="flex items-center gap-2 text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
@@ -239,44 +239,44 @@ export default function SafetyPage() {
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="bg-white pt-32 pb-20 md:pt-40 md:pb-28">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Safety
           </p>
-          <h1 className="mt-5 max-w-[820px] text-[clamp(2.5rem,5.5vw,4rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F]">
+          <h1 className="mt-5 max-w-[820px] text-[clamp(2.5rem,5.5vw,4rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
             Safety is not a feature.{' '}
             <br className="hidden md:block" />
             It&apos;s the foundation.
           </h1>
-          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-[#6e6e73]">
             TakeMe was built safety-first. Every technical decision — from the dispatch algorithm to the payment architecture — is designed to protect riders, drivers, and communities. There are no bolt-on safety features here. Protection is structural, continuous, and transparent.
           </p>
         </div>
       </section>
 
       {/* ═══ FRAUD DETECTION ══════════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={fraudSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(fraudSection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Fraud Intelligence
           </p>
-          <h2 className="mt-4 max-w-[640px] text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 max-w-[640px] text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Eight automated checks. Every single trip.
           </h2>
-          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6e6e73]">
             A unified scoring engine runs 8 weighted checks in parallel the moment a trip completes. Scores above 70 flag for manual review. Above 90 trigger automatic cancellation and device ban.
           </p>
 
           <div className="mt-16 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-5">
             {FRAUD_CHECKS.map((check) => (
               <div key={check.name} className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {check.icon}
                 </div>
-                <h3 className="mt-4 text-[15px] font-semibold text-[#1D1D1F]">{check.name}</h3>
-                <p className="mt-2 text-[14px] leading-[1.6] text-[#6E6E73]">{check.description}</p>
+                <h3 className="mt-4 text-[15px] font-semibold text-[#1d1d1f]">{check.name}</h3>
+                <p className="mt-2 text-[14px] leading-[1.6] text-[#6e6e73]">{check.description}</p>
               </div>
             ))}
           </div>
@@ -289,13 +289,13 @@ export default function SafetyPage() {
           ref={driverSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(driverSection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Driver Standards
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Every driver, verified.
           </h2>
-          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Multi-step verification before any driver can accept a ride. Background checks, document verification via AWS Rekognition and Claude AI review, vehicle inspection, and insurance verification. Ongoing monitoring — not just at signup.
           </p>
 
@@ -304,17 +304,17 @@ export default function SafetyPage() {
               <div key={item.step} className="relative flex gap-6">
                 {/* Timeline line */}
                 <div className="flex flex-col items-center">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1D1D1F] text-[13px] font-bold tabular-nums text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-[13px] font-bold tabular-nums text-white">
                     {item.step}
                   </div>
                   {i < VERIFICATION_STEPS.length - 1 && (
-                    <div className="w-[1px] flex-1 bg-[#E8E8ED]" />
+                    <div className="w-[1px] flex-1 bg-[#d2d2d7]" />
                   )}
                 </div>
                 {/* Content */}
                 <div className={`pb-12 ${i === VERIFICATION_STEPS.length - 1 ? 'pb-0' : ''}`}>
-                  <h3 className="mt-2 text-[17px] font-semibold text-[#1D1D1F]">{item.title}</h3>
-                  <p className="mt-2 text-[15px] leading-[1.7] text-[#6E6E73]">{item.description}</p>
+                  <h3 className="mt-2 text-[17px] font-semibold text-[#1d1d1f]">{item.title}</h3>
+                  <p className="mt-2 text-[15px] leading-[1.7] text-[#6e6e73]">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -323,29 +323,29 @@ export default function SafetyPage() {
       </section>
 
       {/* ═══ RIDE MONITORING ══════════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={monitorSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(monitorSection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Ride Monitoring
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Every ride, watched.
           </h2>
-          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6e6e73]">
             From the moment a ride is requested to the moment it completes, TakeMe&apos;s systems are monitoring. Location streaming, route adherence, speed analysis, trip duration validation, and automatic anomaly detection.
           </p>
 
           <div className="mt-14 grid gap-5 md:grid-cols-3">
             {MONITORING_FEATURES.map((feature) => (
               <div key={feature.title} className="rounded-2xl bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {feature.icon}
                 </div>
-                <h3 className="mt-5 text-[17px] font-semibold text-[#1D1D1F]">{feature.title}</h3>
-                <p className="mt-2 text-[15px] leading-[1.7] text-[#6E6E73]">{feature.description}</p>
+                <h3 className="mt-5 text-[17px] font-semibold text-[#1d1d1f]">{feature.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.7] text-[#6e6e73]">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -358,21 +358,21 @@ export default function SafetyPage() {
           ref={emergencySection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(emergencySection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Emergency Response
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Help is always one tap away.
           </h2>
 
           <div className="mt-14 grid gap-5 md:grid-cols-3">
             {EMERGENCY_FEATURES.map((feature) => (
-              <div key={feature.title} className="rounded-2xl bg-[#FAFAFA] p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#1D1D1F] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
+              <div key={feature.title} className="rounded-2xl bg-[#f5f5f7] p-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[#1d1d1f] shadow-[0_1px_3px_rgba(0,0,0,0.06)]">
                   {feature.icon}
                 </div>
-                <h3 className="mt-5 text-[17px] font-semibold text-[#1D1D1F]">{feature.title}</h3>
-                <p className="mt-2 text-[15px] leading-[1.7] text-[#6E6E73]">{feature.description}</p>
+                <h3 className="mt-5 text-[17px] font-semibold text-[#1d1d1f]">{feature.title}</h3>
+                <p className="mt-2 text-[15px] leading-[1.7] text-[#6e6e73]">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -380,36 +380,36 @@ export default function SafetyPage() {
       </section>
 
       {/* ═══ INSURANCE & COVERAGE ═════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={insuranceSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(insuranceSection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Protection
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Covered from pickup to dropoff.
           </h2>
-          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Every TakeMe ride is backed by comprehensive insurance coverage. Commercial auto liability, uninsured motorist protection, and personal injury coverage — active for the entire duration of the trip.
           </p>
 
           <div className="mt-14 rounded-2xl bg-white p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04)] md:p-10">
             <div className="flex flex-col gap-8 md:flex-row md:items-center md:gap-16">
               <div>
-                <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#1D1D1F]">$1M</p>
-                <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">Per-incident commercial auto liability</p>
+                <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#1d1d1f]">$1M</p>
+                <p className="mt-1 text-[15px] leading-[1.6] text-[#6e6e73]">Per-incident commercial auto liability</p>
               </div>
-              <div className="hidden h-16 w-[1px] bg-[#E8E8ED] md:block" />
+              <div className="hidden h-16 w-[1px] bg-[#d2d2d7] md:block" />
               <div>
-                <p className="text-[17px] font-semibold text-[#1D1D1F]">Uninsured motorist protection</p>
-                <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">Coverage against underinsured and uninsured third parties, active from ride acceptance to trip completion.</p>
+                <p className="text-[17px] font-semibold text-[#1d1d1f]">Uninsured motorist protection</p>
+                <p className="mt-1 text-[15px] leading-[1.6] text-[#6e6e73]">Coverage against underinsured and uninsured third parties, active from ride acceptance to trip completion.</p>
               </div>
-              <div className="hidden h-16 w-[1px] bg-[#E8E8ED] md:block" />
+              <div className="hidden h-16 w-[1px] bg-[#d2d2d7] md:block" />
               <div>
-                <p className="text-[17px] font-semibold text-[#1D1D1F]">Personal injury coverage</p>
-                <p className="mt-1 text-[15px] leading-[1.6] text-[#6E6E73]">Medical expense coverage for riders and drivers in the event of an accident during an active trip.</p>
+                <p className="text-[17px] font-semibold text-[#1d1d1f]">Personal injury coverage</p>
+                <p className="mt-1 text-[15px] leading-[1.6] text-[#6e6e73]">Medical expense coverage for riders and drivers in the event of an accident during an active trip.</p>
               </div>
             </div>
           </div>
@@ -422,53 +422,53 @@ export default function SafetyPage() {
           ref={emissionsSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(emissionsSection.visible)}`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Environmental Safety
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             The safest mile is a clean mile.
           </h2>
-          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[620px] text-[17px] leading-[1.6] text-[#6e6e73]">
             TakeMe&apos;s 100% electric fleet eliminates tailpipe emissions. That means zero NOx, zero particulate matter, zero carbon monoxide in the neighborhoods where rides happen. Cleaner air is a public health outcome, and every ride contributes to it.
           </p>
 
           <div className="mt-14 grid grid-cols-3 gap-5">
-            <div className="rounded-2xl bg-[#FAFAFA] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#34C759]">0g</p>
-              <p className="mt-2 text-[14px] font-medium text-[#6E6E73]">CO2 per mile</p>
+            <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">0g</p>
+              <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">CO2 per mile</p>
             </div>
-            <div className="rounded-2xl bg-[#FAFAFA] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#34C759]">100%</p>
-              <p className="mt-2 text-[14px] font-medium text-[#6E6E73]">Electric fleet</p>
+            <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">100%</p>
+              <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">Electric fleet</p>
             </div>
-            <div className="rounded-2xl bg-[#FAFAFA] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#34C759]">Zero</p>
-              <p className="mt-2 text-[14px] font-medium text-[#6E6E73]">Tailpipe emissions</p>
+            <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">Zero</p>
+              <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">Tailpipe emissions</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* ═══ CTA ══════════════════════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={ctaSection.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 ${revealClass(ctaSection.visible)}`}
         >
           <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
+            <h2 className="text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]">
               Your safety is our standard.
             </h2>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/auth/signup"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Get started
               </Link>
               <Link
                 href="/technology"
-                className="inline-flex h-[52px] items-center rounded-[999px] border border-[#D2D2D7] px-8 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-white"
+                className="inline-flex h-[52px] items-center rounded-[999px] border border-[#d2d2d7] px-8 text-[15px] font-medium text-[#1d1d1f] transition-colors duration-200 hover:bg-white"
               >
                 Explore the technology
               </Link>
@@ -478,15 +478,15 @@ export default function SafetyPage() {
       </section>
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-[#E8E8ED] bg-white">
+      <footer className="border-t border-[#d2d2d7] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
           <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+              <div className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
                 <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
+                <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
               </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
+              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#86868b]">
                 Premium global transportation.<br />One standard, everywhere.
               </p>
             </div>
@@ -513,10 +513,10 @@ export default function SafetyPage() {
                 ]},
               ].map((col) => (
                 <div key={col.t}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">{col.t}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">{col.t}</p>
                   <div className="mt-4 flex flex-col gap-3.5">
                     {col.items.map((item) => (
-                      <Link key={item.label} href={item.href} className="text-[14px] text-[#6E6E73] transition-colors duration-200 hover:text-[#1D1D1F]">
+                      <Link key={item.label} href={item.href} className="text-[14px] text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]">
                         {item.label}
                       </Link>
                     ))}
@@ -525,11 +525,11 @@ export default function SafetyPage() {
               ))}
             </div>
           </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#E8E8ED] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#A1A1A6]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#d2d2d7] pt-8 md:flex-row md:items-center">
+            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
             <div className="flex gap-7">
               {['Twitter', 'LinkedIn', 'Instagram'].map((s) => (
-                <span key={s} className="cursor-pointer text-[13px] text-[#A1A1A6] transition-colors duration-200 hover:text-[#6E6E73]">{s}</span>
+                <span key={s} className="cursor-pointer text-[13px] text-[#86868b] transition-colors duration-200 hover:text-[#6e6e73]">{s}</span>
               ))}
             </div>
           </div>

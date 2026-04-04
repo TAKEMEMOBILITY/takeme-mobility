@@ -15,17 +15,17 @@ export default function ExecLayout({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-[#e4e4e7]">
+    <div className="min-h-screen bg-[#FFFFFF] text-[#111111]">
       {user && <Watermark userEmail={user.email} role={user.role} />}
-      <nav className="border-b border-[#1e1e2e] bg-[#0f0f17]">
+      <nav className="border-b border-[#E5E7EB] bg-[#FAFAFA]">
         <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between px-6">
           <div className="flex items-center gap-6">
-            <Link href="/exec/dashboard" className="text-[15px] font-semibold text-white">
-              TakeMe <span className="font-light text-[#71717a]">Executive</span>
+            <Link href="/exec/dashboard" className="text-[15px] font-semibold text-[#111111]">
+              TakeMe <span className="font-light text-[#9CA3AF]">Executive</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-[13px] text-[#71717a] hover:text-white transition-colors">
+            <Link href="/admin" className="text-[13px] text-[#9CA3AF] hover:text-[#111111] transition-colors">
               Admin &rarr;
             </Link>
             {user && (

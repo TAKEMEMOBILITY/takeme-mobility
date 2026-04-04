@@ -145,18 +145,18 @@ export default function UserProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-sm mb-4">{error}</p>
-          <Link href="/admin" className="text-xs text-emerald-400 hover:text-emerald-300">
+          <Link href="/admin" className="text-xs text-[#0071e3] hover:text-[#005bb5]">
             Back to dashboard
           </Link>
         </div>
@@ -169,13 +169,13 @@ export default function UserProfilePage() {
   const { user, rides, fraudEvents } = data;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8">
       <div className="mx-auto max-w-[1200px]">
         {/* Breadcrumb */}
-        <div className="mb-6 flex items-center gap-2 text-xs text-[#71717a]">
-          <Link href="/admin" className="hover:text-[#a1a1aa] transition-colors">Dashboard</Link>
+        <div className="mb-6 flex items-center gap-2 text-xs text-[#86868b]">
+          <Link href="/admin" className="hover:text-[#6e6e73] transition-colors">Dashboard</Link>
           <span>/</span>
-          <span className="text-[#e4e4e7]">User: {user.full_name || user.email}</span>
+          <span className="text-[#1d1d1f]">User: {user.full_name || user.email}</span>
         </div>
 
         {/* Header */}
@@ -185,9 +185,9 @@ export default function UserProfilePage() {
               {(user.full_name || user.email)?.[0]?.toUpperCase() ?? '?'}
             </div>
             <div>
-              <h1 className="text-xl font-bold text-[#e4e4e7]">{user.full_name || 'Unknown'}</h1>
-              <p className="text-sm text-[#71717a]">{user.email}</p>
-              {user.phone && <p className="text-sm text-[#71717a]">{user.phone}</p>}
+              <h1 className="text-xl font-bold text-[#1d1d1f]">{user.full_name || 'Unknown'}</h1>
+              <p className="text-sm text-[#86868b]">{user.email}</p>
+              {user.phone && <p className="text-sm text-[#86868b]">{user.phone}</p>}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -232,39 +232,39 @@ export default function UserProfilePage() {
         </div>
 
         {/* Ride History */}
-        <div className="mb-8 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
-          <div className="border-b border-[#1e1e2e] px-5 py-4">
-            <h3 className="text-sm font-semibold text-[#e4e4e7]">Ride History ({rides.length})</h3>
+        <div className="mb-8 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] overflow-hidden">
+          <div className="border-b border-[#d2d2d7] px-5 py-4">
+            <h3 className="text-sm font-semibold text-[#1d1d1f]">Ride History ({rides.length})</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1e1e2e]">
+                <tr className="border-b border-[#d2d2d7]">
                   {['Status', 'Pickup', 'Dropoff', 'Class', 'Fare', 'Distance', 'Duration', 'When'].map(h => (
-                    <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">{h}</th>
+                    <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{h}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {rides.map(r => (
-                  <tr key={r.id} className="border-b border-[#1e1e2e]/50 transition-colors hover:bg-[#1e1e2e]/30">
+                  <tr key={r.id} className="border-b border-[#d2d2d7]/50 transition-colors hover:bg-[#d2d2d7]/30">
                     <td className="px-4 py-3">
-                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_COLORS[r.status] ?? 'text-[#71717a] bg-[#71717a]/10'}`}>
+                      <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${STATUS_COLORS[r.status] ?? 'text-[#86868b] bg-[#86868b]/10'}`}>
                         {r.status.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">{r.pickup_address}</td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">{r.dropoff_address}</td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa] capitalize">{r.vehicle_class}</td>
-                    <td className="px-4 py-3 text-xs font-medium text-[#e4e4e7]">{usd(Number(r.final_fare ?? r.estimated_fare))}</td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa]">{r.distance_km ? `${Number(r.distance_km).toFixed(1)} km` : '-'}</td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa]">{r.duration_min ? `${Math.round(Number(r.duration_min))} min` : '-'}</td>
-                    <td className="px-4 py-3 text-xs text-[#71717a]">{ago(r.requested_at)}</td>
+                    <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[140px] truncate">{r.pickup_address}</td>
+                    <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[140px] truncate">{r.dropoff_address}</td>
+                    <td className="px-4 py-3 text-xs text-[#6e6e73] capitalize">{r.vehicle_class}</td>
+                    <td className="px-4 py-3 text-xs font-medium text-[#1d1d1f]">{usd(Number(r.final_fare ?? r.estimated_fare))}</td>
+                    <td className="px-4 py-3 text-xs text-[#6e6e73]">{r.distance_km ? `${Number(r.distance_km).toFixed(1)} km` : '-'}</td>
+                    <td className="px-4 py-3 text-xs text-[#6e6e73]">{r.duration_min ? `${Math.round(Number(r.duration_min))} min` : '-'}</td>
+                    <td className="px-4 py-3 text-xs text-[#86868b]">{ago(r.requested_at)}</td>
                   </tr>
                 ))}
                 {rides.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-sm text-[#71717a]">No rides found</td>
+                    <td colSpan={8} className="px-4 py-10 text-center text-sm text-[#86868b]">No rides found</td>
                   </tr>
                 )}
               </tbody>
@@ -274,33 +274,33 @@ export default function UserProfilePage() {
 
         {/* Fraud Events */}
         {fraudEvents.length > 0 && (
-          <div className="mb-8 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
-            <div className="border-b border-[#1e1e2e] px-5 py-4">
-              <h3 className="text-sm font-semibold text-[#e4e4e7]">Fraud Events ({fraudEvents.length})</h3>
+          <div className="mb-8 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] overflow-hidden">
+            <div className="border-b border-[#d2d2d7] px-5 py-4">
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Fraud Events ({fraudEvents.length})</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#1e1e2e]">
+                  <tr className="border-b border-[#d2d2d7]">
                     {['Type', 'Severity', 'Score', 'Action', 'When', 'Details'].map(h => (
-                      <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">{h}</th>
+                      <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{h}</th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {fraudEvents.map(ev => (
-                    <tr key={ev.id} className="border-b border-[#1e1e2e]/50 transition-colors hover:bg-[#1e1e2e]/30">
-                      <td className="px-4 py-3 text-xs text-[#e4e4e7] font-medium">{ev.event_type.replace(/_/g, ' ')}</td>
+                    <tr key={ev.id} className="border-b border-[#d2d2d7]/50 transition-colors hover:bg-[#d2d2d7]/30">
+                      <td className="px-4 py-3 text-xs text-[#1d1d1f] font-medium">{ev.event_type.replace(/_/g, ' ')}</td>
                       <td className="px-4 py-3">
-                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${SEVERITY_COLORS[ev.severity] ?? 'text-[#71717a] bg-[#71717a]/10'}`}>
+                        <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${SEVERITY_COLORS[ev.severity] ?? 'text-[#86868b] bg-[#86868b]/10'}`}>
                           {ev.severity}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#a1a1aa]">{ev.fraud_score}</td>
-                      <td className="px-4 py-3 text-xs text-[#a1a1aa]">{ev.action_taken.replace(/_/g, ' ')}</td>
-                      <td className="px-4 py-3 text-xs text-[#71717a]">{fmtDate(ev.created_at)}</td>
-                      <td className="px-4 py-3 text-xs text-[#71717a] max-w-[200px]">
-                        <pre className="whitespace-pre-wrap break-all text-[10px] text-[#52525b]">
+                      <td className="px-4 py-3 text-xs text-[#6e6e73]">{ev.fraud_score}</td>
+                      <td className="px-4 py-3 text-xs text-[#6e6e73]">{ev.action_taken.replace(/_/g, ' ')}</td>
+                      <td className="px-4 py-3 text-xs text-[#86868b]">{fmtDate(ev.created_at)}</td>
+                      <td className="px-4 py-3 text-xs text-[#86868b] max-w-[200px]">
+                        <pre className="whitespace-pre-wrap break-all text-[10px] text-[#86868b]">
                           {JSON.stringify(ev.details, null, 2)}
                         </pre>
                       </td>
@@ -314,27 +314,27 @@ export default function UserProfilePage() {
 
         {/* Add Note Modal */}
         {showNoteModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-            <div className="w-full max-w-md rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-6 shadow-2xl">
-              <h3 className="mb-4 text-sm font-semibold text-[#e4e4e7]">Add Note for {user.full_name || user.email}</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+            <div className="w-full max-w-md rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-6 shadow-2xl">
+              <h3 className="mb-4 text-sm font-semibold text-[#1d1d1f]">Add Note for {user.full_name || user.email}</h3>
               <textarea
                 value={noteText}
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Enter note..."
                 rows={4}
-                className="mb-4 w-full rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-4 py-3 text-sm text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                className="mb-4 w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
               />
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => { setShowNoteModal(false); setNoteText(''); }}
-                  className="rounded-lg border border-[#1e1e2e] px-4 py-2 text-xs font-medium text-[#71717a] hover:text-[#a1a1aa] transition-colors"
+                  className="rounded-lg border border-[#d2d2d7] px-4 py-2 text-xs font-medium text-[#86868b] hover:text-[#6e6e73] transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAddNote}
                   disabled={!noteText.trim()}
-                  className="rounded-lg bg-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-400 hover:bg-emerald-500/30 transition-colors disabled:opacity-50"
+                  className="rounded-lg bg-emerald-500/20 px-4 py-2 text-xs font-semibold text-emerald-400 hover:bg-[#005bb5]/30 transition-colors disabled:opacity-50"
                 >
                   Save Note
                 </button>
@@ -349,9 +349,9 @@ export default function UserProfilePage() {
 
 function InfoCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">{label}</p>
-      <p className="mt-2 text-sm font-medium text-[#e4e4e7]">{value}</p>
+    <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{label}</p>
+      <p className="mt-2 text-sm font-medium text-[#1d1d1f]">{value}</p>
     </div>
   );
 }

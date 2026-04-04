@@ -35,7 +35,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[14px] font-semibold text-[#D42B2B]">TAKEME CONNECT</p>
+          <p className="text-[14px] font-semibold text-[#0071e3]">TAKEME CONNECT</p>
           <p className="text-[12px] text-[#86868B]">Unlimited data & calls · $29.90/mo</p>
         </div>
         <svg className="h-4 w-4 shrink-0 text-[#C7C7CC]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
@@ -102,7 +102,7 @@ export default function ConnectCard({ compact = false }: { compact?: boolean }) 
         <button
           onClick={handleActivate}
           disabled={activating}
-          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#D42B2B] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
+          className="flex w-full items-center justify-center rounded-xl bg-white py-3.5 text-[15px] font-semibold text-[#0071e3] transition-colors duration-200 hover:bg-white/90 active:scale-[0.98] disabled:opacity-50"
         >
           {activating ? 'Activating...' : 'Protect your earnings'}
         </button>

@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 
 const RevenueBarChart = dynamic(
   () => import('./_charts').then(m => m.RevenueBarChart),
-  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-[13px] text-[#71717a]">Loading chart...</div> },
+  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-[13px] text-[#86868b]">Loading chart...</div> },
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -40,7 +40,7 @@ const ago = (iso: string) => {
 };
 
 function GrowthBadge({ value }: { value: number }) {
-  const color = value > 0 ? 'text-emerald-400 bg-emerald-500/10' : value < 0 ? 'text-red-400 bg-red-500/10' : 'text-[#71717a] bg-[#1e1e2e]';
+  const color = value > 0 ? 'text-emerald-400 bg-emerald-500/10' : value < 0 ? 'text-red-400 bg-red-500/10' : 'text-[#86868b] bg-[#d2d2d7]';
   return <span className={`ml-2 rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${color}`}>{pct(value)}</span>;
 }
 
@@ -68,7 +68,7 @@ export default function ExecDashboard() {
 
   if (loading) return (
     <div className="flex min-h-[80vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
     </div>
   );
   if (error) return (
@@ -85,8 +85,8 @@ export default function ExecDashboard() {
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Executive Dashboard</h1>
-          <p className="mt-1 text-[13px] text-[#71717a]">
+          <h1 className="text-2xl font-bold text-[#1d1d1f]">Executive Dashboard</h1>
+          <p className="mt-1 text-[13px] text-[#86868b]">
             Updated {data.timestamp ? ago(data.timestamp) : '...'} · Auto-refresh 15s
           </p>
         </div>
@@ -108,11 +108,11 @@ export default function ExecDashboard() {
       </div>
 
       {/* ═══ SECTION 2 — Revenue Chart ════════════════════════════════ */}
-      <div className="mb-8 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-6">
+      <div className="mb-8 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-6">
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <h2 className="text-[15px] font-semibold text-white">Revenue (30 Days)</h2>
-            <p className="mt-1 text-[12px] text-[#52525b]">
+            <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Revenue (30 Days)</h2>
+            <p className="mt-1 text-[12px] text-[#86868b]">
               WoW growth: <GrowthBadge value={growth.revenueGrowthWoW} />
             </p>
           </div>
@@ -125,22 +125,22 @@ export default function ExecDashboard() {
       {/* ═══ SECTION 3 — Growth + Section 5 — Cities ═════════════════ */}
       <div className="mb-8 grid gap-6 lg:grid-cols-2">
         {/* Growth Metrics */}
-        <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-6">
-          <h2 className="text-[15px] font-semibold text-white">Growth Metrics</h2>
+        <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-6">
+          <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Growth Metrics</h2>
           <div className="mt-6 space-y-4">
             <GrowthRow label="Ride Growth (WoW)" value={growth.rideGrowthWoW} detail={`${growth.ridesThisWeek} this week vs ${growth.ridesPrevWeek} last week`} />
             <GrowthRow label="Revenue Growth (WoW)" value={growth.revenueGrowthWoW} detail="Captured payments comparison" />
-            <div className="flex items-center justify-between border-t border-[#1e1e2e] pt-4">
-              <span className="text-[13px] text-[#a1a1aa]">Total Riders</span>
-              <span className="text-[15px] font-bold text-white">{growth.totalRiders.toLocaleString()}</span>
+            <div className="flex items-center justify-between border-t border-[#d2d2d7] pt-4">
+              <span className="text-[13px] text-[#6e6e73]">Total Riders</span>
+              <span className="text-[15px] font-bold text-[#1d1d1f]">{growth.totalRiders.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[13px] text-[#a1a1aa]">Total Drivers</span>
-              <span className="text-[15px] font-bold text-white">{growth.totalDrivers.toLocaleString()}</span>
+              <span className="text-[13px] text-[#6e6e73]">Total Drivers</span>
+              <span className="text-[15px] font-bold text-[#1d1d1f]">{growth.totalDrivers.toLocaleString()}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[13px] text-[#a1a1aa]">Cities Active / Planned</span>
-              <span className="text-[15px] font-bold text-white">
+              <span className="text-[13px] text-[#6e6e73]">Cities Active / Planned</span>
+              <span className="text-[15px] font-bold text-[#1d1d1f]">
                 {cities.filter(c => c.status === 'live').length} / {cities.length}
               </span>
             </div>
@@ -148,21 +148,21 @@ export default function ExecDashboard() {
         </div>
 
         {/* City Expansion */}
-        <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-6">
-          <h2 className="text-[15px] font-semibold text-white">City Expansion</h2>
+        <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-6">
+          <h2 className="text-[15px] font-semibold text-[#1d1d1f]">City Expansion</h2>
           <div className="mt-6 space-y-3">
             {cities.map(city => (
-              <div key={city.name} className="flex items-center justify-between rounded-lg bg-[#0a0a0f] px-4 py-3">
+              <div key={city.name} className="flex items-center justify-between rounded-lg bg-[#FFFFFF] px-4 py-3">
                 <div className="flex items-center gap-3">
-                  <span className={`h-2.5 w-2.5 rounded-full ${city.status === 'live' ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`} />
-                  <span className="text-[13px] font-medium text-white">{city.name}</span>
+                  <span className={`h-2.5 w-2.5 rounded-full ${city.status === 'live' ? 'bg-emerald-400' : 'bg-[#86868b]'}`} />
+                  <span className="text-[13px] font-medium text-[#1d1d1f]">{city.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
                   {city.status === 'live' && city.rides > 0 && (
-                    <span className="text-[12px] tabular-nums text-[#71717a]">{city.rides.toLocaleString()} rides</span>
+                    <span className="text-[12px] tabular-nums text-[#86868b]">{city.rides.toLocaleString()} rides</span>
                   )}
                   <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
-                    city.status === 'live' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[#1e1e2e] text-[#52525b]'
+                    city.status === 'live' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-[#d2d2d7] text-[#86868b]'
                   }`}>
                     {city.status === 'live' ? 'LIVE' : 'SOON'}
                   </span>
@@ -176,60 +176,60 @@ export default function ExecDashboard() {
       {/* ═══ SECTION 4 — Live Activity Feed ═══════════════════════════ */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Completed Rides */}
-        <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-          <h3 className="text-[13px] font-semibold text-white">Recent Rides</h3>
+        <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+          <h3 className="text-[13px] font-semibold text-[#1d1d1f]">Recent Rides</h3>
           <div className="mt-4 space-y-2">
             {feed.completedRides.length > 0 ? feed.completedRides.map(r => (
               <div key={r.id} className="flex items-center justify-between text-[13px]">
                 <div className="flex items-center gap-2">
                   <span className="text-emerald-400">✓</span>
-                  <span className="text-[#a1a1aa]">{r.city}</span>
+                  <span className="text-[#6e6e73]">{r.city}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="font-medium text-white tabular-nums">{usd(r.amount)}</span>
-                  <span className="text-[11px] text-[#52525b]">{ago(r.time)}</span>
+                  <span className="font-medium text-[#1d1d1f] tabular-nums">{usd(r.amount)}</span>
+                  <span className="text-[11px] text-[#86868b]">{ago(r.time)}</span>
                 </div>
               </div>
-            )) : <p className="text-[13px] text-[#52525b]">No completed rides yet</p>}
+            )) : <p className="text-[13px] text-[#86868b]">No completed rides yet</p>}
           </div>
         </div>
 
         {/* Driver Signups */}
-        <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-          <h3 className="text-[13px] font-semibold text-white">Driver Signups</h3>
+        <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+          <h3 className="text-[13px] font-semibold text-[#1d1d1f]">Driver Signups</h3>
           <div className="mt-4 space-y-2">
             {feed.driverSignups.length > 0 ? feed.driverSignups.map(d => (
               <div key={d.id} className="flex items-center justify-between text-[13px]">
                 <div className="flex items-center gap-2">
                   <span className="text-blue-400">+</span>
-                  <span className="text-[#a1a1aa]">{d.name}</span>
+                  <span className="text-[#6e6e73]">{d.name}</span>
                 </div>
-                <span className="text-[11px] text-[#52525b]">{ago(d.time)}</span>
+                <span className="text-[11px] text-[#86868b]">{ago(d.time)}</span>
               </div>
-            )) : <p className="text-[13px] text-[#52525b]">No recent signups</p>}
+            )) : <p className="text-[13px] text-[#86868b]">No recent signups</p>}
           </div>
         </div>
 
         {/* Fraud Flags */}
-        <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-          <h3 className="text-[13px] font-semibold text-white">Fraud Flags</h3>
+        <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+          <h3 className="text-[13px] font-semibold text-[#1d1d1f]">Fraud Flags</h3>
           <div className="mt-4 space-y-2">
             {feed.fraudFlags.length > 0 ? feed.fraudFlags.map(f => (
               <div key={f.id} className="flex items-center justify-between text-[13px]">
                 <div className="flex items-center gap-2">
                   <span className={f.severity === 'critical' ? 'text-red-400' : 'text-amber-400'}>⚠</span>
-                  <span className="text-[#a1a1aa]">{f.type.replace(/_/g, ' ')}</span>
+                  <span className="text-[#6e6e73]">{f.type.replace(/_/g, ' ')}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
                     f.severity === 'critical' ? 'bg-red-500/10 text-red-400'
                     : f.severity === 'high' ? 'bg-amber-500/10 text-amber-400'
-                    : 'bg-[#1e1e2e] text-[#52525b]'
+                    : 'bg-[#d2d2d7] text-[#86868b]'
                   }`}>{f.severity}</span>
-                  <span className="text-[11px] text-[#52525b]">{ago(f.time)}</span>
+                  <span className="text-[11px] text-[#86868b]">{ago(f.time)}</span>
                 </div>
               </div>
-            )) : <p className="text-[13px] text-[#52525b]">No fraud flags</p>}
+            )) : <p className="text-[13px] text-[#86868b]">No fraud flags</p>}
           </div>
         </div>
       </div>
@@ -240,11 +240,11 @@ export default function ExecDashboard() {
 // ── Sub-components ───────────────────────────────────────────────────────
 
 function KPICard({ label, value, icon, accent }: { label: string; value: number | string; icon: string; accent?: string }) {
-  const textColor = accent === 'emerald' ? 'text-emerald-400' : 'text-white';
+  const textColor = accent === 'emerald' ? 'text-emerald-400' : 'text-[#1d1d1f]';
   return (
-    <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
+    <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#52525b]">{label}</span>
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{label}</span>
         <span className="text-[16px]">{icon}</span>
       </div>
       <p className={`mt-3 text-2xl font-bold tabular-nums ${textColor}`}>{value}</p>
@@ -256,10 +256,10 @@ function GrowthRow({ label, value, detail }: { label: string; value: number; det
   return (
     <div>
       <div className="flex items-center justify-between">
-        <span className="text-[13px] text-[#a1a1aa]">{label}</span>
+        <span className="text-[13px] text-[#6e6e73]">{label}</span>
         <GrowthBadge value={value} />
       </div>
-      <p className="mt-0.5 text-[11px] text-[#3f3f46]">{detail}</p>
+      <p className="mt-0.5 text-[11px] text-[#86868b]">{detail}</p>
     </div>
   );
 }

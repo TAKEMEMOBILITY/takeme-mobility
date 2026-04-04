@@ -135,18 +135,18 @@ export default function CitiesPage() {
         scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
       }`}>
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1D1D1F]">
+          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[5px] font-light text-[#8E8E93]">Mobility</span>
+            <span className="ml-[5px] font-light text-[#86868b]">Mobility</span>
           </Link>
           <div className="flex items-center gap-6">
-            <Link href="/" className="text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
+            <Link href="/" className="text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
               Home
             </Link>
-            <Link href="/technology" className="text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
+            <Link href="/technology" className="text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
               Technology
             </Link>
-            <Link href="/safety" className="text-[14px] font-medium text-[#8E8E93] transition-colors duration-200 hover:text-[#1D1D1F]">
+            <Link href="/safety" className="text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
               Safety
             </Link>
           </div>
@@ -156,51 +156,51 @@ export default function CitiesPage() {
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="bg-white pt-32 pb-20 md:pt-40 md:pb-28">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Cities
           </p>
-          <h1 className="mt-5 text-[clamp(2.5rem,5.5vw,4rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1D1D1F]">
+          <h1 className="mt-5 text-[clamp(2.5rem,5.5vw,4rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
             Starting in Seattle.<br />Scaling everywhere.
           </h1>
-          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-6 max-w-[620px] text-[19px] leading-[1.6] text-[#6e6e73]">
             TakeMe launches in the Pacific Northwest — one of America's most EV-ready metropolitan areas. Every city we enter gets the same premium, all-electric experience from day one.
           </p>
         </div>
       </section>
 
       {/* ═══ SEATTLE LAUNCH CITY ══════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={seattle.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 transition-all duration-[900ms] ease-out ${
             seattle.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Launch City
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Seattle, Washington
           </h2>
-          <p className="mt-2 text-[19px] font-medium text-[#0071E3]">
+          <p className="mt-2 text-[19px] font-medium text-[#0071e3]">
             America's most EV-ready city.
           </p>
-          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Seattle is the ideal launch market. Washington State leads the nation in EV adoption, with over 130,000 registered electric vehicles. The city's compact urban core, progressive environmental policies, and tech-forward population make it the perfect proving ground for all-electric rideshare.
           </p>
 
           {/* Neighborhoods */}
           <div className="mt-16">
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">
               Neighborhoods Served
             </h3>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
               {NEIGHBORHOODS.map((name) => (
                 <div
                   key={name}
-                  className="rounded-2xl border border-[#E8E8ED] bg-white px-4 py-4 text-center"
+                  className="rounded-2xl border border-[#d2d2d7] bg-white px-4 py-4 text-center"
                 >
-                  <span className="text-[14px] font-medium text-[#1D1D1F]">{name}</span>
+                  <span className="text-[14px] font-medium text-[#1d1d1f]">{name}</span>
                 </div>
               ))}
             </div>
@@ -208,26 +208,26 @@ export default function CitiesPage() {
 
           {/* Key Routes */}
           <div className="mt-16">
-            <h3 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">
+            <h3 className="text-[13px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">
               Key Routes
             </h3>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {KEY_ROUTES.map((route) => (
                 <div
                   key={route.from + route.to}
-                  className="flex items-center justify-between rounded-2xl bg-white px-6 py-5 border border-[#E8E8ED]"
+                  className="flex items-center justify-between rounded-2xl bg-white px-6 py-5 border border-[#d2d2d7]"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-[15px] font-medium text-[#1D1D1F]">{route.from}</span>
-                    <svg className="h-4 w-4 shrink-0 text-[#A1A1A6]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <span className="text-[15px] font-medium text-[#1d1d1f]">{route.from}</span>
+                    <svg className="h-4 w-4 shrink-0 text-[#86868b]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
                     </svg>
-                    <span className="text-[15px] font-medium text-[#1D1D1F]">{route.to}</span>
+                    <span className="text-[15px] font-medium text-[#1d1d1f]">{route.to}</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-[15px] font-semibold tabular-nums text-[#1D1D1F]">{route.time}</span>
+                    <span className="text-[15px] font-semibold tabular-nums text-[#1d1d1f]">{route.time}</span>
                     {route.note && (
-                      <span className="hidden rounded-full bg-[#0071E3]/10 px-3 py-1 text-[12px] font-medium text-[#0071E3] sm:inline-block">
+                      <span className="hidden rounded-full bg-[#0071e3]/10 px-3 py-1 text-[12px] font-medium text-[#0071e3] sm:inline-block">
                         {route.note}
                       </span>
                     )}
@@ -247,13 +247,13 @@ export default function CitiesPage() {
             incentives.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             EV Incentives
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Washington is investing in electric.
           </h2>
-          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Washington State has committed over $112 million through the Washington Zero Emission Incentive Program (WAZIP) to accelerate EV adoption. For TakeMe drivers, this means significant financial advantages.
           </p>
 
@@ -261,15 +261,15 @@ export default function CitiesPage() {
             {INCENTIVES.map((item) => (
               <div
                 key={item.title}
-                className="group rounded-2xl border border-[#F5F5F7] bg-[#FAFAFA] p-6 transition-all duration-200 hover:border-[#E8E8ED] hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
+                className="group rounded-2xl border border-[#f5f5f7] bg-[#f5f5f7] p-6 transition-all duration-200 hover:border-[#d2d2d7] hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
               >
-                <p className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-bold tracking-[-0.02em] text-[#0071E3]">
+                <p className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-bold tracking-[-0.02em] text-[#0071e3]">
                   {item.amount}
                 </p>
-                <h3 className="mt-2 text-[15px] font-semibold text-[#1D1D1F]">
+                <h3 className="mt-2 text-[15px] font-semibold text-[#1d1d1f]">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-[14px] leading-[1.6] text-[#6E6E73]">
+                <p className="mt-2 text-[14px] leading-[1.6] text-[#6e6e73]">
                   {item.desc}
                 </p>
               </div>
@@ -279,20 +279,20 @@ export default function CitiesPage() {
       </section>
 
       {/* ═══ CHARGING INFRASTRUCTURE ═════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={charging.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 transition-all duration-[900ms] ease-out ${
             charging.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Charging Network
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Powered by the Pacific Northwest.
           </h2>
-          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Seattle's charging infrastructure is among the densest in the United States. Over 2,500 public charging ports within King County, with the number growing monthly. Washington's grid runs 70%+ on hydroelectric power — meaning TakeMe rides are powered by some of the cleanest electricity in the country.
           </p>
 
@@ -300,12 +300,12 @@ export default function CitiesPage() {
             {CHARGING_STATS.map((stat) => (
               <div
                 key={stat.value}
-                className="rounded-2xl bg-white px-6 py-8 text-center border border-[#E8E8ED]"
+                className="rounded-2xl bg-white px-6 py-8 text-center border border-[#d2d2d7]"
               >
-                <p className="text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.03em] text-[#1D1D1F]">
+                <p className="text-[clamp(2rem,4vw,3rem)] font-bold tracking-[-0.03em] text-[#1d1d1f]">
                   {stat.value}
                 </p>
-                <p className="mt-2 text-[14px] leading-[1.5] text-[#6E6E73]">
+                <p className="mt-2 text-[14px] leading-[1.5] text-[#6e6e73]">
                   {stat.label}
                 </p>
               </div>
@@ -322,13 +322,13 @@ export default function CitiesPage() {
             expansion.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Expansion
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             The roadmap.
           </h2>
-          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Seattle is the beginning. TakeMe is building toward nationwide coverage, one city at a time. Each launch follows the same playbook: verify the charging infrastructure, recruit and verify local drivers, and open at full quality from day one.
           </p>
 
@@ -336,24 +336,24 @@ export default function CitiesPage() {
             {EXPANSION_CITIES.map((item) => (
               <div
                 key={item.city}
-                className="group relative rounded-2xl border border-[#F5F5F7] bg-[#FAFAFA] p-6 transition-all duration-200 hover:border-[#E8E8ED]"
+                className="group relative rounded-2xl border border-[#f5f5f7] bg-[#f5f5f7] p-6 transition-all duration-200 hover:border-[#d2d2d7]"
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <h3 className="text-[19px] font-semibold text-[#1D1D1F]">
+                    <h3 className="text-[19px] font-semibold text-[#1d1d1f]">
                       {item.city}, {item.state}
                     </h3>
-                    <p className="mt-1 text-[14px] text-[#6E6E73]">{item.tagline}</p>
+                    <p className="mt-1 text-[14px] text-[#6e6e73]">{item.tagline}</p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-[#F5F5F7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-[#A1A1A6]">
+                  <span className="shrink-0 rounded-full bg-[#f5f5f7] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.05em] text-[#86868b]">
                     Coming soon
                   </span>
                 </div>
                 <div className="mt-5 flex items-center gap-2">
-                  <svg className="h-4 w-4 text-[#A1A1A6]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#86868b]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
                   </svg>
-                  <span className="text-[13px] font-medium text-[#A1A1A6]">{item.quarter}</span>
+                  <span className="text-[13px] font-medium text-[#86868b]">{item.quarter}</span>
                 </div>
               </div>
             ))}
@@ -362,20 +362,20 @@ export default function CitiesPage() {
       </section>
 
       {/* ═══ OUR PROMISE ══════════════════════════════════════════════════ */}
-      <section className="bg-[#F5F5F7]">
+      <section className="bg-[#f5f5f7]">
         <div
           ref={promise.ref}
           className={`mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10 transition-all duration-[900ms] ease-out ${
             promise.visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}
         >
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#A1A1A6]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">
             Our Promise
           </p>
-          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+          <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             One standard. Every city.
           </h2>
-          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6E6E73]">
+          <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
             Whether you're in Seattle or San Francisco, the experience is identical. Same app, same safety standards, same all-electric fleet, same transparent pricing. No city gets a lesser version. No market gets shortcuts.
           </p>
 
@@ -383,12 +383,12 @@ export default function CitiesPage() {
             {PROMISES.map((item) => (
               <div
                 key={item.title}
-                className="flex items-start gap-4 rounded-2xl bg-white p-6 border border-[#E8E8ED]"
+                className="flex items-start gap-4 rounded-2xl bg-white p-6 border border-[#d2d2d7]"
               >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F5F5F7] text-[#1D1D1F]">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f5f5f7] text-[#1d1d1f]">
                   {item.icon}
                 </div>
-                <p className="text-[15px] font-medium leading-[1.5] text-[#1D1D1F]">
+                <p className="text-[15px] font-medium leading-[1.5] text-[#1d1d1f]">
                   {item.title}
                 </p>
               </div>
@@ -406,19 +406,19 @@ export default function CitiesPage() {
           }`}
         >
           <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1D1D1F]">
+            <h2 className="text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
               Ready to ride in Seattle?
             </h2>
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/auth/signup"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D1D1F] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#424245]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Book a ride
               </Link>
               <Link
                 href="/driver/apply"
-                className="inline-flex h-[52px] items-center rounded-[999px] border border-[#D2D2D7] px-8 text-[15px] font-medium text-[#1D1D1F] transition-colors duration-200 hover:bg-[#F5F5F7]"
+                className="inline-flex h-[52px] items-center rounded-[999px] border border-[#d2d2d7] px-8 text-[15px] font-medium text-[#1d1d1f] transition-colors duration-200 hover:bg-[#f5f5f7]"
               >
                 Become a driver
               </Link>
@@ -428,15 +428,15 @@ export default function CitiesPage() {
       </section>
 
       {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-[#E8E8ED] bg-white">
+      <footer className="border-t border-[#d2d2d7] bg-white">
         <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
           <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
             <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+              <div className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
                 <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#8E8E93]">Mobility</span>
+                <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
               </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#A1A1A6]">
+              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#86868b]">
                 Premium all-electric transportation.<br />One standard, everywhere.
               </p>
             </div>
@@ -470,10 +470,10 @@ export default function CitiesPage() {
                 },
               ].map((col) => (
                 <div key={col.t}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#A1A1A6]">{col.t}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">{col.t}</p>
                   <div className="mt-4 flex flex-col gap-3.5">
                     {col.items.map((item) => (
-                      <Link key={item.label} href={item.href} className="text-[14px] text-[#6E6E73] transition-colors duration-200 hover:text-[#1D1D1F]">
+                      <Link key={item.label} href={item.href} className="text-[14px] text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]">
                         {item.label}
                       </Link>
                     ))}
@@ -482,11 +482,11 @@ export default function CitiesPage() {
               ))}
             </div>
           </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#E8E8ED] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#A1A1A6]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
+          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#d2d2d7] pt-8 md:flex-row md:items-center">
+            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
             <div className="flex gap-7">
               {['Twitter', 'LinkedIn', 'Instagram'].map((s) => (
-                <span key={s} className="cursor-pointer text-[13px] text-[#A1A1A6] transition-colors duration-200 hover:text-[#6E6E73]">{s}</span>
+                <span key={s} className="cursor-pointer text-[13px] text-[#86868b] transition-colors duration-200 hover:text-[#6e6e73]">{s}</span>
               ))}
             </div>
           </div>

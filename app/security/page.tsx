@@ -51,13 +51,13 @@ function timeAgo(ts: string): string {
 
 function RiskBadge({ score }: { score: number }) {
   const c = score > 75 ? 'bg-red-500/20 text-red-400' : score > 50 ? 'bg-amber-500/20 text-amber-400'
-    : score > 25 ? 'bg-blue-500/20 text-blue-400' : 'bg-[#1e1e2e] text-[#52525b]';
+    : score > 25 ? 'bg-blue-500/20 text-blue-400' : 'bg-[#d2d2d7] text-[#86868b]';
   return <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold tabular-nums ${c}`}>{score}</span>;
 }
 
 const ROLES = ['user', 'backoffice_staff', 'support_manager', 'ops_core', 'exec_founder', 'security_owner', 'super_admin'] as const;
 
-const INPUT = 'rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-3 py-1.5 text-[13px] text-white placeholder-[#3f3f46] outline-none focus:border-[#3f3f46]';
+const INPUT = 'rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-1.5 text-[13px] text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#86868b]';
 
 // ── Page ─────────────────────────────────────────────────────────────────
 
@@ -175,15 +175,15 @@ export default function SecurityPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8 text-[#e4e4e7]">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8 text-[#1d1d1f]">
       <style>{`@media print { body { display: none !important; } } .sensitive-data { filter: blur(4px); transition: filter .2s; } .sensitive-data:hover { filter: none; }`}</style>
 
       <div className="mx-auto max-w-[1400px]">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-white">Security Center</h1>
-            <p className="mt-1 text-[13px] text-[#71717a]">
+            <h1 className="text-xl font-semibold text-[#1d1d1f]">Security Center</h1>
+            <p className="mt-1 text-[13px] text-[#86868b]">
               Zero Trust Administration &middot; {lastRefresh ? `Updated ${timeAgo(lastRefresh)}` : '...'}
             </p>
           </div>
@@ -201,23 +201,23 @@ export default function SecurityPage() {
           <div className="mt-4 rounded-xl border border-red-500/30 bg-red-500/5 p-4">
             <p className="text-[13px] font-medium text-red-400">⚠ Unusual Activity Detected</p>
             {unusualUsers.map(u => (
-              <p key={u.email} className="mt-1 text-[12px] text-[#a1a1aa]">{u.email}: {u.count} failed attempts in last hour</p>
+              <p key={u.email} className="mt-1 text-[12px] text-[#6e6e73]">{u.email}: {u.count} failed attempts in last hour</p>
             ))}
           </div>
         )}
 
         {/* Tabs */}
-        <div className="mt-6 flex gap-0.5 overflow-x-auto border-b border-[#1e1e2e]">
+        <div className="mt-6 flex gap-0.5 overflow-x-auto border-b border-[#d2d2d7]">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-[13px] font-medium transition-colors ${tab === t.key ? 'border-b-2 border-emerald-400 text-white' : 'text-[#71717a] hover:text-[#a1a1aa]'}`}>
+              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-[13px] font-medium transition-colors ${tab === t.key ? 'border-b-2 border-[#0071e3] text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#6e6e73]'}`}>
               {t.label}
               {t.badge !== undefined && <span className="rounded-full bg-red-500/20 px-1.5 text-[10px] font-bold text-red-400">{t.badge}</span>}
             </button>
           ))}
         </div>
 
-        {loading ? <div className="mt-12 text-center text-[#52525b]">Loading...</div> : (
+        {loading ? <div className="mt-12 text-center text-[#86868b]">Loading...</div> : (
           <div className="mt-6">
 
             {/* ═══ THREAT SUMMARY ═══════════════════════════════════════ */}
@@ -243,31 +243,31 @@ export default function SecurityPage() {
                     </select>
                     <input type="number" placeholder="Min risk..." value={af.minRisk} onChange={e => setAf(f => ({ ...f, minRisk: e.target.value }))} className={`${INPUT} w-24`} />
                   </div>
-                  <button onClick={exportCSV} className="rounded-lg bg-[#1e1e2e] px-4 py-1.5 text-[13px] font-medium text-[#a1a1aa] hover:text-white">Export CSV</button>
+                  <button onClick={exportCSV} className="rounded-lg bg-[#d2d2d7] px-4 py-1.5 text-[13px] font-medium text-[#6e6e73] hover:text-[#1d1d1f]">Export CSV</button>
                 </div>
-                <div className="mt-4 max-h-[600px] overflow-auto rounded-xl border border-[#1e1e2e]">
+                <div className="mt-4 max-h-[600px] overflow-auto rounded-xl border border-[#d2d2d7]">
                   <table className="w-full text-left text-[13px]">
-                    <thead className="sticky top-0 bg-[#0f0f17] z-10">
-                      <tr className="border-b border-[#1e1e2e] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#3f3f46]">
+                    <thead className="sticky top-0 bg-[#f5f5f7] z-10">
+                      <tr className="border-b border-[#d2d2d7] text-[10px] font-semibold uppercase tracking-[0.1em] text-[#86868b]">
                         <th className="px-3 py-2.5">Time</th><th className="px-3 py-2.5">User</th><th className="px-3 py-2.5">Role</th>
                         <th className="px-3 py-2.5">Action</th><th className="px-3 py-2.5">Resource</th><th className="px-3 py-2.5">OK</th>
                         <th className="px-3 py-2.5">Risk</th><th className="px-3 py-2.5">IP</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#1e1e2e]/30">
+                    <tbody className="divide-y divide-[#d2d2d7]/30">
                       {filteredAudit.map(e => (
                         <tr key={e.id} className={e.risk_score > 75 ? 'bg-red-500/5' : e.risk_score > 50 ? 'bg-amber-500/5' : ''}>
-                          <td className="px-3 py-2 tabular-nums text-[11px] text-[#3f3f46]">{timeAgo(e.created_at)}</td>
-                          <td className="sensitive-data px-3 py-2 text-white">{e.user_email || '—'}</td>
-                          <td className="px-3 py-2 text-[#52525b]">{e.user_role || '—'}</td>
-                          <td className="px-3 py-2 font-medium text-white">{e.action}</td>
-                          <td className="px-3 py-2 text-[#71717a]">{e.resource}</td>
+                          <td className="px-3 py-2 tabular-nums text-[11px] text-[#86868b]">{timeAgo(e.created_at)}</td>
+                          <td className="sensitive-data px-3 py-2 text-[#1d1d1f]">{e.user_email || '—'}</td>
+                          <td className="px-3 py-2 text-[#86868b]">{e.user_role || '—'}</td>
+                          <td className="px-3 py-2 font-medium text-[#1d1d1f]">{e.action}</td>
+                          <td className="px-3 py-2 text-[#86868b]">{e.resource}</td>
                           <td className="px-3 py-2"><span className={e.success ? 'text-emerald-400' : 'text-red-400'}>{e.success ? '✓' : '✗'}</span></td>
                           <td className="px-3 py-2"><RiskBadge score={e.risk_score} /></td>
-                          <td className="sensitive-data px-3 py-2 text-[11px] text-[#3f3f46]">{e.ip_address}</td>
+                          <td className="sensitive-data px-3 py-2 text-[11px] text-[#86868b]">{e.ip_address}</td>
                         </tr>
                       ))}
-                      {filteredAudit.length === 0 && <tr><td colSpan={8} className="px-4 py-8 text-center text-[#3f3f46]">No matching entries</td></tr>}
+                      {filteredAudit.length === 0 && <tr><td colSpan={8} className="px-4 py-8 text-center text-[#86868b]">No matching entries</td></tr>}
                     </tbody>
                   </table>
                 </div>
@@ -281,23 +281,23 @@ export default function SecurityPage() {
                   const expired = new Date(s.expires_at) < new Date();
                   const stale = Date.now() - new Date(s.last_activity).getTime() > 30 * 60_000;
                   return (
-                    <div key={s.id} className={`rounded-xl border p-4 ${stale ? 'border-amber-500/30 bg-amber-500/5' : 'border-[#1e1e2e] bg-[#0f0f17]'}`}>
+                    <div key={s.id} className={`rounded-xl border p-4 ${stale ? 'border-amber-500/30 bg-amber-500/5' : 'border-[#d2d2d7] bg-[#f5f5f7]'}`}>
                       <div className="flex items-start justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-2">
                             <span className={`h-2 w-2 rounded-full ${expired ? 'bg-red-400' : 'bg-emerald-400'}`} />
-                            <span className="sensitive-data text-[13px] font-medium text-white">{s.user_email ?? s.user_id.slice(0, 12)}</span>
-                            <span className="text-[11px] text-[#52525b]">{s.user_role ?? ''}</span>
+                            <span className="sensitive-data text-[13px] font-medium text-[#1d1d1f]">{s.user_email ?? s.user_id.slice(0, 12)}</span>
+                            <span className="text-[11px] text-[#86868b]">{s.user_role ?? ''}</span>
                             {s.mfa_verified && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400">MFA</span>}
                             {stale && <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-medium text-amber-400">Stale</span>}
                           </div>
-                          <div className="mt-1 flex flex-wrap gap-x-4 text-[12px] text-[#52525b]">
-                            <span>IP: <span className="sensitive-data text-[#71717a]">{s.ip_address}</span></span>
+                          <div className="mt-1 flex flex-wrap gap-x-4 text-[12px] text-[#86868b]">
+                            <span>IP: <span className="sensitive-data text-[#86868b]">{s.ip_address}</span></span>
                             <span>Last active: {timeAgo(s.last_activity)}</span>
                             <span>Created: {timeAgo(s.created_at)}</span>
                             <span>Expires: {timeAgo(s.expires_at)}</span>
                           </div>
-                          <p className="mt-0.5 truncate text-[11px] text-[#27272a]">{s.user_agent?.slice(0, 100)}</p>
+                          <p className="mt-0.5 truncate text-[11px] text-[#d2d2d7]">{s.user_agent?.slice(0, 100)}</p>
                         </div>
                         <div className="ml-4 flex shrink-0 gap-2">
                           <button onClick={() => revokeAllForUser(s.user_id)}
@@ -308,7 +308,7 @@ export default function SecurityPage() {
                       </div>
                     </div>
                   );
-                }) : <p className="text-center text-[13px] text-[#3f3f46]">No active sessions</p>}
+                }) : <p className="text-center text-[13px] text-[#86868b]">No active sessions</p>}
               </div>
             )}
 
@@ -319,32 +319,32 @@ export default function SecurityPage() {
                 <div className="flex gap-2">
                   <input placeholder="IP or CIDR (e.g. 1.2.3.4/32)" value={newIP.cidr} onChange={e => setNewIP(f => ({ ...f, cidr: e.target.value }))} className={`${INPUT} flex-1`} />
                   <input placeholder="Description" value={newIP.desc} onChange={e => setNewIP(f => ({ ...f, desc: e.target.value }))} className={`${INPUT} flex-1`} />
-                  <button onClick={addIP} className="rounded-lg bg-emerald-500/20 px-4 py-1.5 text-[13px] font-medium text-emerald-400 hover:bg-emerald-500/30">Add</button>
+                  <button onClick={addIP} className="rounded-lg bg-emerald-500/20 px-4 py-1.5 text-[13px] font-medium text-emerald-400 hover:bg-[#005bb5]/30">Add</button>
                 </div>
 
                 {/* Entries */}
                 <div className="mt-4 space-y-2">
                   {ipData.entries.map(e => (
-                    <div key={e.id} className={`flex items-center justify-between rounded-lg border px-4 py-3 ${e.description === 'AUTO_BLOCKED' ? 'border-red-500/30 bg-red-500/5' : 'border-[#1e1e2e] bg-[#0f0f17]'}`}>
+                    <div key={e.id} className={`flex items-center justify-between rounded-lg border px-4 py-3 ${e.description === 'AUTO_BLOCKED' ? 'border-red-500/30 bg-red-500/5' : 'border-[#d2d2d7] bg-[#f5f5f7]'}`}>
                       <div>
-                        <span className="text-[13px] font-mono font-medium text-white">{e.ip_cidr}</span>
-                        {e.description && <span className="ml-2 text-[12px] text-[#52525b]">{e.description}</span>}
-                        {e.expires_at && <span className="ml-2 text-[11px] text-[#3f3f46]">Expires: {timeAgo(e.expires_at)}</span>}
+                        <span className="text-[13px] font-mono font-medium text-[#1d1d1f]">{e.ip_cidr}</span>
+                        {e.description && <span className="ml-2 text-[12px] text-[#86868b]">{e.description}</span>}
+                        {e.expires_at && <span className="ml-2 text-[11px] text-[#86868b]">Expires: {timeAgo(e.expires_at)}</span>}
                       </div>
                       <button onClick={() => deleteIP(e.id)}
                         className="rounded-lg bg-red-500/20 px-3 py-1 text-[11px] font-medium text-red-400 hover:bg-red-500/30">Delete</button>
                     </div>
                   ))}
-                  {ipData.entries.length === 0 && <p className="text-center text-[13px] text-[#3f3f46]">No entries — all IPs allowed by default</p>}
+                  {ipData.entries.length === 0 && <p className="text-center text-[13px] text-[#86868b]">No entries — all IPs allowed by default</p>}
                 </div>
 
                 {/* Recent access IPs */}
                 {ipData.recentAccessIPs.length > 0 && (
                   <div className="mt-6">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#52525b]">IPs that accessed /ops or /security (24h)</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">IPs that accessed /ops or /security (24h)</p>
                     <div className="mt-2 flex flex-wrap gap-2">
                       {ipData.recentAccessIPs.map(ip => (
-                        <span key={ip} className="rounded-full border border-[#1e1e2e] px-3 py-1 text-[12px] font-mono text-[#71717a]">{ip}</span>
+                        <span key={ip} className="rounded-full border border-[#d2d2d7] px-3 py-1 text-[12px] font-mono text-[#86868b]">{ip}</span>
                       ))}
                     </div>
                   </div>
@@ -358,15 +358,15 @@ export default function SecurityPage() {
                 {users.map(u => {
                   const locked = u.locked_until && new Date(u.locked_until) > new Date();
                   return (
-                    <div key={u.id} className={`rounded-xl border p-4 ${locked ? 'border-red-500/30 bg-red-500/5' : 'border-[#1e1e2e] bg-[#0f0f17]'}`}>
+                    <div key={u.id} className={`rounded-xl border p-4 ${locked ? 'border-red-500/30 bg-red-500/5' : 'border-[#d2d2d7] bg-[#f5f5f7]'}`}>
                       <div className="flex items-start justify-between">
                         <div className="min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="sensitive-data text-[13px] font-medium text-white">{u.email}</span>
+                            <span className="sensitive-data text-[13px] font-medium text-[#1d1d1f]">{u.email}</span>
                             {locked && <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-[10px] font-bold text-red-400">LOCKED</span>}
                             {u.mfa_enabled && <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-medium text-emerald-400">MFA</span>}
                           </div>
-                          <p className="mt-0.5 text-[12px] text-[#52525b]">
+                          <p className="mt-0.5 text-[12px] text-[#86868b]">
                             {u.full_name ?? '—'} &middot; Last active: {u.last_active_at ? timeAgo(u.last_active_at) : 'never'} &middot; Fails: {u.failed_attempts}
                           </p>
                         </div>
@@ -380,7 +380,7 @@ export default function SecurityPage() {
                           </select>
                           {locked ? (
                             <button onClick={() => updateUser(u.id, 'unlock')}
-                              className="rounded-lg bg-emerald-500/20 px-3 py-1 text-[11px] font-medium text-emerald-400 hover:bg-emerald-500/30">Unlock</button>
+                              className="rounded-lg bg-emerald-500/20 px-3 py-1 text-[11px] font-medium text-emerald-400 hover:bg-[#005bb5]/30">Unlock</button>
                           ) : (
                             <button onClick={() => updateUser(u.id, 'lock', { lockHours: 24 })}
                               className="rounded-lg bg-red-500/20 px-3 py-1 text-[11px] font-medium text-red-400 hover:bg-red-500/30">Lock 24h</button>
@@ -392,7 +392,7 @@ export default function SecurityPage() {
                     </div>
                   );
                 })}
-                {users.length === 0 && <p className="text-center text-[13px] text-[#3f3f46]">No users found</p>}
+                {users.length === 0 && <p className="text-center text-[13px] text-[#86868b]">No users found</p>}
               </div>
             )}
 
@@ -412,20 +412,20 @@ export default function SecurityPage() {
                           : e.action.includes('LOGOUT') ? 'bg-amber-500/20 text-amber-400'
                           : 'bg-blue-500/20 text-blue-400'
                         }`}>{e.action}</span>
-                        <span className="sensitive-data text-[13px] text-[#a1a1aa]">{e.user_email ?? '—'}</span>
+                        <span className="sensitive-data text-[13px] text-[#6e6e73]">{e.user_email ?? '—'}</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <RiskBadge score={e.risk_score} />
-                        <span className="text-[11px] text-[#3f3f46]">{timeAgo(e.created_at)}</span>
+                        <span className="text-[11px] text-[#86868b]">{timeAgo(e.created_at)}</span>
                       </div>
                     </div>
                     {e.metadata && typeof e.metadata === 'object' && Object.keys(e.metadata).length > 0 && (
-                      <p className="mt-1 truncate text-[11px] text-[#3f3f46]">
+                      <p className="mt-1 truncate text-[11px] text-[#86868b]">
                         {Object.entries(e.metadata).slice(0, 4).map(([k, v]) => `${k}: ${v}`).join(' · ')}
                       </p>
                     )}
                   </div>
-                )) : <p className="text-center text-[13px] text-[#3f3f46]">No automated reactions recorded</p>}
+                )) : <p className="text-center text-[13px] text-[#86868b]">No automated reactions recorded</p>}
               </div>
             )}
           </div>
@@ -447,7 +447,7 @@ function ThreatCard({ label, value, color }: { label: string; value: number; col
   const textColor = { emerald: 'text-emerald-400', blue: 'text-blue-400', amber: 'text-amber-400', red: 'text-red-400' };
   return (
     <div className={`rounded-xl border p-5 ${colors[color]}`}>
-      <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#71717a]">{label}</p>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">{label}</p>
       <p className={`mt-2 text-3xl font-bold tabular-nums ${textColor[color]}`}>{value}</p>
     </div>
   );

@@ -93,7 +93,7 @@ const STATUS_CLASSES: Record<string, string> = {
   available: 'bg-emerald-500/15 text-emerald-400',
   busy: 'bg-amber-500/15 text-amber-400',
   on_trip: 'bg-red-500/15 text-red-400',
-  offline: 'bg-zinc-500/15 text-zinc-400',
+  offline: 'bg-zinc-500/15 text-[#86868b]',
 };
 
 const RIDE_STATUS_CLASSES: Record<string, string> = {
@@ -221,26 +221,26 @@ export default function AdminDriversPage() {
       {/* Main content */}
       <div className={`flex-1 overflow-y-auto p-6 transition-all ${panelOpen ? 'mr-[480px]' : ''}`}>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#e4e4e7]">Drivers</h1>
-          <p className="text-sm text-[#71717a] mt-1">{drivers.length} drivers</p>
+          <h1 className="text-2xl font-bold text-[#1d1d1f]">Drivers</h1>
+          <p className="text-sm text-[#86868b] mt-1">{drivers.length} drivers</p>
         </div>
 
         {/* Tabs + Search */}
         <div className="flex items-center justify-between mb-5 gap-4 flex-wrap">
-          <div className="flex gap-1 bg-[#13131b] rounded-xl p-1 border border-[#1e1e2e]">
+          <div className="flex gap-1 bg-[#f5f5f7] rounded-xl p-1 border border-[#d2d2d7]">
             {TABS.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5 ${
                   tab === t.key
-                    ? 'bg-[#1e1e2e] text-white'
-                    : 'text-[#71717a] hover:text-[#a1a1aa]'
+                    ? 'bg-[#d2d2d7] text-[#1d1d1f]'
+                    : 'text-[#86868b] hover:text-[#6e6e73]'
                 }`}
               >
                 {t.label}
                 {tab === 'all' && t.key !== 'all' && (
-                  <span className="text-[10px] text-[#52525b]">{driverCounts[t.key]}</span>
+                  <span className="text-[10px] text-[#86868b]">{driverCounts[t.key]}</span>
                 )}
               </button>
             ))}
@@ -248,7 +248,7 @@ export default function AdminDriversPage() {
 
           <div className="relative">
             <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#52525b]"
+              className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#86868b]"
               fill="none"
               viewBox="0 0 24 24"
               strokeWidth={2}
@@ -260,7 +260,7 @@ export default function AdminDriversPage() {
               type="text"
               placeholder="Search name or email..."
               onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-xl bg-[#13131b] border border-[#1e1e2e] text-sm text-[#e4e4e7] placeholder:text-[#52525b] focus:outline-none focus:border-[#3f3f5e] w-64"
+              className="pl-10 pr-4 py-2 rounded-xl bg-[#f5f5f7] border border-[#d2d2d7] text-sm text-[#1d1d1f] placeholder:text-[#86868b] focus:outline-none focus:border-[#d2d2d7] w-64"
             />
           </div>
         </div>
@@ -273,22 +273,22 @@ export default function AdminDriversPage() {
         )}
 
         {/* Table */}
-        <div className="bg-[#13131b] rounded-xl border border-[#1e1e2e] overflow-hidden">
+        <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center py-20 text-[#71717a]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#71717a] border-t-emerald-500 mr-3" />
+            <div className="flex items-center justify-center py-20 text-[#86868b]">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
               Loading drivers...
             </div>
           ) : drivers.length === 0 ? (
-            <div className="py-20 text-center text-[#52525b] text-sm">No drivers found</div>
+            <div className="py-20 text-center text-[#86868b] text-sm">No drivers found</div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1e1e2e]">
+                <tr className="border-b border-[#d2d2d7]">
                   {['Name', 'Status', 'Rating', 'Trips', 'Vehicle', 'Last Seen'].map((h) => (
                     <th
                       key={h}
-                      className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#52525b]"
+                      className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#86868b]"
                     >
                       {h}
                     </th>
@@ -300,11 +300,11 @@ export default function AdminDriversPage() {
                   <tr
                     key={driver.id}
                     onClick={() => openDetail(driver.id)}
-                    className="border-b border-[#1e1e2e]/50 cursor-pointer transition-colors hover:bg-[#1e1e2e]/30"
+                    className="border-b border-[#d2d2d7]/50 cursor-pointer transition-colors hover:bg-[#d2d2d7]/30"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-[#1e1e2e] flex items-center justify-center text-xs font-semibold text-[#71717a]">
+                        <div className="h-8 w-8 rounded-full bg-[#d2d2d7] flex items-center justify-center text-xs font-semibold text-[#86868b]">
                           {driver.full_name
                             ?.split(' ')
                             .map((n) => n[0])
@@ -313,30 +313,30 @@ export default function AdminDriversPage() {
                             .toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-[#e4e4e7]">{driver.full_name}</p>
-                          <p className="text-[10px] text-[#52525b]">{driver.email}</p>
+                          <p className="text-sm font-medium text-[#1d1d1f]">{driver.full_name}</p>
+                          <p className="text-[10px] text-[#86868b]">{driver.email}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                          STATUS_CLASSES[driver.status] ?? 'bg-zinc-500/15 text-zinc-400'
+                          STATUS_CLASSES[driver.status] ?? 'bg-zinc-500/15 text-[#86868b]'
                         }`}
                       >
                         {driver.status.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa]">
+                    <td className="px-4 py-3 text-xs text-[#6e6e73]">
                       {driver.rating ? `${Number(driver.rating).toFixed(1)}` : '--'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa]">{driver.total_trips}</td>
-                    <td className="px-4 py-3 text-xs text-[#71717a]">
+                    <td className="px-4 py-3 text-xs text-[#6e6e73]">{driver.total_trips}</td>
+                    <td className="px-4 py-3 text-xs text-[#86868b]">
                       {driver.vehicle
                         ? `${driver.vehicle.make} ${driver.vehicle.model}`
                         : '--'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#52525b]">
+                    <td className="px-4 py-3 text-xs text-[#86868b]">
                       {timeAgo(driver.last_location_at)}
                     </td>
                   </tr>
@@ -349,13 +349,13 @@ export default function AdminDriversPage() {
 
       {/* Slide-in detail panel */}
       {panelOpen && (
-        <div className="fixed right-0 top-0 bottom-0 w-[480px] bg-[#0f0f17] border-l border-[#1e1e2e] overflow-y-auto z-50 shadow-2xl">
+        <div className="fixed right-0 top-0 bottom-0 w-[480px] bg-[#f5f5f7] border-l border-[#d2d2d7] overflow-y-auto z-50 shadow-2xl">
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#1e1e2e] bg-[#0f0f17] px-5 py-4">
-            <h2 className="text-base font-semibold text-[#e4e4e7]">Driver Detail</h2>
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#d2d2d7] bg-[#f5f5f7] px-5 py-4">
+            <h2 className="text-base font-semibold text-[#1d1d1f]">Driver Detail</h2>
             <button
               onClick={() => setPanelOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#1e1e2e] text-[#71717a] hover:text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#d2d2d7] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -364,15 +364,15 @@ export default function AdminDriversPage() {
           </div>
 
           {detailLoading ? (
-            <div className="flex items-center justify-center py-20 text-[#71717a]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#71717a] border-t-emerald-500 mr-3" />
+            <div className="flex items-center justify-center py-20 text-[#86868b]">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
               Loading...
             </div>
           ) : detail ? (
             <div className="p-5 space-y-5">
               {/* Profile header */}
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 rounded-full bg-[#1e1e2e] flex items-center justify-center text-lg font-bold text-[#71717a]">
+                <div className="h-14 w-14 rounded-full bg-[#d2d2d7] flex items-center justify-center text-lg font-bold text-[#86868b]">
                   {detail.driver.full_name
                     ?.split(' ')
                     .map((n) => n[0])
@@ -381,12 +381,12 @@ export default function AdminDriversPage() {
                     .toUpperCase()}
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-[#e4e4e7]">{detail.driver.full_name}</h3>
-                  <p className="text-xs text-[#71717a]">{detail.driver.email}</p>
+                  <h3 className="text-lg font-semibold text-[#1d1d1f]">{detail.driver.full_name}</h3>
+                  <p className="text-xs text-[#86868b]">{detail.driver.email}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span
                       className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                        STATUS_CLASSES[detail.driver.status] ?? 'bg-zinc-500/15 text-zinc-400'
+                        STATUS_CLASSES[detail.driver.status] ?? 'bg-zinc-500/15 text-[#86868b]'
                       }`}
                     >
                       {detail.driver.status.replace(/_/g, ' ')}
@@ -455,18 +455,18 @@ export default function AdminDriversPage() {
                         className={`p-3 rounded-lg border ${
                           v.is_active
                             ? 'border-emerald-500/30 bg-emerald-500/5'
-                            : 'border-[#1e1e2e] bg-[#0a0a0f]'
+                            : 'border-[#d2d2d7] bg-[#FFFFFF]'
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs font-medium text-[#e4e4e7]">
+                          <span className="text-xs font-medium text-[#1d1d1f]">
                             {v.color} {v.year} {v.make} {v.model}
                           </span>
                           {v.is_active && (
                             <span className="text-[9px] font-semibold text-emerald-400 uppercase">Active</span>
                           )}
                         </div>
-                        <div className="flex gap-3 text-[10px] text-[#71717a]">
+                        <div className="flex gap-3 text-[10px] text-[#86868b]">
                           <span>Plate: {v.plate_number}</span>
                           <span>Class: {v.vehicle_class}</span>
                         </div>
@@ -483,22 +483,22 @@ export default function AdminDriversPage() {
                     {detail.recent_rides.map((ride) => (
                       <div
                         key={ride.id}
-                        className="p-3 rounded-lg bg-[#0a0a0f] border border-[#1e1e2e]/50"
+                        className="p-3 rounded-lg bg-[#FFFFFF] border border-[#d2d2d7]/50"
                       >
                         <div className="flex items-center justify-between mb-1">
                           <span
                             className={`inline-flex rounded-full px-2 py-0.5 text-[9px] font-semibold ${
-                              RIDE_STATUS_CLASSES[ride.status] ?? 'bg-zinc-500/15 text-zinc-400'
+                              RIDE_STATUS_CLASSES[ride.status] ?? 'bg-zinc-500/15 text-[#86868b]'
                             }`}
                           >
                             {ride.status.replace(/_/g, ' ')}
                           </span>
-                          <span className="text-[10px] text-[#52525b]">{timeAgo(ride.requested_at)}</span>
+                          <span className="text-[10px] text-[#86868b]">{timeAgo(ride.requested_at)}</span>
                         </div>
-                        <p className="text-[11px] text-[#a1a1aa] truncate">
+                        <p className="text-[11px] text-[#6e6e73] truncate">
                           {ride.pickup_address?.slice(0, 30)} → {ride.dropoff_address?.slice(0, 30)}
                         </p>
-                        <div className="flex gap-3 mt-1 text-[10px] text-[#71717a]">
+                        <div className="flex gap-3 mt-1 text-[10px] text-[#86868b]">
                           <span>Fare: {usd(Number(ride.final_fare ?? ride.estimated_fare))}</span>
                           {ride.rider_name && <span>Rider: {ride.rider_name}</span>}
                         </div>
@@ -509,7 +509,7 @@ export default function AdminDriversPage() {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-20 text-[#52525b] text-sm">
+            <div className="flex items-center justify-center py-20 text-[#86868b] text-sm">
               Failed to load driver detail
             </div>
           )}
@@ -523,8 +523,8 @@ export default function AdminDriversPage() {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#13131b] rounded-xl border border-[#1e1e2e] p-5">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#52525b] mb-3">
+    <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] p-5">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-3">
         {title}
       </h3>
       {children}
@@ -535,19 +535,19 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between text-xs">
-      <span className="text-[#71717a]">{label}</span>
-      <span className="text-[#a1a1aa]">{value}</span>
+      <span className="text-[#86868b]">{label}</span>
+      <span className="text-[#6e6e73]">{value}</span>
     </div>
   );
 }
 
 function StatBox({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="rounded-lg bg-[#0a0a0f] border border-[#1e1e2e]/50 p-3 text-center">
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-[#52525b] mb-1">
+    <div className="rounded-lg bg-[#FFFFFF] border border-[#d2d2d7]/50 p-3 text-center">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-[#86868b] mb-1">
         {label}
       </p>
-      <p className={`text-lg font-bold ${color ?? 'text-[#e4e4e7]'}`}>{value}</p>
+      <p className={`text-lg font-bold ${color ?? 'text-[#1d1d1f]'}`}>{value}</p>
     </div>
   );
 }

@@ -190,12 +190,12 @@ export default function DispatchDebugPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#e4e4e7]">Dispatch Debugger</h1>
-          <p className="mt-1 text-sm text-[#71717a]">
+          <h1 className="text-2xl font-bold text-[#1d1d1f]">Dispatch Debugger</h1>
+          <p className="mt-1 text-sm text-[#86868b]">
             Inspect the dispatch pipeline for any ride. View driver offers, escalations, and assignment results.
           </p>
         </div>
@@ -207,12 +207,12 @@ export default function DispatchDebugPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Enter Ride ID (UUID)"
-            className="flex-1 rounded-lg border border-[#1e1e2e] bg-[#13131b] px-4 py-2.5 text-sm text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/30"
+            className="flex-1 rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2.5 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50 focus:ring-1 focus:ring-[#0071e3]/30"
           />
           <button
             type="submit"
             disabled={loading || !searchInput.trim()}
-            className="rounded-lg bg-emerald-600 px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            className="rounded-lg bg-[#0071e3] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center gap-2">
@@ -235,8 +235,8 @@ export default function DispatchDebugPage() {
         {data && (
           <div className="space-y-6">
             {/* Ride Overview */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">Ride Overview</h2>
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">Ride Overview</h2>
               <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 <InfoCell label="Ride ID" value={data.ride.id.slice(0, 8) + '...'} mono />
                 <InfoCell label="Status">
@@ -261,8 +261,8 @@ export default function DispatchDebugPage() {
 
             {/* Assigned Driver */}
             {data.assignedDriver && (
-              <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">Assigned Driver</h2>
+              <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">Assigned Driver</h2>
                 <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                   <InfoCell label="Name" value={data.assignedDriver.full_name} />
                   <InfoCell label="Status">
@@ -290,10 +290,10 @@ export default function DispatchDebugPage() {
             )}
 
             {/* Ride Status Timeline */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">Status Timeline</h2>
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">Status Timeline</h2>
               {data.allEvents.length === 0 ? (
-                <p className="text-sm text-[#52525b]">No events recorded</p>
+                <p className="text-sm text-[#86868b]">No events recorded</p>
               ) : (
                 <div className="relative space-y-0">
                   {data.allEvents.map((event, idx) => (
@@ -302,14 +302,14 @@ export default function DispatchDebugPage() {
                       <div className="flex flex-col items-center">
                         <div className="h-2.5 w-2.5 rounded-full bg-emerald-500 ring-2 ring-emerald-500/30" />
                         {idx < data.allEvents.length - 1 && (
-                          <div className="w-px flex-1 bg-[#1e1e2e]" />
+                          <div className="w-px flex-1 bg-[#d2d2d7]" />
                         )}
                       </div>
                       <div className="pb-5">
-                        <p className="text-sm font-medium text-[#e4e4e7]">
+                        <p className="text-sm font-medium text-[#1d1d1f]">
                           {event.event_type.replace(/_/g, ' ')}
                         </p>
-                        <p className="text-xs text-[#71717a]">
+                        <p className="text-xs text-[#86868b]">
                           {formatTime(event.created_at)}
                           {event.old_status && event.new_status && (
                             <span className="ml-2">
@@ -317,7 +317,7 @@ export default function DispatchDebugPage() {
                             </span>
                           )}
                           {event.actor && (
-                            <span className="ml-2 text-[#52525b]">by {event.actor}</span>
+                            <span className="ml-2 text-[#86868b]">by {event.actor}</span>
                           )}
                         </p>
                       </div>
@@ -329,14 +329,14 @@ export default function DispatchDebugPage() {
 
             {/* Candidate Drivers */}
             {candidateDrivers.length > 0 && (
-              <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+              <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                   Candidate Drivers ({candidateDrivers.length})
                 </h2>
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#1e1e2e] text-xs uppercase tracking-wider text-[#52525b]">
+                      <tr className="border-b border-[#d2d2d7] text-xs uppercase tracking-wider text-[#86868b]">
                         <th className="pb-3 pr-4">Driver</th>
                         <th className="pb-3 pr-4">Distance</th>
                         <th className="pb-3 pr-4">Score</th>
@@ -344,13 +344,13 @@ export default function DispatchDebugPage() {
                         <th className="pb-3">Time</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#1e1e2e]">
+                    <tbody className="divide-y divide-[#d2d2d7]">
                       {candidateDrivers.map((c, i) => (
-                        <tr key={i} className="text-[#a1a1aa]">
+                        <tr key={i} className="text-[#6e6e73]">
                           <td className="py-3 pr-4">
-                            <span className="text-[#e4e4e7]">{c.driverName}</span>
+                            <span className="text-[#1d1d1f]">{c.driverName}</span>
                             {c.driverId && (
-                              <span className="ml-2 font-mono text-xs text-[#52525b]">
+                              <span className="ml-2 font-mono text-xs text-[#86868b]">
                                 {c.driverId.slice(0, 8)}
                               </span>
                             )}
@@ -364,7 +364,7 @@ export default function DispatchDebugPage() {
                           <td className="py-3 pr-4">
                             <CandidateResult result={c.result} />
                           </td>
-                          <td className="py-3 text-xs text-[#71717a]">{formatTime(c.timestamp)}</td>
+                          <td className="py-3 text-xs text-[#86868b]">{formatTime(c.timestamp)}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -375,19 +375,19 @@ export default function DispatchDebugPage() {
 
             {/* Excluded Drivers */}
             {data.excludedDrivers.length > 0 && (
-              <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+              <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+                <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                   Excluded Drivers ({data.excludedDrivers.length})
                 </h2>
                 <div className="space-y-2">
                   {data.excludedDrivers.map((d) => (
                     <div
                       key={d.id}
-                      className="flex items-center gap-3 rounded-lg bg-[#0a0a0f] px-4 py-2.5 text-sm"
+                      className="flex items-center gap-3 rounded-lg bg-[#FFFFFF] px-4 py-2.5 text-sm"
                     >
-                      <span className="text-[#e4e4e7]">{d.full_name}</span>
-                      <span className="font-mono text-xs text-[#52525b]">{d.id.slice(0, 8)}</span>
-                      <span className="text-xs text-[#71717a]">{d.email}</span>
+                      <span className="text-[#1d1d1f]">{d.full_name}</span>
+                      <span className="font-mono text-xs text-[#86868b]">{d.id.slice(0, 8)}</span>
+                      <span className="text-xs text-[#86868b]">{d.email}</span>
                     </div>
                   ))}
                 </div>
@@ -395,29 +395,29 @@ export default function DispatchDebugPage() {
             )}
 
             {/* Nearby Available Drivers */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                 Nearby Available Drivers ({data.nearbyDrivers.length})
               </h2>
               {data.nearbyDrivers.length === 0 ? (
-                <p className="text-sm text-[#52525b]">No available drivers within 10km</p>
+                <p className="text-sm text-[#86868b]">No available drivers within 10km</p>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#1e1e2e] text-xs uppercase tracking-wider text-[#52525b]">
+                      <tr className="border-b border-[#d2d2d7] text-xs uppercase tracking-wider text-[#86868b]">
                         <th className="pb-3 pr-4">Driver</th>
                         <th className="pb-3 pr-4">Distance</th>
                         <th className="pb-3 pr-4">Rating</th>
                         <th className="pb-3">Status</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#1e1e2e]">
+                    <tbody className="divide-y divide-[#d2d2d7]">
                       {data.nearbyDrivers.map((d) => (
-                        <tr key={d.id} className="text-[#a1a1aa]">
+                        <tr key={d.id} className="text-[#6e6e73]">
                           <td className="py-3 pr-4">
-                            <span className="text-[#e4e4e7]">{d.full_name}</span>
-                            <span className="ml-2 font-mono text-xs text-[#52525b]">
+                            <span className="text-[#1d1d1f]">{d.full_name}</span>
+                            <span className="ml-2 font-mono text-xs text-[#86868b]">
                               {d.id.slice(0, 8)}
                             </span>
                           </td>
@@ -437,27 +437,27 @@ export default function DispatchDebugPage() {
             </div>
 
             {/* Dispatch Events Detail */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                 Dispatch Events ({data.dispatchEvents.length})
               </h2>
               {data.dispatchEvents.length === 0 ? (
-                <p className="text-sm text-[#52525b]">No dispatch events found</p>
+                <p className="text-sm text-[#86868b]">No dispatch events found</p>
               ) : (
                 <div className="space-y-3">
                   {data.dispatchEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] p-4"
+                      className="rounded-lg bg-[#FFFFFF] border border-[#d2d2d7] p-4"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-[#e4e4e7]">
+                        <span className="text-sm font-medium text-[#1d1d1f]">
                           {event.event_type.replace(/_/g, ' ')}
                         </span>
-                        <span className="text-xs text-[#71717a]">{formatTime(event.created_at)}</span>
+                        <span className="text-xs text-[#86868b]">{formatTime(event.created_at)}</span>
                       </div>
                       {event.metadata && Object.keys(event.metadata).length > 0 && (
-                        <pre className="mt-2 overflow-x-auto rounded-md bg-[#13131b] p-3 text-xs text-[#71717a]">
+                        <pre className="mt-2 overflow-x-auto rounded-md bg-[#f5f5f7] p-3 text-xs text-[#86868b]">
                           {JSON.stringify(event.metadata, null, 2)}
                         </pre>
                       )}
@@ -470,17 +470,17 @@ export default function DispatchDebugPage() {
         )}
 
         {/* Recent Active Rides (quick access) */}
-        <div className="mt-8 rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+        <div className="mt-8 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-[#86868b]">
             Active Dispatch Rides
           </h2>
           {recentLoading ? (
             <div className="flex items-center justify-center py-8">
               <Spinner />
-              <span className="ml-2 text-sm text-[#52525b]">Loading...</span>
+              <span className="ml-2 text-sm text-[#86868b]">Loading...</span>
             </div>
           ) : recentRides.length === 0 ? (
-            <p className="text-sm text-[#52525b]">
+            <p className="text-sm text-[#86868b]">
               No rides currently in searching_driver or driver_assigned status
             </p>
           ) : (
@@ -492,12 +492,12 @@ export default function DispatchDebugPage() {
                     setSearchInput(r.id);
                     fetchDispatch(r.id);
                   }}
-                  className="flex w-full items-center gap-4 rounded-lg bg-[#0a0a0f] px-4 py-3 text-left text-sm transition-colors hover:bg-[#1a1a25]"
+                  className="flex w-full items-center gap-4 rounded-lg bg-[#FFFFFF] px-4 py-3 text-left text-sm transition-colors hover:bg-[#f5f5f7]"
                 >
                   <StatusBadge status={r.status} />
-                  <span className="font-mono text-xs text-[#71717a]">{r.id.slice(0, 12)}...</span>
-                  <span className="flex-1 truncate text-[#a1a1aa]">{r.pickup_address}</span>
-                  <span className="text-xs text-[#52525b]">{timeAgo(r.requested_at)}</span>
+                  <span className="font-mono text-xs text-[#86868b]">{r.id.slice(0, 12)}...</span>
+                  <span className="flex-1 truncate text-[#6e6e73]">{r.pickup_address}</span>
+                  <span className="text-xs text-[#86868b]">{timeAgo(r.requested_at)}</span>
                 </button>
               ))}
             </div>
@@ -512,7 +512,7 @@ export default function DispatchDebugPage() {
 
 function Spinner() {
   return (
-    <svg className="h-4 w-4 animate-spin text-[#71717a]" viewBox="0 0 24 24" fill="none">
+    <svg className="h-4 w-4 animate-spin text-[#86868b]" viewBox="0 0 24 24" fill="none">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
@@ -524,7 +524,7 @@ function Spinner() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_COLORS[status] ?? 'bg-[#1e1e2e] text-[#71717a]';
+  const cls = STATUS_COLORS[status] ?? 'bg-[#d2d2d7] text-[#86868b]';
   return (
     <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
       {status.replace(/_/g, ' ')}
@@ -545,9 +545,9 @@ function InfoCell({
 }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-[#52525b]">{label}</p>
+      <p className="text-xs uppercase tracking-wider text-[#86868b]">{label}</p>
       {children ?? (
-        <p className={`mt-1 text-sm text-[#e4e4e7] ${mono ? 'font-mono' : ''}`}>
+        <p className={`mt-1 text-sm text-[#1d1d1f] ${mono ? 'font-mono' : ''}`}>
           {value ?? '--'}
         </p>
       )}
@@ -557,8 +557,8 @@ function InfoCell({
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-      <p className="text-xs uppercase tracking-wider text-[#52525b]">{label}</p>
+    <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+      <p className="text-xs uppercase tracking-wider text-[#86868b]">{label}</p>
       <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
@@ -571,7 +571,7 @@ function CandidateResult({ result }: { result: string }) {
     timed_out: 'bg-amber-500/20 text-amber-400',
     offered: 'bg-blue-500/20 text-blue-400',
   };
-  const cls = map[result] ?? 'bg-[#1e1e2e] text-[#71717a]';
+  const cls = map[result] ?? 'bg-[#d2d2d7] text-[#86868b]';
   return (
     <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
       {result.replace(/_/g, ' ')}

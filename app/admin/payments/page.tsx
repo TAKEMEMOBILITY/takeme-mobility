@@ -50,7 +50,7 @@ const STATUS_COLORS: Record<string, string> = {
   failed: 'bg-red-500/20 text-red-400',
   refunded: 'bg-purple-500/20 text-purple-400',
   disputed: 'bg-red-500/20 text-red-300',
-  resolved: 'bg-[#1e1e2e] text-[#71717a]',
+  resolved: 'bg-[#d2d2d7] text-[#86868b]',
 };
 
 const TABS = ['all', 'captured', 'failed', 'refunded', 'disputed', 'pending'] as const;
@@ -156,31 +156,31 @@ export default function PaymentsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#e4e4e7]">Payments</h1>
-            <p className="mt-1 text-sm text-[#71717a]">
+            <h1 className="text-2xl font-bold text-[#1d1d1f]">Payments</h1>
+            <p className="mt-1 text-sm text-[#86868b]">
               Manage payment captures, refunds, and disputes. Auto-refreshes every 30s.
             </p>
           </div>
-          <div className="text-xs text-[#52525b]">
+          <div className="text-xs text-[#86868b]">
             {total} total
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex gap-1 rounded-lg border border-[#1e1e2e] bg-[#13131b] p-1">
+        <div className="mb-6 flex gap-1 rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] p-1">
           {TABS.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`rounded-md px-4 py-2 text-xs font-semibold capitalize transition-colors ${
                 activeTab === tab
-                  ? 'bg-[#1e1e2e] text-white'
-                  : 'text-[#71717a] hover:text-[#a1a1aa]'
+                  ? 'bg-[#d2d2d7] text-[#1d1d1f]'
+                  : 'text-[#86868b] hover:text-[#6e6e73]'
               }`}
             >
               {tab}
@@ -197,14 +197,14 @@ export default function PaymentsPage() {
 
         <div className="flex gap-6">
           {/* Table */}
-          <div className="flex-1 overflow-hidden rounded-xl border border-[#1e1e2e] bg-[#13131b]">
+          <div className="flex-1 overflow-hidden rounded-xl border border-[#d2d2d7] bg-[#f5f5f7]">
             {loading ? (
               <div className="flex items-center justify-center py-20">
                 <Spinner />
-                <span className="ml-2 text-sm text-[#52525b]">Loading payments...</span>
+                <span className="ml-2 text-sm text-[#86868b]">Loading payments...</span>
               </div>
             ) : payments.length === 0 ? (
-              <div className="py-20 text-center text-sm text-[#52525b]">
+              <div className="py-20 text-center text-sm text-[#86868b]">
                 No payments found
               </div>
             ) : (
@@ -212,7 +212,7 @@ export default function PaymentsPage() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-sm">
                     <thead>
-                      <tr className="border-b border-[#1e1e2e] text-xs uppercase tracking-wider text-[#52525b]">
+                      <tr className="border-b border-[#d2d2d7] text-xs uppercase tracking-wider text-[#86868b]">
                         <th className="px-4 py-3">Ride</th>
                         <th className="px-4 py-3">Amount</th>
                         <th className="px-4 py-3">Status</th>
@@ -221,7 +221,7 @@ export default function PaymentsPage() {
                         <th className="px-4 py-3">Date</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#1e1e2e]">
+                    <tbody className="divide-y divide-[#d2d2d7]">
                       {payments.map((p) => (
                         <tr
                           key={p.id}
@@ -232,26 +232,26 @@ export default function PaymentsPage() {
                               : ''
                           } ${
                             selectedId === p.id
-                              ? 'bg-[#1e1e2e]'
-                              : 'hover:bg-[#0f0f17]'
+                              ? 'bg-[#d2d2d7]'
+                              : 'hover:bg-[#f5f5f7]'
                           }`}
                         >
-                          <td className="px-4 py-3 font-mono text-xs text-[#a1a1aa]">
+                          <td className="px-4 py-3 font-mono text-xs text-[#6e6e73]">
                             {p.ride_id.slice(0, 8)}...
                           </td>
-                          <td className="px-4 py-3 font-semibold text-[#e4e4e7]">
+                          <td className="px-4 py-3 font-semibold text-[#1d1d1f]">
                             {usd(p.amount, p.currency)}
                           </td>
                           <td className="px-4 py-3">
                             <StatusBadge status={p.status} />
                           </td>
-                          <td className="px-4 py-3 text-[#a1a1aa]">
+                          <td className="px-4 py-3 text-[#6e6e73]">
                             {p.payment_method_type ?? '--'}
                           </td>
-                          <td className="px-4 py-3 text-[#a1a1aa]">
+                          <td className="px-4 py-3 text-[#6e6e73]">
                             {p.riders?.full_name ?? '--'}
                           </td>
-                          <td className="px-4 py-3 text-xs text-[#71717a]">
+                          <td className="px-4 py-3 text-xs text-[#86868b]">
                             {formatDate(p.authorized_at ?? p.captured_at)}
                           </td>
                         </tr>
@@ -262,22 +262,22 @@ export default function PaymentsPage() {
 
                 {/* Pagination */}
                 {total > limit && (
-                  <div className="flex items-center justify-between border-t border-[#1e1e2e] px-4 py-3">
-                    <span className="text-xs text-[#52525b]">
+                  <div className="flex items-center justify-between border-t border-[#d2d2d7] px-4 py-3">
+                    <span className="text-xs text-[#86868b]">
                       Showing {offset + 1}–{Math.min(offset + limit, total)} of {total}
                     </span>
                     <div className="flex gap-2">
                       <button
                         onClick={() => setOffset(Math.max(0, offset - limit))}
                         disabled={offset === 0}
-                        className="rounded-md border border-[#1e1e2e] px-3 py-1.5 text-xs text-[#a1a1aa] transition-colors hover:bg-[#1e1e2e] disabled:opacity-30"
+                        className="rounded-md border border-[#d2d2d7] px-3 py-1.5 text-xs text-[#6e6e73] transition-colors hover:bg-[#d2d2d7] disabled:opacity-30"
                       >
                         Previous
                       </button>
                       <button
                         onClick={() => setOffset(offset + limit)}
                         disabled={offset + limit >= total}
-                        className="rounded-md border border-[#1e1e2e] px-3 py-1.5 text-xs text-[#a1a1aa] transition-colors hover:bg-[#1e1e2e] disabled:opacity-30"
+                        className="rounded-md border border-[#d2d2d7] px-3 py-1.5 text-xs text-[#6e6e73] transition-colors hover:bg-[#d2d2d7] disabled:opacity-30"
                       >
                         Next
                       </button>
@@ -290,14 +290,14 @@ export default function PaymentsPage() {
 
           {/* Detail Panel */}
           {selectedPayment && (
-            <div className="w-96 shrink-0 rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
+            <div className="w-96 shrink-0 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
               <div className="mb-5 flex items-center justify-between">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                   Payment Details
                 </h3>
                 <button
                   onClick={() => setSelectedId(null)}
-                  className="text-[#52525b] hover:text-[#a1a1aa]"
+                  className="text-[#86868b] hover:text-[#6e6e73]"
                 >
                   <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -308,14 +308,14 @@ export default function PaymentsPage() {
               <div className="space-y-4">
                 {/* Amount & Status */}
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-[#e4e4e7]">
+                  <span className="text-2xl font-bold text-[#1d1d1f]">
                     {usd(selectedPayment.amount, selectedPayment.currency)}
                   </span>
                   <StatusBadge status={selectedPayment.status} />
                 </div>
 
                 {/* Payment Info */}
-                <div className="space-y-2 rounded-lg bg-[#0a0a0f] p-3">
+                <div className="space-y-2 rounded-lg bg-[#FFFFFF] p-3">
                   <DetailRow label="Payment ID" value={selectedPayment.id.slice(0, 12) + '...'} mono />
                   <DetailRow label="Stripe PI" value={selectedPayment.stripe_payment_intent ?? '--'} mono />
                   <DetailRow label="Charge ID" value={selectedPayment.stripe_charge_id ?? '--'} mono />
@@ -324,8 +324,8 @@ export default function PaymentsPage() {
                 </div>
 
                 {/* Ride Info */}
-                <div className="space-y-2 rounded-lg bg-[#0a0a0f] p-3">
-                  <p className="text-xs uppercase tracking-wider text-[#52525b]">Ride Info</p>
+                <div className="space-y-2 rounded-lg bg-[#FFFFFF] p-3">
+                  <p className="text-xs uppercase tracking-wider text-[#86868b]">Ride Info</p>
                   <DetailRow label="Ride ID" value={selectedPayment.ride_id.slice(0, 12) + '...'} mono />
                   <DetailRow label="Pickup" value={selectedPayment.rides?.pickup_address ?? '--'} />
                   <DetailRow label="Dropoff" value={selectedPayment.rides?.dropoff_address ?? '--'} />
@@ -333,8 +333,8 @@ export default function PaymentsPage() {
                 </div>
 
                 {/* Status Timeline */}
-                <div className="space-y-2 rounded-lg bg-[#0a0a0f] p-3">
-                  <p className="text-xs uppercase tracking-wider text-[#52525b]">Status Timeline</p>
+                <div className="space-y-2 rounded-lg bg-[#FFFFFF] p-3">
+                  <p className="text-xs uppercase tracking-wider text-[#86868b]">Status Timeline</p>
                   <TimelineEntry
                     label="Authorized"
                     time={selectedPayment.authorized_at}
@@ -375,8 +375,8 @@ export default function PaymentsPage() {
                 )}
 
                 {/* Actions */}
-                <div className="space-y-3 border-t border-[#1e1e2e] pt-4">
-                  <p className="text-xs uppercase tracking-wider text-[#52525b]">Actions</p>
+                <div className="space-y-3 border-t border-[#d2d2d7] pt-4">
+                  <p className="text-xs uppercase tracking-wider text-[#86868b]">Actions</p>
 
                   {/* Reason Input */}
                   <input
@@ -384,7 +384,7 @@ export default function PaymentsPage() {
                     value={actionReason}
                     onChange={(e) => setActionReason(e.target.value)}
                     placeholder="Reason (required for refund/resolve)"
-                    className="w-full rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                    className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                   />
 
                   {/* Retry Capture */}
@@ -406,7 +406,7 @@ export default function PaymentsPage() {
                         value={refundAmount}
                         onChange={(e) => setRefundAmount(e.target.value)}
                         placeholder={`Partial amount in dollars (leave blank for full ${usd(selectedPayment.amount, selectedPayment.currency)})`}
-                        className="w-full rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                        className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                       />
                       <button
                         onClick={() => performAction('refund', selectedPayment.id)}
@@ -427,7 +427,7 @@ export default function PaymentsPage() {
                     <button
                       onClick={() => performAction('mark_resolved', selectedPayment.id)}
                       disabled={!!actionLoading || !actionReason.trim()}
-                      className="w-full rounded-lg bg-emerald-600 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-500 disabled:opacity-40"
+                      className="w-full rounded-lg bg-[#0071e3] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40"
                     >
                       {actionLoading === 'mark_resolved' ? 'Resolving...' : 'Mark Resolved'}
                     </button>
@@ -446,7 +446,7 @@ export default function PaymentsPage() {
 
 function Spinner() {
   return (
-    <svg className="h-4 w-4 animate-spin text-[#71717a]" viewBox="0 0 24 24" fill="none">
+    <svg className="h-4 w-4 animate-spin text-[#86868b]" viewBox="0 0 24 24" fill="none">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
@@ -458,7 +458,7 @@ function Spinner() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const cls = STATUS_COLORS[status] ?? 'bg-[#1e1e2e] text-[#71717a]';
+  const cls = STATUS_COLORS[status] ?? 'bg-[#d2d2d7] text-[#86868b]';
   return (
     <span className={`inline-block whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>
       {status}
@@ -469,8 +469,8 @@ function StatusBadge({ status }: { status: string }) {
 function DetailRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <span className="text-xs text-[#52525b]">{label}</span>
-      <span className={`text-xs text-[#a1a1aa] ${mono ? 'font-mono' : ''} max-w-[180px] truncate`}>
+      <span className="text-xs text-[#86868b]">{label}</span>
+      <span className={`text-xs text-[#6e6e73] ${mono ? 'font-mono' : ''} max-w-[180px] truncate`}>
         {value}
       </span>
     </div>
@@ -496,13 +496,13 @@ function TimelineEntry({
             ? isError
               ? 'bg-red-500'
               : 'bg-emerald-500'
-            : 'bg-[#1e1e2e]'
+            : 'bg-[#d2d2d7]'
         }`}
       />
-      <span className={`text-xs ${active ? 'text-[#a1a1aa]' : 'text-[#3f3f46]'}`}>
+      <span className={`text-xs ${active ? 'text-[#6e6e73]' : 'text-[#86868b]'}`}>
         {label}
       </span>
-      <span className="ml-auto text-xs text-[#52525b]">{formatDate(time)}</span>
+      <span className="ml-auto text-xs text-[#86868b]">{formatDate(time)}</span>
     </div>
   );
 }

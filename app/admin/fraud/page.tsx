@@ -102,7 +102,7 @@ const ACTION_COLORS: Record<string, string> = {
   flag: 'bg-amber-500/20 text-amber-400',
   cancel: 'bg-red-500/20 text-red-400',
   ban: 'bg-red-500/20 text-red-300',
-  dismissed: 'bg-[#1e1e2e] text-[#71717a]',
+  dismissed: 'bg-[#d2d2d7] text-[#86868b]',
 };
 
 type Tab = 'flagged' | 'events' | 'bans';
@@ -212,16 +212,16 @@ export default function FraudPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFFFFF]">
         <Spinner />
-        <span className="ml-2 text-sm text-[#52525b]">Loading fraud data...</span>
+        <span className="ml-2 text-sm text-[#86868b]">Loading fraud data...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#0a0a0f]">
+      <div className="flex min-h-screen items-center justify-center bg-[#FFFFFF]">
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 text-sm text-red-400">
           {error}
         </div>
@@ -237,12 +237,12 @@ export default function FraudPage() {
   const bannedDevices = data.bannedDeviceCount;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8">
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#e4e4e7]">Fraud Detection</h1>
-          <p className="mt-1 text-sm text-[#71717a]">
+          <h1 className="text-2xl font-bold text-[#1d1d1f]">Fraud Detection</h1>
+          <p className="mt-1 text-sm text-[#86868b]">
             Monitor flagged rides, fraud events, and device bans. Auto-refreshes every 30s.
           </p>
         </div>
@@ -256,7 +256,7 @@ export default function FraudPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 flex gap-1 rounded-lg border border-[#1e1e2e] bg-[#13131b] p-1">
+        <div className="mb-6 flex gap-1 rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] p-1">
           {([
             { key: 'flagged' as const, label: 'Flagged Rides' },
             { key: 'events' as const, label: 'Fraud Events' },
@@ -267,8 +267,8 @@ export default function FraudPage() {
               onClick={() => setActiveTab(tab.key)}
               className={`rounded-md px-4 py-2 text-xs font-semibold transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-[#1e1e2e] text-white'
-                  : 'text-[#71717a] hover:text-[#a1a1aa]'
+                  ? 'bg-[#d2d2d7] text-[#1d1d1f]'
+                  : 'text-[#86868b] hover:text-[#6e6e73]'
               }`}
             >
               {tab.label}
@@ -278,13 +278,13 @@ export default function FraudPage() {
 
         {/* Tab Content */}
         {activeTab === 'flagged' && (
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b]">
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7]">
             {data.flaggedTrips.length === 0 ? (
-              <div className="py-20 text-center text-sm text-[#52525b]">
+              <div className="py-20 text-center text-sm text-[#86868b]">
                 No flagged trips
               </div>
             ) : (
-              <div className="divide-y divide-[#1e1e2e]">
+              <div className="divide-y divide-[#d2d2d7]">
                 {data.flaggedTrips.map((trip) => {
                   const isExpanded = expandedTrip === trip.id;
                   const checks = trip.checks ?? [];
@@ -292,11 +292,11 @@ export default function FraudPage() {
                     <div key={trip.id}>
                       <div
                         onClick={() => setExpandedTrip(isExpanded ? null : trip.id)}
-                        className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-[#0f0f17]"
+                        className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-[#f5f5f7]"
                       >
                         {/* Expand Icon */}
                         <svg
-                          className={`h-4 w-4 shrink-0 text-[#52525b] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                          className={`h-4 w-4 shrink-0 text-[#86868b] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -306,7 +306,7 @@ export default function FraudPage() {
                         </svg>
 
                         {/* Ride ID */}
-                        <span className="font-mono text-xs text-[#a1a1aa]">
+                        <span className="font-mono text-xs text-[#6e6e73]">
                           {trip.ride_id.slice(0, 8)}...
                         </span>
 
@@ -325,27 +325,27 @@ export default function FraudPage() {
                         )}
 
                         {/* Failed checks count */}
-                        <span className="text-xs text-[#52525b]">
+                        <span className="text-xs text-[#86868b]">
                           {checks.filter((c) => c.passed === false).length} checks failed
                         </span>
 
                         {/* Time */}
-                        <span className="ml-auto text-xs text-[#52525b]">
+                        <span className="ml-auto text-xs text-[#86868b]">
                           {timeAgo(trip.created_at)}
                         </span>
                       </div>
 
                       {/* Expanded: Check Breakdown */}
                       {isExpanded && (
-                        <div className="border-t border-[#1e1e2e] bg-[#0a0a0f] px-5 py-4">
-                          <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#52525b]">
+                        <div className="border-t border-[#d2d2d7] bg-[#FFFFFF] px-5 py-4">
+                          <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                             Check Breakdown
                           </h4>
                           <div className="space-y-2">
                             {checks.map((check, i) => (
                               <div
                                 key={i}
-                                className="flex items-center gap-3 rounded-lg bg-[#13131b] border border-[#1e1e2e] px-4 py-3"
+                                className="flex items-center gap-3 rounded-lg bg-[#f5f5f7] border border-[#d2d2d7] px-4 py-3"
                               >
                                 {/* Pass/Fail indicator */}
                                 <div
@@ -354,7 +354,7 @@ export default function FraudPage() {
                                   }`}
                                 />
                                 {/* Check name */}
-                                <span className="min-w-[140px] text-xs font-medium text-[#e4e4e7]">
+                                <span className="min-w-[140px] text-xs font-medium text-[#1d1d1f]">
                                   {(check.check ?? check.name ?? 'Unknown').replace(/_/g, ' ')}
                                 </span>
                                 {/* Score */}
@@ -362,11 +362,11 @@ export default function FraudPage() {
                                   {check.score}
                                 </span>
                                 {/* Weight */}
-                                <span className="min-w-[40px] text-xs text-[#52525b]">
+                                <span className="min-w-[40px] text-xs text-[#86868b]">
                                   w: {check.weight}
                                 </span>
                                 {/* Detail */}
-                                <span className="flex-1 truncate text-xs text-[#71717a]">
+                                <span className="flex-1 truncate text-xs text-[#86868b]">
                                   {check.detail ?? check.details ?? ''}
                                 </span>
                               </div>
@@ -396,24 +396,24 @@ export default function FraudPage() {
         )}
 
         {activeTab === 'events' && (
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b]">
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7]">
             {data.events.length === 0 ? (
-              <div className="py-20 text-center text-sm text-[#52525b]">
+              <div className="py-20 text-center text-sm text-[#86868b]">
                 No fraud events
               </div>
             ) : (
-              <div className="divide-y divide-[#1e1e2e]">
+              <div className="divide-y divide-[#d2d2d7]">
                 {data.events.map((event) => {
                   const isExpanded = expandedEvent === event.id;
                   return (
                     <div key={event.id}>
                       <div
                         onClick={() => setExpandedEvent(isExpanded ? null : event.id)}
-                        className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-[#0f0f17]"
+                        className="flex cursor-pointer items-center gap-4 px-5 py-4 transition-colors hover:bg-[#f5f5f7]"
                       >
                         {/* Expand Icon */}
                         <svg
-                          className={`h-4 w-4 shrink-0 text-[#52525b] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
+                          className={`h-4 w-4 shrink-0 text-[#86868b] transition-transform ${isExpanded ? 'rotate-90' : ''}`}
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -423,14 +423,14 @@ export default function FraudPage() {
                         </svg>
 
                         {/* Event Type */}
-                        <span className="min-w-[120px] text-sm text-[#e4e4e7]">
+                        <span className="min-w-[120px] text-sm text-[#1d1d1f]">
                           {event.event_type.replace(/_/g, ' ')}
                         </span>
 
                         {/* Severity */}
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            SEVERITY_COLORS[event.severity] ?? 'bg-[#1e1e2e] text-[#71717a]'
+                            SEVERITY_COLORS[event.severity] ?? 'bg-[#d2d2d7] text-[#86868b]'
                           }`}
                         >
                           {event.severity}
@@ -442,11 +442,11 @@ export default function FraudPage() {
                         </span>
 
                         {/* User / Ride */}
-                        <span className="font-mono text-xs text-[#52525b]">
+                        <span className="font-mono text-xs text-[#86868b]">
                           user: {event.user_id?.slice(0, 8) ?? '--'}
                         </span>
                         {event.ride_id && (
-                          <span className="font-mono text-xs text-[#52525b]">
+                          <span className="font-mono text-xs text-[#86868b]">
                             ride: {event.ride_id.slice(0, 8)}
                           </span>
                         )}
@@ -454,21 +454,21 @@ export default function FraudPage() {
                         {/* Action Taken */}
                         <span
                           className={`ml-auto rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                            ACTION_COLORS[event.action_taken] ?? 'bg-[#1e1e2e] text-[#71717a]'
+                            ACTION_COLORS[event.action_taken] ?? 'bg-[#d2d2d7] text-[#86868b]'
                           }`}
                         >
                           {event.action_taken}
                         </span>
 
                         {/* Time */}
-                        <span className="text-xs text-[#52525b]">
+                        <span className="text-xs text-[#86868b]">
                           {timeAgo(event.created_at)}
                         </span>
                       </div>
 
                       {/* Expanded Details */}
                       {isExpanded && (
-                        <div className="border-t border-[#1e1e2e] bg-[#0a0a0f] px-5 py-4">
+                        <div className="border-t border-[#d2d2d7] bg-[#FFFFFF] px-5 py-4">
                           <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                             <InfoCell label="Event ID" value={event.id.slice(0, 12) + '...'} />
                             <InfoCell label="User ID" value={event.user_id ?? '--'} />
@@ -481,14 +481,14 @@ export default function FraudPage() {
                           {/* Check details if available */}
                           {event.details?.checks && event.details.checks.length > 0 && (
                             <div className="mt-4">
-                              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#52525b]">
+                              <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                                 Checks
                               </h4>
                               <div className="space-y-1">
                                 {event.details.checks.map((check, i) => (
                                   <div
                                     key={i}
-                                    className="flex items-center gap-3 text-xs text-[#a1a1aa]"
+                                    className="flex items-center gap-3 text-xs text-[#6e6e73]"
                                   >
                                     <div
                                       className={`h-1.5 w-1.5 rounded-full ${
@@ -499,7 +499,7 @@ export default function FraudPage() {
                                       {(check.check ?? check.name ?? '').replace(/_/g, ' ')}
                                     </span>
                                     <span className={scoreColor(check.score)}>{check.score}</span>
-                                    <span className="text-[#52525b]">{check.detail ?? check.details ?? ''}</span>
+                                    <span className="text-[#86868b]">{check.detail ?? check.details ?? ''}</span>
                                   </div>
                                 ))}
                               </div>
@@ -508,10 +508,10 @@ export default function FraudPage() {
 
                           {event.details?.reasons && event.details.reasons.length > 0 && (
                             <div className="mt-3">
-                              <h4 className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#52525b]">
+                              <h4 className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#86868b]">
                                 Reasons
                               </h4>
-                              <ul className="list-inside list-disc text-xs text-[#71717a]">
+                              <ul className="list-inside list-disc text-xs text-[#86868b]">
                                 {event.details.reasons.map((r, i) => (
                                   <li key={i}>{r}</li>
                                 ))}
@@ -527,7 +527,7 @@ export default function FraudPage() {
                                   performAction('dismiss', { eventId: event.id })
                                 }
                                 disabled={actionLoading === `dismiss-${event.id}`}
-                                className="rounded-lg border border-[#1e1e2e] bg-[#13131b] px-4 py-2 text-xs font-semibold text-[#a1a1aa] transition-colors hover:bg-[#1e1e2e] disabled:opacity-40"
+                                className="rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2 text-xs font-semibold text-[#6e6e73] transition-colors hover:bg-[#d2d2d7] disabled:opacity-40"
                               >
                                 {actionLoading === `dismiss-${event.id}` ? 'Dismissing...' : 'Dismiss'}
                               </button>
@@ -575,9 +575,9 @@ export default function FraudPage() {
         {activeTab === 'bans' && (
           <div className="space-y-6">
             {/* Ban Device Form */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#71717a]">
+                <h3 className="text-sm font-semibold uppercase tracking-wider text-[#86868b]">
                   Banned Devices ({bannedDevices})
                 </h3>
                 <button
@@ -589,7 +589,7 @@ export default function FraudPage() {
               </div>
 
               {showBanForm && (
-                <div className="mt-4 space-y-3 rounded-lg border border-[#1e1e2e] bg-[#0a0a0f] p-4">
+                <div className="mt-4 space-y-3 rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] p-4">
                   <div className="grid grid-cols-2 gap-3">
                     <input
                       type="text"
@@ -598,7 +598,7 @@ export default function FraudPage() {
                         setBanForm({ ...banForm, fingerprint: e.target.value })
                       }
                       placeholder="Device fingerprint (required)"
-                      className="rounded-lg border border-[#1e1e2e] bg-[#13131b] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                      className="rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                     />
                     <input
                       type="text"
@@ -607,7 +607,7 @@ export default function FraudPage() {
                         setBanForm({ ...banForm, reason: e.target.value })
                       }
                       placeholder="Reason (required)"
-                      className="rounded-lg border border-[#1e1e2e] bg-[#13131b] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                      className="rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                     />
                     <input
                       type="text"
@@ -616,7 +616,7 @@ export default function FraudPage() {
                         setBanForm({ ...banForm, userId: e.target.value })
                       }
                       placeholder="User ID (optional)"
-                      className="rounded-lg border border-[#1e1e2e] bg-[#13131b] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                      className="rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                     />
                     <input
                       type="text"
@@ -625,7 +625,7 @@ export default function FraudPage() {
                         setBanForm({ ...banForm, ip: e.target.value })
                       }
                       placeholder="IP address (optional)"
-                      className="rounded-lg border border-[#1e1e2e] bg-[#13131b] px-3 py-2 text-xs text-[#e4e4e7] placeholder-[#52525b] outline-none focus:border-emerald-500/50"
+                      className="rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
                     />
                   </div>
                   <button
@@ -651,23 +651,23 @@ export default function FraudPage() {
             </div>
 
             {/* Bans info note */}
-            <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-              <p className="text-sm text-[#71717a]">
+            <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+              <p className="text-sm text-[#86868b]">
                 Device bans are permanent. Banned devices are checked on every ride request and account login.
                 Bans can be applied from fraud events above, or manually using the form.
               </p>
               <div className="mt-4 grid grid-cols-3 gap-4">
-                <div className="rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] p-4 text-center">
+                <div className="rounded-lg bg-[#FFFFFF] border border-[#d2d2d7] p-4 text-center">
                   <p className="text-2xl font-bold text-purple-400">{bannedDevices}</p>
-                  <p className="mt-1 text-xs text-[#52525b]">Total Bans</p>
+                  <p className="mt-1 text-xs text-[#86868b]">Total Bans</p>
                 </div>
-                <div className="rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] p-4 text-center">
+                <div className="rounded-lg bg-[#FFFFFF] border border-[#d2d2d7] p-4 text-center">
                   <p className="text-2xl font-bold text-red-400">{criticalEvents}</p>
-                  <p className="mt-1 text-xs text-[#52525b]">Critical Events</p>
+                  <p className="mt-1 text-xs text-[#86868b]">Critical Events</p>
                 </div>
-                <div className="rounded-lg bg-[#0a0a0f] border border-[#1e1e2e] p-4 text-center">
+                <div className="rounded-lg bg-[#FFFFFF] border border-[#d2d2d7] p-4 text-center">
                   <p className="text-2xl font-bold text-amber-400">{autoCancelled}</p>
-                  <p className="mt-1 text-xs text-[#52525b]">Auto-Cancelled</p>
+                  <p className="mt-1 text-xs text-[#86868b]">Auto-Cancelled</p>
                 </div>
               </div>
             </div>
@@ -682,7 +682,7 @@ export default function FraudPage() {
 
 function Spinner() {
   return (
-    <svg className="h-4 w-4 animate-spin text-[#71717a]" viewBox="0 0 24 24" fill="none">
+    <svg className="h-4 w-4 animate-spin text-[#86868b]" viewBox="0 0 24 24" fill="none">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path
         className="opacity-75"
@@ -695,8 +695,8 @@ function Spinner() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="rounded-xl border border-[#1e1e2e] bg-[#13131b] p-5">
-      <p className="text-xs uppercase tracking-wider text-[#52525b]">{label}</p>
+    <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+      <p className="text-xs uppercase tracking-wider text-[#86868b]">{label}</p>
       <p className={`mt-2 text-3xl font-bold ${color}`}>{value}</p>
     </div>
   );
@@ -705,8 +705,8 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 function InfoCell({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs uppercase tracking-wider text-[#52525b]">{label}</p>
-      <p className="mt-1 truncate font-mono text-xs text-[#a1a1aa]">{value}</p>
+      <p className="text-xs uppercase tracking-wider text-[#86868b]">{label}</p>
+      <p className="mt-1 truncate font-mono text-xs text-[#6e6e73]">{value}</p>
     </div>
   );
 }

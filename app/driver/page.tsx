@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/lib/auth/context';
 import { createClient } from '@/lib/supabase/client';
 import ConnectCard from '@/components/ConnectCard';
@@ -266,26 +267,30 @@ export default function DriverPage() {
   if (authLoading || mode === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D1D1F]" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#d2d2d7] border-t-[#1d1d1f]" />
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-[#1D1D1F]">
+    <div className="flex min-h-screen flex-col bg-white text-[#1d1d1f]">
 
       {/* ── Header ───────────────────────────────────────────── */}
-      <header className="flex items-center justify-between border-b border-[#F5F5F7] px-5 py-4">
-        <div>
-          <p className="text-[18px] font-semibold tracking-[-0.01em]">TakeMe Driver</p>
+      <header className="flex items-center justify-between border-b border-[#f5f5f7] px-5 py-4">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-[14px] font-medium text-[#86868b] hover:text-[#1d1d1f] transition-colors">&larr; TakeMe</Link>
+          <div className="h-4 w-px bg-[#d2d2d7]" />
+          <div>
+            <p className="text-[18px] font-semibold tracking-[-0.01em]">TakeMe Driver</p>
           {profile && (
-            <p className="text-[13px] text-[#86868B]">
+            <p className="text-[13px] text-[#6e6e73]">
               {profile.full_name} · ★ {Number(profile.rating).toFixed(1)} · {profile.total_trips} trips
             </p>
           )}
+          </div>
         </div>
         <div className={`h-3 w-3 rounded-full ${
-          isOnline ? 'bg-[#34C759]' : 'bg-[#E8E8ED]'
+          isOnline ? 'bg-[#34c759]' : 'bg-[#d2d2d7]'
         }`} />
       </header>
 
@@ -294,7 +299,7 @@ export default function DriverPage() {
         <div className="mx-5 mt-4 flex items-center gap-2.5 rounded-xl bg-[#FFF5F5] px-4 py-3">
           <span className="h-2 w-2 shrink-0 rounded-full bg-[#FF3B30]" />
           <p className="text-[13px] font-medium">{error}</p>
-          <button onClick={() => setError('')} className="ml-auto text-[12px] text-[#86868B]">Dismiss</button>
+          <button onClick={() => setError('')} className="ml-auto text-[12px] text-[#6e6e73]">Dismiss</button>
         </div>
       )}
 
@@ -304,19 +309,19 @@ export default function DriverPage() {
         {/* ═══ OFFLINE ════════════════════════════════════════ */}
         {mode === 'offline' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-6">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#F5F5F7]">
-              <svg className="h-8 w-8 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-[#f5f5f7]">
+              <svg className="h-8 w-8 text-[#6e6e73]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
               </svg>
             </div>
             <div className="text-center">
               <p className="text-[20px] font-semibold">You're offline</p>
-              <p className="mt-1 text-[15px] text-[#86868B]">Go online to start receiving ride requests</p>
+              <p className="mt-1 text-[15px] text-[#6e6e73]">Go online to start receiving ride requests</p>
             </div>
             <button
               onClick={toggleOnline}
               disabled={actionLoading}
-              className="h-[56px] w-full max-w-xs rounded-[999px] bg-[#34C759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#2DB84E] disabled:opacity-50"
+              className="h-[56px] w-full max-w-xs rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
             >
               {actionLoading ? 'Going online...' : 'Go online'}
             </button>
@@ -332,18 +337,18 @@ export default function DriverPage() {
         {mode === 'online' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-6">
             <div className="relative flex h-20 w-20 items-center justify-center">
-              <div className="h-20 w-20 rounded-full bg-[#34C759]/10" />
-              <div className="absolute h-12 w-12 animate-ping rounded-full bg-[#34C759] opacity-10" />
-              <div className="absolute h-4 w-4 rounded-full bg-[#34C759]" />
+              <div className="h-20 w-20 rounded-full bg-[#34c759]/10" />
+              <div className="absolute h-12 w-12 animate-ping rounded-full bg-[#34c759] opacity-10" />
+              <div className="absolute h-4 w-4 rounded-full bg-[#34c759]" />
             </div>
             <div className="text-center">
               <p className="text-[20px] font-semibold">You're online</p>
-              <p className="mt-1 text-[15px] text-[#86868B]">Waiting for ride requests</p>
+              <p className="mt-1 text-[15px] text-[#6e6e73]">Waiting for ride requests</p>
             </div>
             <button
               onClick={toggleOnline}
               disabled={actionLoading}
-              className="h-[48px] w-full max-w-xs rounded-[999px] border border-[#E8E8ED] text-[15px] font-medium text-[#86868B] transition-colors duration-200 hover:bg-[#F5F5F7] disabled:opacity-50"
+              className="h-[48px] w-full max-w-xs rounded-[999px] border border-[#d2d2d7] text-[15px] font-medium text-[#6e6e73] transition-colors duration-200 hover:bg-[#f5f5f7] disabled:opacity-50"
             >
               {actionLoading ? 'Going offline...' : 'Go offline'}
             </button>
@@ -360,10 +365,10 @@ export default function DriverPage() {
           <div className="flex flex-1 flex-col gap-5">
 
             {/* Phase indicator */}
-            <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
+            <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
               <span className="relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0071E3] opacity-30" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-[#0071E3]" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0071e3] opacity-30" />
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-[#0071e3]" />
               </span>
               <span className="text-[15px] font-semibold">
                 {mode === 'assigned' && 'New ride request'}
@@ -374,28 +379,28 @@ export default function DriverPage() {
             </div>
 
             {/* Rider info */}
-            <div className="flex items-center gap-4 rounded-xl border border-[#F5F5F7] p-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F5F5F7] text-[18px] font-bold">
+            <div className="flex items-center gap-4 rounded-xl border border-[#f5f5f7] p-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#f5f5f7] text-[18px] font-bold">
                 {ride.rider_name.charAt(0)}
               </div>
               <div className="flex-1">
                 <p className="text-[16px] font-semibold">{ride.rider_name}</p>
-                <p className="text-[13px] text-[#86868B]">★ {Number(ride.rider_rating).toFixed(1)} · {ride.vehicle_class}</p>
+                <p className="text-[13px] text-[#6e6e73]">★ {Number(ride.rider_rating).toFixed(1)} · {ride.vehicle_class}</p>
               </div>
               <div className="text-right">
                 <p className="text-[18px] font-bold tabular-nums">${Number(ride.estimated_fare).toFixed(2)}</p>
-                <p className="text-[12px] text-[#86868B]">{ride.distance_km} km · {ride.duration_min} min</p>
+                <p className="text-[12px] text-[#6e6e73]">{ride.distance_km} km · {ride.duration_min} min</p>
               </div>
             </div>
 
             {/* Route */}
             <div className="space-y-2">
               <div className={`flex items-center gap-3 rounded-xl px-4 py-3.5 ${
-                mode === 'on_trip' ? 'bg-[#F5F5F7]' : 'bg-[#34C759]/8 border border-[#34C759]/20'
+                mode === 'on_trip' ? 'bg-[#f5f5f7]' : 'bg-[#34c759]/8 border border-[#34c759]/20'
               }`}>
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#34C759]" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#34c759]" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Pickup</p>
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#6e6e73]">Pickup</p>
                   <p className="mt-0.5 truncate text-[15px] font-medium">{ride.pickup_address}</p>
                 </div>
                 {(mode === 'assigned' || mode === 'arriving') && (
@@ -403,7 +408,7 @@ export default function DriverPage() {
                     href={`https://maps.google.com/maps?daddr=${ride.pickup_lat},${ride.pickup_lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0071E3] text-white"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-white"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
@@ -413,11 +418,11 @@ export default function DriverPage() {
               </div>
 
               <div className={`flex items-center gap-3 rounded-xl px-4 py-3.5 ${
-                mode === 'on_trip' ? 'bg-[#0071E3]/8 border border-[#0071E3]/20' : 'bg-[#F5F5F7]'
+                mode === 'on_trip' ? 'bg-[#0071e3]/8 border border-[#0071e3]/20' : 'bg-[#f5f5f7]'
               }`}>
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#1D1D1F]" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#1d1d1f]" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Dropoff</p>
+                  <p className="text-[11px] font-medium uppercase tracking-wider text-[#6e6e73]">Dropoff</p>
                   <p className="mt-0.5 truncate text-[15px] font-medium">{ride.dropoff_address}</p>
                 </div>
                 {mode === 'on_trip' && (
@@ -425,7 +430,7 @@ export default function DriverPage() {
                     href={`https://maps.google.com/maps?daddr=${ride.dropoff_lat},${ride.dropoff_lng}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0071E3] text-white"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-white"
                   >
                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
@@ -442,14 +447,14 @@ export default function DriverPage() {
                   <button
                     onClick={() => rideAction('accept')}
                     disabled={actionLoading}
-                    className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34C759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#2DB84E] disabled:opacity-50"
+                    className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
                   >
                     {actionLoading ? 'Accepting...' : 'Accept ride'}
                   </button>
                   <button
                     onClick={() => rideAction('cancel', 'Driver rejected')}
                     disabled={actionLoading}
-                    className="flex h-[48px] w-full items-center justify-center rounded-[999px] border border-[#E8E8ED] text-[15px] font-medium text-[#86868B] transition-colors duration-200 hover:bg-[#F5F5F7] disabled:opacity-50"
+                    className="flex h-[48px] w-full items-center justify-center rounded-[999px] border border-[#d2d2d7] text-[15px] font-medium text-[#6e6e73] transition-colors duration-200 hover:bg-[#f5f5f7] disabled:opacity-50"
                   >
                     Decline
                   </button>
@@ -460,7 +465,7 @@ export default function DriverPage() {
                 <button
                   onClick={() => rideAction('arrived')}
                   disabled={actionLoading}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#1D1D1F] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#424245] disabled:opacity-50"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#0071e3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] disabled:opacity-50"
                 >
                   {actionLoading ? 'Updating...' : 'I\'ve arrived'}
                 </button>
@@ -470,7 +475,7 @@ export default function DriverPage() {
                 <button
                   onClick={() => rideAction('start_trip')}
                   disabled={actionLoading}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#0071E3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005BB5] disabled:opacity-50"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#0071e3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] disabled:opacity-50"
                 >
                   {actionLoading ? 'Starting...' : 'Start trip'}
                 </button>
@@ -480,7 +485,7 @@ export default function DriverPage() {
                 <button
                   onClick={() => rideAction('complete')}
                   disabled={actionLoading}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34C759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#2DB84E] disabled:opacity-50"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
                 >
                   {actionLoading ? 'Completing...' : 'Complete trip'}
                 </button>
@@ -503,14 +508,14 @@ export default function DriverPage() {
         {/* ═══ COMPLETED ══════════════════════════════════════ */}
         {mode === 'completed' && ride && (
           <div className="flex flex-1 flex-col items-center justify-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#34C759]/10">
-              <svg className="h-8 w-8 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#34c759]/10">
+              <svg className="h-8 w-8 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
             <div className="text-center">
               <p className="text-[22px] font-semibold">Trip complete</p>
-              <p className="mt-1 text-[15px] text-[#86868B]">{ride.rider_name} · {ride.distance_km} km</p>
+              <p className="mt-1 text-[15px] text-[#6e6e73]">{ride.rider_name} · {ride.distance_km} km</p>
             </div>
             <p className="text-[28px] font-bold tabular-nums">${Number(ride.estimated_fare).toFixed(2)}</p>
           </div>

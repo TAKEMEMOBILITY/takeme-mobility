@@ -54,8 +54,8 @@ export default function DriverDashboard() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F5F5F7]">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#D2D2D7] border-t-[#1D1D1F]" />
+      <div className="flex min-h-screen items-center justify-center bg-[#f5f5f7]">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#d2d2d7] border-t-[#1d1d1f]" />
       </div>
     );
   }
@@ -64,8 +64,8 @@ export default function DriverDashboard() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6">
         <div className="text-center">
-          <h1 className="text-[22px] font-semibold text-[#1D1D1F]">Sign in to access your dashboard</h1>
-          <Link href="/auth/login?redirect=/driver/dashboard" className="mt-4 inline-flex h-12 items-center rounded-[999px] bg-[#1D1D1F] px-7 text-[15px] font-semibold text-white hover:bg-[#333]">
+          <h1 className="text-[22px] font-semibold text-[#1d1d1f]">Sign in to access your dashboard</h1>
+          <Link href="/auth/login?redirect=/driver/dashboard" className="mt-4 inline-flex h-12 items-center rounded-[999px] bg-[#0071e3] px-7 text-[15px] font-semibold text-white hover:bg-[#005bb5]">
             Sign in
           </Link>
         </div>
@@ -76,30 +76,30 @@ export default function DriverDashboard() {
   const rewardsPercent = Math.round((REWARDS.tripsThisMonth / REWARDS.target) * 100);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
+    <div className="min-h-screen bg-[#f5f5f7]">
       {/* ── Header ────────────────────────────────────────────── */}
-      <header className="bg-white border-b border-[#E5E5EA]">
+      <header className="bg-white border-b border-[#d2d2d7]">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
           <div>
-            <Link href="/" className="text-[17px] tracking-[0.01em] text-[#1D1D1F]">
+            <Link href="/" className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
               <span className="font-semibold">TakeMe</span>
-              <span className="ml-1 font-light text-[#8E8E93]">Driver</span>
+              <span className="ml-1 font-light text-[#86868b]">Driver</span>
             </Link>
           </div>
           <div className="flex items-center gap-4">
             <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold ${
-              driverStatus === 'online' ? 'bg-[#34C759]/10 text-[#34C759]'
+              driverStatus === 'online' ? 'bg-[#34c759]/10 text-[#34c759]'
               : driverStatus === 'review' ? 'bg-[#FF9F0A]/10 text-[#FF9F0A]'
-              : 'bg-[#E5E5EA] text-[#86868B]'
+              : 'bg-[#d2d2d7] text-[#6e6e73]'
             }`}>
               <span className={`h-2 w-2 rounded-full ${
-                driverStatus === 'online' ? 'bg-[#34C759]'
+                driverStatus === 'online' ? 'bg-[#34c759]'
                 : driverStatus === 'review' ? 'bg-[#FF9F0A]'
-                : 'bg-[#86868B]'
+                : 'bg-[#6e6e73]'
               }`} />
               {driverStatus === 'online' ? 'Online' : driverStatus === 'review' ? 'Under Review' : 'Offline'}
             </div>
-            <Link href="/driver" className="text-[13px] font-medium text-[#86868B] hover:text-[#1D1D1F]">
+            <Link href="/driver" className="text-[13px] font-medium text-[#6e6e73] hover:text-[#1d1d1f]">
               Drive mode
             </Link>
           </div>
@@ -112,13 +112,13 @@ export default function DriverDashboard() {
           <div className="mb-5 space-y-2">
             {ALERTS.map(alert => (
               <div key={alert.id} className={`flex items-center justify-between rounded-xl px-4 py-3 ${
-                alert.type === 'warning' ? 'bg-[#FF9F0A]/8' : 'bg-[#0071E3]/6'
+                alert.type === 'warning' ? 'bg-[#FF9F0A]/8' : 'bg-[#0071e3]/6'
               }`}>
                 <div className="flex items-center gap-2.5">
-                  <span className={`h-2 w-2 rounded-full ${alert.type === 'warning' ? 'bg-[#FF9F0A]' : 'bg-[#0071E3]'}`} />
-                  <span className="text-[13px] font-medium text-[#1D1D1F]">{alert.text}</span>
+                  <span className={`h-2 w-2 rounded-full ${alert.type === 'warning' ? 'bg-[#FF9F0A]' : 'bg-[#0071e3]'}`} />
+                  <span className="text-[13px] font-medium text-[#1d1d1f]">{alert.text}</span>
                 </div>
-                <button className="text-[12px] font-semibold text-[#0071E3]">{alert.action}</button>
+                <button className="text-[12px] font-semibold text-[#0071e3]">{alert.action}</button>
               </div>
             ))}
           </div>
@@ -132,9 +132,9 @@ export default function DriverDashboard() {
             { label: 'Rating', value: STATS.rating.toFixed(2), accent: false },
             { label: 'Acceptance', value: `${STATS.acceptance}%`, accent: false },
           ].map(stat => (
-            <div key={stat.label} className={`rounded-2xl p-5 ${stat.accent ? 'bg-[#1D1D1F] text-white' : 'bg-white'}`}>
-              <p className={`text-[11px] font-semibold uppercase tracking-wider ${stat.accent ? 'text-white/40' : 'text-[#86868B]'}`}>{stat.label}</p>
-              <p className={`mt-2 text-[28px] font-bold tabular-nums ${stat.accent ? 'text-white' : 'text-[#1D1D1F]'}`}>{stat.value}</p>
+            <div key={stat.label} className={`rounded-2xl p-5 ${stat.accent ? 'bg-[#0071e3] text-white' : 'bg-white'}`}>
+              <p className={`text-[11px] font-semibold uppercase tracking-wider ${stat.accent ? 'text-white/40' : 'text-[#6e6e73]'}`}>{stat.label}</p>
+              <p className={`mt-2 text-[28px] font-bold tabular-nums ${stat.accent ? 'text-white' : 'text-[#1d1d1f]'}`}>{stat.value}</p>
             </div>
           ))}
         </div>
@@ -147,7 +147,7 @@ export default function DriverDashboard() {
 
             {/* Earnings breakdown */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Earnings</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Earnings</h2>
               <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
                 {[
                   { label: 'Today', value: EARNINGS.today },
@@ -156,19 +156,19 @@ export default function DriverDashboard() {
                   { label: 'Pending', value: EARNINGS.pending },
                 ].map(e => (
                   <div key={e.label}>
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1A6]">{e.label}</p>
-                    <p className="mt-1 text-[20px] font-bold tabular-nums text-[#1D1D1F]">${e.value.toFixed(2)}</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{e.label}</p>
+                    <p className="mt-1 text-[20px] font-bold tabular-nums text-[#1d1d1f]">${e.value.toFixed(2)}</p>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 flex items-center justify-between border-t border-[#F5F5F7] pt-3">
-                <p className="text-[12px] text-[#A1A1A6]">Last payout: {new Date(EARNINGS.lastPayout).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
-                <button className="text-[12px] font-semibold text-[#0071E3]">View details</button>
+              <div className="mt-4 flex items-center justify-between border-t border-[#f5f5f7] pt-3">
+                <p className="text-[12px] text-[#86868b]">Last payout: {new Date(EARNINGS.lastPayout).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</p>
+                <button className="text-[12px] font-semibold text-[#0071e3]">View details</button>
               </div>
             </div>
 
             {/* TAKEME Card */}
-            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#1D1D1F] via-[#252527] to-[#2C2C2E]">
+            <div className="overflow-hidden rounded-2xl bg-gradient-to-br from-[#1d1d1f] via-[#252527] to-[#2C2C2E]">
               {/* Card visual */}
               <div className="relative px-6 pt-6 pb-5">
                 {/* Logo */}
@@ -180,7 +180,7 @@ export default function DriverDashboard() {
                 <div className="flex items-center gap-2">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">TAKEME</p>
                   {CARD.virtualReady && (
-                    <span className="rounded-full bg-[#34C759]/20 px-2 py-[1px] text-[8px] font-bold uppercase text-[#34C759]">Virtual active</span>
+                    <span className="rounded-full bg-[#34c759]/20 px-2 py-[1px] text-[8px] font-bold uppercase text-[#34c759]">Virtual active</span>
                   )}
                 </div>
                 <p className="mt-0.5 text-[17px] font-semibold text-white">Debit Card</p>
@@ -194,7 +194,7 @@ export default function DriverDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-white/25">Cashback earned</p>
-                    <p className="mt-0.5 text-[16px] font-bold tabular-nums text-[#34C759]">${CARD.totalCashback.toFixed(2)}</p>
+                    <p className="mt-0.5 text-[16px] font-bold tabular-nums text-[#34c759]">${CARD.totalCashback.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function DriverDashboard() {
                   {/* Physical card status */}
                   <div className="flex items-center gap-1.5">
                     <span className={`h-1.5 w-1.5 rounded-full ${
-                      CARD.physicalStatus === 'delivered' ? 'bg-[#34C759]'
+                      CARD.physicalStatus === 'delivered' ? 'bg-[#34c759]'
                       : CARD.physicalStatus === 'shipping' ? 'bg-[#FF9500]'
                       : 'bg-white/20'
                     }`} />
@@ -233,9 +233,9 @@ export default function DriverDashboard() {
               <div className="border-t border-white/8 px-6 py-3">
                 <div className="flex items-center gap-4">
                   {[
-                    { label: 'EV charging', rate: '5%', color: '#34C759' },
+                    { label: 'EV charging', rate: '5%', color: '#34c759' },
                     { label: 'Gas', rate: '3%', color: '#FF9500' },
-                    { label: 'Everything else', rate: '1%', color: '#0071E3' },
+                    { label: 'Everything else', rate: '1%', color: '#0071e3' },
                   ].map(cb => (
                     <div key={cb.label} className="flex items-center gap-1.5">
                       <span className="h-1.5 w-1.5 rounded-full" style={{ background: cb.color }} />
@@ -308,7 +308,7 @@ export default function DriverDashboard() {
 
               {/* Primary action */}
               <div className="border-t border-white/10 px-6 py-4">
-                <button className="flex w-full items-center justify-center rounded-xl bg-white py-3 text-[14px] font-semibold text-[#1D1D1F] transition-colors hover:bg-white/90">
+                <button className="flex w-full items-center justify-center rounded-xl bg-white py-3 text-[14px] font-semibold text-[#1d1d1f] transition-colors hover:bg-white/90">
                   Instant cash out
                 </button>
               </div>
@@ -331,15 +331,15 @@ export default function DriverDashboard() {
 
             {/* Driver balance */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Your balance</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Your balance</h2>
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1A6]">Available</p>
-                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#1D1D1F]">${DRIVER_BALANCE.available.toFixed(2)}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">Available</p>
+                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#1d1d1f]">${DRIVER_BALANCE.available.toFixed(2)}</p>
                 </div>
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#A1A1A6]">On card</p>
-                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#34C759]">${DRIVER_BALANCE.cardBalance.toFixed(2)}</p>
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">On card</p>
+                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#34c759]">${DRIVER_BALANCE.cardBalance.toFixed(2)}</p>
                 </div>
               </div>
 
@@ -347,9 +347,9 @@ export default function DriverDashboard() {
               {!showFund ? (
                 <button
                   onClick={() => setShowFund(true)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#E5E5EA] py-3 text-[14px] font-semibold text-[#1D1D1F] transition-colors hover:bg-[#F5F5F7]"
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d2d2d7] py-3 text-[14px] font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
                 >
-                  <svg className="h-4 w-4 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                   Add funds to card
@@ -363,16 +363,16 @@ export default function DriverDashboard() {
                         onClick={() => setFundAmount(String(amt))}
                         className={`flex-1 rounded-lg border py-2 text-[13px] font-semibold transition-colors ${
                           fundAmount === String(amt)
-                            ? 'border-[#1D1D1F] bg-[#1D1D1F] text-white'
-                            : 'border-[#E5E5EA] text-[#1D1D1F] hover:border-[#C7C7CC]'
+                            ? 'border-[#0071e3] bg-[#0071e3] text-white'
+                            : 'border-[#d2d2d7] text-[#1d1d1f] hover:border-[#d2d2d7]'
                         }`}
                       >
                         ${amt}
                       </button>
                     ))}
                   </div>
-                  <div className="flex items-center gap-2 rounded-lg border border-[#E5E5EA] px-3 py-2">
-                    <span className="text-[15px] font-medium text-[#86868B]">$</span>
+                  <div className="flex items-center gap-2 rounded-lg border border-[#d2d2d7] px-3 py-2">
+                    <span className="text-[15px] font-medium text-[#6e6e73]">$</span>
                     <input
                       type="number"
                       value={fundAmount}
@@ -380,13 +380,13 @@ export default function DriverDashboard() {
                       placeholder="Custom amount"
                       min={1}
                       max={5000}
-                      className="w-full bg-transparent text-[15px] font-medium text-[#1D1D1F] outline-none"
+                      className="w-full bg-transparent text-[15px] font-medium text-[#1d1d1f] outline-none"
                     />
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => { setShowFund(false); setFundAmount(''); }}
-                      className="flex-1 rounded-xl border border-[#E5E5EA] py-2.5 text-[13px] font-semibold text-[#86868B] hover:bg-[#F5F5F7]"
+                      className="flex-1 rounded-xl border border-[#d2d2d7] py-2.5 text-[13px] font-semibold text-[#6e6e73] hover:bg-[#f5f5f7]"
                     >
                       Cancel
                     </button>
@@ -407,7 +407,7 @@ export default function DriverDashboard() {
                         finally { setFunding(false); }
                       }}
                       disabled={funding || !fundAmount || Number(fundAmount) <= 0}
-                      className="flex-1 rounded-xl bg-[#1D1D1F] py-2.5 text-[13px] font-semibold text-white hover:bg-[#333] disabled:opacity-40"
+                      className="flex-1 rounded-xl bg-[#0071e3] py-2.5 text-[13px] font-semibold text-white hover:bg-[#005bb5] disabled:opacity-40"
                     >
                       {funding ? 'Transferring...' : `Transfer $${Number(fundAmount || 0).toFixed(2)}`}
                     </button>
@@ -415,18 +415,18 @@ export default function DriverDashboard() {
                 </div>
               )}
 
-              <div className="mt-3 flex items-center justify-between border-t border-[#F5F5F7] pt-3">
-                <p className="text-[11px] text-[#A1A1A6]">Pending: ${DRIVER_BALANCE.pending.toFixed(2)}</p>
-                <p className="text-[11px] text-[#A1A1A6]">Lifetime: ${DRIVER_BALANCE.lifetime.toFixed(2)}</p>
+              <div className="mt-3 flex items-center justify-between border-t border-[#f5f5f7] pt-3">
+                <p className="text-[11px] text-[#86868b]">Pending: ${DRIVER_BALANCE.pending.toFixed(2)}</p>
+                <p className="text-[11px] text-[#86868b]">Lifetime: ${DRIVER_BALANCE.lifetime.toFixed(2)}</p>
               </div>
             </div>
 
             {/* Payout method */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Payout method</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Payout method</h2>
               <div className="mt-3 space-y-2">
                 {([
-                  { id: 'takeme_card' as const, label: 'TAKEME Card', desc: 'Instant · Cashback rewards', badge: 'Best', badgeColor: 'bg-[#34C759] text-white' },
+                  { id: 'takeme_card' as const, label: 'TAKEME Card', desc: 'Instant · Cashback rewards', badge: 'Best', badgeColor: 'bg-[#34c759] text-white' },
                   { id: 'bank' as const, label: 'Bank account', desc: '1–3 business days', badge: null, badgeColor: '' },
                   { id: 'debit' as const, label: 'Debit card', desc: 'Within 30 minutes', badge: null, badgeColor: '' },
                 ]).map(opt => (
@@ -435,23 +435,23 @@ export default function DriverDashboard() {
                     onClick={() => setPayoutMethod(opt.id)}
                     className={`flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left transition-all duration-150 ${
                       payoutMethod === opt.id
-                        ? 'border-[#1D1D1F] bg-[#1D1D1F]/[0.03]'
-                        : 'border-[#E5E5EA] hover:border-[#C7C7CC]'
+                        ? 'border-[#0071e3] bg-[#0071e3]/[0.03]'
+                        : 'border-[#d2d2d7] hover:border-[#d2d2d7]'
                     }`}
                   >
                     <div className={`flex h-5 w-5 items-center justify-center rounded-full border-2 ${
-                      payoutMethod === opt.id ? 'border-[#1D1D1F]' : 'border-[#D2D2D7]'
+                      payoutMethod === opt.id ? 'border-[#0071e3]' : 'border-[#d2d2d7]'
                     }`}>
-                      {payoutMethod === opt.id && <div className="h-2.5 w-2.5 rounded-full bg-[#1D1D1F]" />}
+                      {payoutMethod === opt.id && <div className="h-2.5 w-2.5 rounded-full bg-[#0071e3]" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-[14px] font-semibold text-[#1D1D1F]">{opt.label}</span>
+                        <span className="text-[14px] font-semibold text-[#1d1d1f]">{opt.label}</span>
                         {opt.badge && (
                           <span className={`rounded-full px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none ${opt.badgeColor}`}>{opt.badge}</span>
                         )}
                       </div>
-                      <p className="text-[12px] text-[#86868B]">{opt.desc}</p>
+                      <p className="text-[12px] text-[#6e6e73]">{opt.desc}</p>
                     </div>
                   </button>
                 ))}
@@ -461,25 +461,25 @@ export default function DriverDashboard() {
             {/* Recent trips */}
             <div className="rounded-2xl bg-white p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Recent trips</h2>
-                <span className="text-[12px] text-[#A1A1A6]">{STATS.tripsToday} today</span>
+                <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Recent trips</h2>
+                <span className="text-[12px] text-[#86868b]">{STATS.tripsToday} today</span>
               </div>
-              <div className="mt-4 divide-y divide-[#F5F5F7]">
+              <div className="mt-4 divide-y divide-[#f5f5f7]">
                 {RECENT_TRIPS.map(trip => (
                   <div key={trip.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34C759]" />
-                        <p className="truncate text-[14px] font-medium text-[#1D1D1F]">{trip.pickup}</p>
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34c759]" />
+                        <p className="truncate text-[14px] font-medium text-[#1d1d1f]">{trip.pickup}</p>
                       </div>
                       <div className="mt-0.5 flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#1D1D1F]" />
-                        <p className="truncate text-[13px] text-[#86868B]">{trip.dropoff}</p>
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#1d1d1f]" />
+                        <p className="truncate text-[13px] text-[#6e6e73]">{trip.dropoff}</p>
                       </div>
                     </div>
                     <div className="ml-4 text-right shrink-0">
-                      <p className="text-[15px] font-semibold tabular-nums text-[#1D1D1F]">${trip.fare.toFixed(2)}</p>
-                      <p className="text-[11px] text-[#A1A1A6]">{trip.time}</p>
+                      <p className="text-[15px] font-semibold tabular-nums text-[#1d1d1f]">${trip.fare.toFixed(2)}</p>
+                      <p className="text-[11px] text-[#86868b]">{trip.time}</p>
                     </div>
                   </div>
                 ))}
@@ -488,7 +488,7 @@ export default function DriverDashboard() {
 
             {/* Quick actions */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Quick actions</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Quick actions</h2>
               <div className="mt-3 grid grid-cols-3 gap-2 md:grid-cols-6">
                 {[
                   { label: 'Go online', icon: 'M5.636 5.636a9 9 0 1 0 12.728 0M12 3v9', href: '/driver', green: true },
@@ -500,12 +500,12 @@ export default function DriverDashboard() {
                 ].map(action => (
                   <Link key={action.label} href={action.href}
                     className={`flex flex-col items-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors ${
-                      action.green ? 'border-[#34C759]/20 bg-[#34C759]/5 hover:bg-[#34C759]/10' : 'border-[#E5E5EA] hover:bg-[#F5F5F7]'
+                      action.green ? 'border-[#34c759]/20 bg-[#34c759]/5 hover:bg-[#34c759]/10' : 'border-[#d2d2d7] hover:bg-[#f5f5f7]'
                     }`}>
-                    <svg className={`h-5 w-5 ${action.green ? 'text-[#34C759]' : 'text-[#86868B]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg className={`h-5 w-5 ${action.green ? 'text-[#34c759]' : 'text-[#6e6e73]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d={action.icon} />
                     </svg>
-                    <span className="text-[11px] font-medium text-[#1D1D1F]">{action.label}</span>
+                    <span className="text-[11px] font-medium text-[#1d1d1f]">{action.label}</span>
                   </Link>
                 ))}
               </div>
@@ -518,40 +518,40 @@ export default function DriverDashboard() {
             {/* Driver Hub Membership */}
             <div className="rounded-2xl bg-white p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Driver Hub</h2>
-                <span className="rounded-full bg-[#34C759]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#34C759]">Active</span>
+                <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Driver Hub</h2>
+                <span className="rounded-full bg-[#34c759]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#34c759]">Active</span>
               </div>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] text-[#86868B]">Membership</span>
-                  <span className="text-[13px] font-medium text-[#1D1D1F]">TakeMe Driver</span>
+                  <span className="text-[13px] text-[#6e6e73]">Membership</span>
+                  <span className="text-[13px] font-medium text-[#1d1d1f]">TakeMe Driver</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] text-[#86868B]">Next billing</span>
-                  <span className="text-[13px] font-medium text-[#1D1D1F]">Apr 1, 2026</span>
+                  <span className="text-[13px] text-[#6e6e73]">Next billing</span>
+                  <span className="text-[13px] font-medium text-[#1d1d1f]">Apr 1, 2026</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-[13px] text-[#86868B]">Benefits</span>
-                  <span className="text-[13px] font-medium text-[#34C759]">All unlocked</span>
+                  <span className="text-[13px] text-[#6e6e73]">Benefits</span>
+                  <span className="text-[13px] font-medium text-[#34c759]">All unlocked</span>
                 </div>
               </div>
-              <button className="mt-4 w-full rounded-xl border border-[#E5E5EA] py-2.5 text-[13px] font-semibold text-[#1D1D1F] transition-colors hover:bg-[#F5F5F7]">
+              <button className="mt-4 w-full rounded-xl border border-[#d2d2d7] py-2.5 text-[13px] font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]">
                 Manage membership
               </button>
             </div>
 
             {/* TAKEME CONNECT */}
-            <div className="rounded-2xl bg-[#1D1D1F] p-5">
+            <div className="rounded-2xl bg-[#1d1d1f] p-5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
-                    <svg className="h-4 w-4 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg className="h-4 w-4 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
                     </svg>
                   </div>
                   <span className="text-[14px] font-semibold text-white">TAKEME CONNECT</span>
                 </div>
-                <span className="rounded-full bg-[#34C759]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#34C759]">Active</span>
+                <span className="rounded-full bg-[#34c759]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#34c759]">Active</span>
               </div>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-[24px] font-bold tabular-nums text-white">$29.90</span>
@@ -566,18 +566,18 @@ export default function DriverDashboard() {
             {/* Women Driver Rewards */}
             <div className="rounded-2xl bg-white p-5">
               <div className="flex items-center justify-between">
-                <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Women Driver Rewards</h2>
+                <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Women Driver Rewards</h2>
                 <span className="rounded-full bg-[#AF52DE]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#AF52DE]">In Progress</span>
               </div>
               <div className="mt-4">
                 <div className="flex items-baseline justify-between">
-                  <span className="text-[13px] text-[#86868B]">{REWARDS.tripsThisMonth} of {REWARDS.target} trips</span>
-                  <span className="text-[13px] font-semibold text-[#1D1D1F]">{rewardsPercent}%</span>
+                  <span className="text-[13px] text-[#6e6e73]">{REWARDS.tripsThisMonth} of {REWARDS.target} trips</span>
+                  <span className="text-[13px] font-semibold text-[#1d1d1f]">{rewardsPercent}%</span>
                 </div>
-                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#F5F5F7]">
+                <div className="mt-2 h-2 overflow-hidden rounded-full bg-[#f5f5f7]">
                   <div className="h-full rounded-full bg-[#AF52DE] transition-all duration-500" style={{ width: `${rewardsPercent}%` }} />
                 </div>
-                <p className="mt-3 text-[13px] text-[#86868B]">
+                <p className="mt-3 text-[13px] text-[#6e6e73]">
                   Complete {REWARDS.target - REWARDS.tripsThisMonth} more trips to unlock:
                 </p>
                 <p className="mt-1 text-[15px] font-semibold text-[#AF52DE]">{REWARDS.reward}</p>
@@ -586,18 +586,18 @@ export default function DriverDashboard() {
 
             {/* Community */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Community</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Community</h2>
               <div className="mt-3 space-y-2.5">
-                <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-3.5 py-2.5">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#0071E3]" />
-                  <span className="text-[13px] text-[#1D1D1F]">Seattle driver meetup — Apr 5</span>
+                <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-3.5 py-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#0071e3]" />
+                  <span className="text-[13px] text-[#1d1d1f]">Seattle driver meetup — Apr 5</span>
                 </div>
-                <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-3.5 py-2.5">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#34C759]" />
-                  <span className="text-[13px] text-[#1D1D1F]">EV charging guide updated</span>
+                <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-3.5 py-2.5">
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#34c759]" />
+                  <span className="text-[13px] text-[#1d1d1f]">EV charging guide updated</span>
                 </div>
               </div>
-              <button className="mt-3 w-full rounded-xl border border-[#E5E5EA] py-2.5 text-[13px] font-semibold text-[#1D1D1F] transition-colors hover:bg-[#F5F5F7]">
+              <button className="mt-3 w-full rounded-xl border border-[#d2d2d7] py-2.5 text-[13px] font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]">
                 Open community
               </button>
             </div>
@@ -607,18 +607,18 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <span className="text-[16px]">🐾</span>
-                  <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Pet Rides</h2>
+                  <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Pet Rides</h2>
                 </div>
                 <button
                   onClick={() => setAcceptsPets(!acceptsPets)}
-                  className={`relative h-7 w-12 rounded-full transition-colors duration-200 ${acceptsPets ? 'bg-[#FF9500]' : 'bg-[#E5E5EA]'}`}
+                  className={`relative h-7 w-12 rounded-full transition-colors duration-200 ${acceptsPets ? 'bg-[#FF9500]' : 'bg-[#d2d2d7]'}`}
                 >
                   <div className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition-transform duration-200 ${acceptsPets ? 'translate-x-5' : 'translate-x-0.5'}`} />
                 </button>
               </div>
               {acceptsPets && (
                 <div className="mt-3 space-y-2">
-                  <p className="text-[12px] text-[#86868B]">You'll receive pet ride requests. Earn +$5–15 per trip.</p>
+                  <p className="text-[12px] text-[#6e6e73]">You'll receive pet ride requests. Earn +$5–15 per trip.</p>
                   <div className="flex gap-2">
                     {(['small', 'medium', 'large'] as const).map(size => (
                       <button
@@ -627,21 +627,21 @@ export default function DriverDashboard() {
                         className={`flex-1 rounded-lg border py-2 text-[12px] font-medium transition-colors ${
                           maxPetSize === size || (['medium', 'large'].includes(size) && maxPetSize === 'large') || (size === 'medium' && maxPetSize !== 'small')
                             ? 'border-[#FF9500] bg-[#FF9500]/10 text-[#FF9500]'
-                            : 'border-[#E5E5EA] text-[#86868B]'
+                            : 'border-[#d2d2d7] text-[#6e6e73]'
                         }`}
                       >
                         {size.charAt(0).toUpperCase() + size.slice(1)}
                       </button>
                     ))}
                   </div>
-                  <p className="text-[11px] text-[#A1A1A6]">Max size: {maxPetSize}</p>
+                  <p className="text-[11px] text-[#86868b]">Max size: {maxPetSize}</p>
                 </div>
               )}
             </div>
 
             {/* Driver profile status */}
             <div className="rounded-2xl bg-white p-5">
-              <h2 className="text-[15px] font-semibold text-[#1D1D1F]">Profile status</h2>
+              <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Profile status</h2>
               <div className="mt-3 space-y-2.5">
                 {[
                   { label: 'Verification', status: 'Verified', ok: true },
@@ -651,8 +651,8 @@ export default function DriverDashboard() {
                   { label: 'Pet rides', status: acceptsPets ? 'Enabled' : 'Disabled', ok: acceptsPets },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
-                    <span className="text-[13px] text-[#86868B]">{item.label}</span>
-                    <span className={`text-[13px] font-medium ${item.ok ? 'text-[#34C759]' : 'text-[#FF9F0A]'}`}>{item.status}</span>
+                    <span className="text-[13px] text-[#6e6e73]">{item.label}</span>
+                    <span className={`text-[13px] font-medium ${item.ok ? 'text-[#34c759]' : 'text-[#FF9F0A]'}`}>{item.status}</span>
                   </div>
                 ))}
               </div>

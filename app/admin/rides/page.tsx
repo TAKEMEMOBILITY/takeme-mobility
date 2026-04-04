@@ -190,20 +190,20 @@ export default function AdminRidesPage() {
       {/* Main content */}
       <div className={`flex-1 overflow-y-auto p-6 transition-all ${panelOpen ? 'mr-[480px]' : ''}`}>
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#e4e4e7]">Rides</h1>
-          <p className="text-sm text-[#71717a] mt-1">{total} rides total</p>
+          <h1 className="text-2xl font-bold text-[#1d1d1f]">Rides</h1>
+          <p className="text-sm text-[#86868b] mt-1">{total} rides total</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-5 bg-[#13131b] rounded-xl p-1 w-fit border border-[#1e1e2e]">
+        <div className="flex gap-1 mb-5 bg-[#f5f5f7] rounded-xl p-1 w-fit border border-[#d2d2d7]">
           {TABS.map((t) => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 tab === t.key
-                  ? 'bg-[#1e1e2e] text-white'
-                  : 'text-[#71717a] hover:text-[#a1a1aa]'
+                  ? 'bg-[#d2d2d7] text-[#1d1d1f]'
+                  : 'text-[#86868b] hover:text-[#6e6e73]'
               }`}
             >
               {t.label}
@@ -219,23 +219,23 @@ export default function AdminRidesPage() {
         )}
 
         {/* Table */}
-        <div className="bg-[#13131b] rounded-xl border border-[#1e1e2e] overflow-hidden">
+        <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] overflow-hidden">
           {loading ? (
-            <div className="flex items-center justify-center py-20 text-[#71717a]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#71717a] border-t-emerald-500 mr-3" />
+            <div className="flex items-center justify-center py-20 text-[#86868b]">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
               Loading rides...
             </div>
           ) : rides.length === 0 ? (
-            <div className="py-20 text-center text-[#52525b] text-sm">No rides found</div>
+            <div className="py-20 text-center text-[#86868b] text-sm">No rides found</div>
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[#1e1e2e]">
+                <tr className="border-b border-[#d2d2d7]">
                   {['ID', 'Status', 'Pickup', 'Dropoff', 'Fare', 'Driver', 'Requested'].map(
                     (h) => (
                       <th
                         key={h}
-                        className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#52525b]"
+                        className="px-4 py-3 text-left text-[10px] font-semibold uppercase tracking-wider text-[#86868b]"
                       >
                         {h}
                       </th>
@@ -248,33 +248,33 @@ export default function AdminRidesPage() {
                   <tr
                     key={ride.id}
                     onClick={() => openDetail(ride.id)}
-                    className="border-b border-[#1e1e2e]/50 cursor-pointer transition-colors hover:bg-[#1e1e2e]/30"
+                    className="border-b border-[#d2d2d7]/50 cursor-pointer transition-colors hover:bg-[#d2d2d7]/30"
                   >
-                    <td className="px-4 py-3 font-mono text-[11px] text-[#71717a]">
+                    <td className="px-4 py-3 font-mono text-[11px] text-[#86868b]">
                       {ride.id.slice(0, 8)}
                     </td>
                     <td className="px-4 py-3">
                       <span
                         className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-semibold ${
-                          STATUS_CLASSES[ride.status] ?? 'bg-zinc-500/15 text-zinc-400'
+                          STATUS_CLASSES[ride.status] ?? 'bg-zinc-500/15 text-[#86868b]'
                         }`}
                       >
                         {ride.status.replace(/_/g, ' ')}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[180px] truncate">
+                    <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[180px] truncate">
                       {ride.pickup_address}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[180px] truncate">
+                    <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[180px] truncate">
                       {ride.dropoff_address}
                     </td>
-                    <td className="px-4 py-3 text-xs font-medium text-[#e4e4e7]">
+                    <td className="px-4 py-3 text-xs font-medium text-[#1d1d1f]">
                       {usd(Number(ride.final_fare ?? ride.estimated_fare))}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#a1a1aa]">
+                    <td className="px-4 py-3 text-xs text-[#6e6e73]">
                       {ride.driver_name ?? '--'}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#52525b]">
+                    <td className="px-4 py-3 text-xs text-[#86868b]">
                       {timeAgo(ride.requested_at)}
                     </td>
                   </tr>
@@ -287,21 +287,21 @@ export default function AdminRidesPage() {
         {/* Pagination */}
         {total > limit && (
           <div className="flex items-center justify-between mt-4">
-            <span className="text-xs text-[#52525b]">
+            <span className="text-xs text-[#86868b]">
               Showing {offset + 1}-{Math.min(offset + limit, total)} of {total}
             </span>
             <div className="flex gap-2">
               <button
                 onClick={() => setOffset(Math.max(0, offset - limit))}
                 disabled={offset === 0}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#13131b] border border-[#1e1e2e] text-[#a1a1aa] disabled:opacity-30 hover:bg-[#1e1e2e] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#f5f5f7] border border-[#d2d2d7] text-[#6e6e73] disabled:opacity-30 hover:bg-[#d2d2d7] transition-colors"
               >
                 Previous
               </button>
               <button
                 onClick={() => setOffset(offset + limit)}
                 disabled={offset + limit >= total}
-                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#13131b] border border-[#1e1e2e] text-[#a1a1aa] disabled:opacity-30 hover:bg-[#1e1e2e] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#f5f5f7] border border-[#d2d2d7] text-[#6e6e73] disabled:opacity-30 hover:bg-[#d2d2d7] transition-colors"
               >
                 Next
               </button>
@@ -312,18 +312,18 @@ export default function AdminRidesPage() {
 
       {/* Slide-in detail panel */}
       {panelOpen && (
-        <div className="fixed right-0 top-0 bottom-0 w-[480px] bg-[#0f0f17] border-l border-[#1e1e2e] overflow-y-auto z-50 shadow-2xl">
+        <div className="fixed right-0 top-0 bottom-0 w-[480px] bg-[#f5f5f7] border-l border-[#d2d2d7] overflow-y-auto z-50 shadow-2xl">
           {/* Header */}
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#1e1e2e] bg-[#0f0f17] px-5 py-4">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#d2d2d7] bg-[#f5f5f7] px-5 py-4">
             <div>
-              <h2 className="text-base font-semibold text-[#e4e4e7]">Ride Detail</h2>
+              <h2 className="text-base font-semibold text-[#1d1d1f]">Ride Detail</h2>
               {detail && (
-                <span className="font-mono text-[10px] text-[#52525b]">{detail.ride.id}</span>
+                <span className="font-mono text-[10px] text-[#86868b]">{detail.ride.id}</span>
               )}
             </div>
             <button
               onClick={() => setPanelOpen(false)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#1e1e2e] text-[#71717a] hover:text-white transition-colors"
+              className="flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#d2d2d7] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -332,8 +332,8 @@ export default function AdminRidesPage() {
           </div>
 
           {detailLoading ? (
-            <div className="flex items-center justify-center py-20 text-[#71717a]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#71717a] border-t-emerald-500 mr-3" />
+            <div className="flex items-center justify-center py-20 text-[#86868b]">
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
               Loading...
             </div>
           ) : detail ? (
@@ -342,7 +342,7 @@ export default function AdminRidesPage() {
               <div className="flex items-center justify-between">
                 <span
                   className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                    STATUS_CLASSES[detail.ride.status] ?? 'bg-zinc-500/15 text-zinc-400'
+                    STATUS_CLASSES[detail.ride.status] ?? 'bg-zinc-500/15 text-[#86868b]'
                   }`}
                 >
                   {detail.ride.status.replace(/_/g, ' ')}
@@ -486,7 +486,7 @@ export default function AdminRidesPage() {
                     <Row label="Flagged" value={detail.fraud_score.flagged ? 'Yes' : 'No'} />
                     <Row label="Auto-cancelled" value={detail.fraud_score.auto_cancelled ? 'Yes' : 'No'} />
                     {detail.fraud_score.checks && (
-                      <div className="mt-2 p-2 rounded-lg bg-[#0a0a0f] text-[10px] font-mono text-[#52525b] overflow-x-auto">
+                      <div className="mt-2 p-2 rounded-lg bg-[#FFFFFF] text-[10px] font-mono text-[#86868b] overflow-x-auto">
                         {JSON.stringify(detail.fraud_score.checks, null, 2)}
                       </div>
                     )}
@@ -500,28 +500,28 @@ export default function AdminRidesPage() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs">
                       <thead>
-                        <tr className="border-b border-[#1e1e2e]">
-                          <th className="pb-2 text-left text-[10px] font-semibold text-[#52525b] uppercase">Event</th>
-                          <th className="pb-2 text-left text-[10px] font-semibold text-[#52525b] uppercase">Actor</th>
-                          <th className="pb-2 text-left text-[10px] font-semibold text-[#52525b] uppercase">Status</th>
-                          <th className="pb-2 text-left text-[10px] font-semibold text-[#52525b] uppercase">Time</th>
+                        <tr className="border-b border-[#d2d2d7]">
+                          <th className="pb-2 text-left text-[10px] font-semibold text-[#86868b] uppercase">Event</th>
+                          <th className="pb-2 text-left text-[10px] font-semibold text-[#86868b] uppercase">Actor</th>
+                          <th className="pb-2 text-left text-[10px] font-semibold text-[#86868b] uppercase">Status</th>
+                          <th className="pb-2 text-left text-[10px] font-semibold text-[#86868b] uppercase">Time</th>
                         </tr>
                       </thead>
                       <tbody>
                         {detail.events.map((e) => (
-                          <tr key={e.id} className="border-b border-[#1e1e2e]/30">
-                            <td className="py-2 text-[#a1a1aa]">{e.event_type}</td>
-                            <td className="py-2 text-[#71717a]">{e.actor}</td>
+                          <tr key={e.id} className="border-b border-[#d2d2d7]/30">
+                            <td className="py-2 text-[#6e6e73]">{e.event_type}</td>
+                            <td className="py-2 text-[#86868b]">{e.actor}</td>
                             <td className="py-2">
                               {e.new_status ? (
-                                <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CLASSES[e.new_status] ?? 'bg-zinc-500/15 text-zinc-400'}`}>
+                                <span className={`inline-flex rounded-full px-1.5 py-0.5 text-[9px] font-semibold ${STATUS_CLASSES[e.new_status] ?? 'bg-zinc-500/15 text-[#86868b]'}`}>
                                   {e.new_status.replace(/_/g, ' ')}
                                 </span>
                               ) : (
-                                <span className="text-[#52525b]">--</span>
+                                <span className="text-[#86868b]">--</span>
                               )}
                             </td>
-                            <td className="py-2 text-[#52525b] whitespace-nowrap">{fmtTime(e.created_at)}</td>
+                            <td className="py-2 text-[#86868b] whitespace-nowrap">{fmtTime(e.created_at)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -542,7 +542,7 @@ export default function AdminRidesPage() {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center py-20 text-[#52525b] text-sm">
+            <div className="flex items-center justify-center py-20 text-[#86868b] text-sm">
               Failed to load ride detail
             </div>
           )}
@@ -556,8 +556,8 @@ export default function AdminRidesPage() {
 
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-[#13131b] rounded-xl border border-[#1e1e2e] p-5">
-      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#52525b] mb-3">
+    <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] p-5">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-[#86868b] mb-3">
         {title}
       </h3>
       {children}
@@ -578,8 +578,8 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between text-xs">
-      <span className="text-[#71717a]">{label}</span>
-      <span className={`${highlight ? 'font-semibold text-[#e4e4e7]' : 'text-[#a1a1aa]'} ${className ?? ''}`}>
+      <span className="text-[#86868b]">{label}</span>
+      <span className={`${highlight ? 'font-semibold text-[#1d1d1f]' : 'text-[#6e6e73]'} ${className ?? ''}`}>
         {value}
       </span>
     </div>
@@ -599,7 +599,7 @@ function TimelineStep({
   isLast: boolean;
   variant?: 'success' | 'error';
 }) {
-  let dotColor = 'bg-[#2a2a3e]';
+  let dotColor = 'bg-[#d2d2d7]';
   if (active) {
     if (variant === 'error') dotColor = 'bg-red-500';
     else if (variant === 'success') dotColor = 'bg-emerald-500';
@@ -611,14 +611,14 @@ function TimelineStep({
       <div className="flex flex-col items-center">
         <div className={`h-3 w-3 rounded-full ${dotColor} shrink-0 mt-0.5`} />
         {!isLast && (
-          <div className={`w-px flex-1 min-h-[28px] ${active ? 'bg-[#2a2a3e]' : 'bg-[#1e1e2e]'}`} />
+          <div className={`w-px flex-1 min-h-[28px] ${active ? 'bg-[#d2d2d7]' : 'bg-[#d2d2d7]'}`} />
         )}
       </div>
       <div className="pb-4">
-        <p className={`text-xs font-medium ${active ? 'text-[#e4e4e7]' : 'text-[#52525b]'}`}>
+        <p className={`text-xs font-medium ${active ? 'text-[#1d1d1f]' : 'text-[#86868b]'}`}>
           {label}
         </p>
-        <p className="text-[10px] text-[#52525b] mt-0.5">{time ? fmtTime(time) : 'Pending'}</p>
+        <p className="text-[10px] text-[#86868b] mt-0.5">{time ? fmtTime(time) : 'Pending'}</p>
       </div>
     </div>
   );

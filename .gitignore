@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules
 /.pnp
 .pnp.*
 .yarn/*
@@ -36,6 +36,26 @@ yarn-error.log*
 # vercel
 .vercel
 
+# supabase temp
+supabase/.temp/
+
+# scripts
+scripts/
+
+# expo root
+.expo/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# expo
+packages/*/dist/
+packages/*/.expo/
+packages/*/ios/
+packages/*/android/
+packages/*/web-build/
+expo-env.d.ts
+
+.vercel
+.claude/

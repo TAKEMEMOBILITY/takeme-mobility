@@ -1,50 +1,55 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { createServiceClient } from '@/lib/supabase/service';
-import { getOnboardingProgress } from '@/lib/fleet/onboarding';
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { z } from 'zod'
+import { createClient } from '@/lib/supabase/server'
+import { registerOwner, getOwnerByUserId } from '@/lib/fleet/services/owner.service'
+import { apiSuccess, apiError } from '@/lib/fleet/utils/api'
 
-// POST — register as fleet owner
+const registerSchema = z.object({
+  fullName: z.string().min(1, 'Full name is required'),
+  phone: z.string().optional(),
+  businessName: z.string().optional(),
+  businessType: z.string().optional(),
+})
+
+// POST — Register as fleet owner
 export async function POST(request: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const svc = createServiceClient();
+    const body = await request.json()
+    const validated = registerSchema.parse(body)
 
-  // Check if already registered
-  const { data: existing } = await svc.from('fleet_owners').select('id').eq('auth_user_id', user.id).limit(1);
-  if (existing && existing.length > 0) {
-    return NextResponse.json({ ownerId: existing[0].id, existing: true });
+    console.log('[fleet/owners] POST register', { userId: user.id })
+
+    const result = await registerOwner(user.id, user.email!, validated)
+
+    return apiSuccess({ ownerId: result.id }, 201)
+  } catch (error) {
+    console.log('[fleet/owners] POST error', error)
+    return apiError(error)
   }
-
-  const body = await request.json();
-  const { data: owner, error } = await svc.from('fleet_owners').insert({
-    auth_user_id: user.id,
-    email: user.email ?? body.email,
-    phone: body.phone ?? null,
-  }).select('id').single();
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  // Create empty profile
-  await svc.from('fleet_owner_profiles').insert({ owner_id: owner!.id, full_name: body.fullName ?? '' });
-  // Create empty KYC
-  await svc.from('fleet_owner_kyc').insert({ owner_id: owner!.id });
-
-  return NextResponse.json({ ownerId: owner!.id });
 }
 
-// GET — get onboarding progress
+// GET — Get own owner profile
 export async function GET() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const svc = createServiceClient();
-  const { data: owner } = await svc.from('fleet_owners').select('id').eq('auth_user_id', user.id).single();
-  if (!owner) return NextResponse.json({ error: 'Not a fleet owner' }, { status: 404 });
+    console.log('[fleet/owners] GET owner profile', { userId: user.id })
 
-  const progress = await getOnboardingProgress(owner.id);
-  return NextResponse.json({ ownerId: owner.id, ...progress });
+    const owner = await getOwnerByUserId(user.id)
+    if (!owner) {
+      return NextResponse.json({ success: false, error: 'Not a fleet owner' }, { status: 404 })
+    }
+
+    return apiSuccess(owner)
+  } catch (error) {
+    console.log('[fleet/owners] GET error', error)
+    return apiError(error)
+  }
 }

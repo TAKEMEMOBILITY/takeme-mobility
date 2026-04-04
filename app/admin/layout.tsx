@@ -41,12 +41,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f] text-[#e4e4e7]">
+    <div className="flex h-screen bg-[#FFFFFF] text-[#1d1d1f]">
       {/* Sidebar */}
-      <aside className={`flex flex-col border-r border-[#1e1e2e] bg-[#0f0f17] transition-all duration-200 ${collapsed ? 'w-16' : 'w-56'}`}>
+      <aside className={`flex flex-col border-r border-[#d2d2d7] bg-[#f5f5f7] transition-all duration-200 ${collapsed ? 'w-16' : 'w-56'}`}>
         {/* Brand */}
-        <div className="flex h-14 items-center gap-2.5 border-b border-[#1e1e2e] px-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400 font-bold text-sm">T</div>
+        <div className="flex h-14 items-center gap-2.5 border-b border-[#d2d2d7] px-4">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#0071e3]/20 text-[#0071e3] font-bold text-sm">T</div>
           {!collapsed && <span className="text-sm font-semibold tracking-wide">TakeMe Ops</span>}
         </div>
 
@@ -54,7 +54,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <nav className="flex-1 overflow-y-auto px-2 py-3 space-y-0.5">
           {nav.map((item, i) => {
             if ('type' in item && item.type === 'divider') {
-              return <div key={i} className="my-2 border-t border-[#1e1e2e]" />;
+              return <div key={i} className="my-2 border-t border-[#d2d2d7]" />;
             }
             if (!('href' in item)) return null;
             const active = item.href === '/admin' ? pathname === '/admin' : pathname.startsWith(item.href);
@@ -65,8 +65,8 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 href={item.href}
                 className={`flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors
                   ${active
-                    ? 'bg-[#1e1e2e] text-white'
-                    : 'text-[#71717a] hover:bg-[#1e1e2e]/50 hover:text-[#a1a1aa]'
+                    ? 'bg-[#d2d2d7] text-[#1d1d1f]'
+                    : 'text-[#86868b] hover:bg-[#d2d2d7]/50 hover:text-[#6e6e73]'
                   } ${collapsed ? 'justify-center' : ''}`}
                 title={collapsed ? item.label : undefined}
               >
@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         {/* Collapse toggle */}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="flex h-10 items-center justify-center border-t border-[#1e1e2e] text-[#71717a] hover:text-white transition-colors"
+          className="flex h-10 items-center justify-center border-t border-[#d2d2d7] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
         >
           <svg className={`h-4 w-4 transition-transform ${collapsed ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />

@@ -7,11 +7,11 @@ import Link from 'next/link';
 // Dynamically import chart components to avoid SSR issues with recharts
 const RidesPerHourChart = dynamic(
   () => import('./_charts').then(m => m.RidesPerHourChart),
-  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#71717a]">Loading chart...</div> }
+  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#86868b]">Loading chart...</div> }
 );
 const RevenueChart = dynamic(
   () => import('./_charts').then(m => m.RevenueChart),
-  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#71717a]">Loading chart...</div> }
+  { ssr: false, loading: () => <div className="flex h-full items-center justify-center text-sm text-[#86868b]">Loading chart...</div> }
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -127,10 +127,10 @@ export default function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-          <p className="text-sm text-[#71717a]">Loading dashboard...</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
+          <p className="text-sm text-[#86868b]">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="rounded-xl border border-red-500/20 bg-red-500/5 px-8 py-6 text-center">
           <p className="text-red-400 text-sm">{error}</p>
         </div>
@@ -151,13 +151,13 @@ export default function AdminDashboard() {
   const m = data.metrics;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] p-6 lg:p-8">
+    <div className="min-h-screen bg-[#FFFFFF] p-6 lg:p-8">
       <div className="mx-auto max-w-[1400px]">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#e4e4e7]">Dashboard</h1>
-            <p className="mt-1 text-xs text-[#71717a]">
+            <h1 className="text-2xl font-bold text-[#1d1d1f]">Dashboard</h1>
+            <p className="mt-1 text-xs text-[#86868b]">
               Last updated {data.timestamp ? ago(data.timestamp) : '...'} -- Auto-refreshes every 10s
             </p>
           </div>
@@ -225,16 +225,16 @@ export default function AdminDashboard() {
         {/* ── Charts Row ─────────────────────────────────────────────── */}
         <div className="mb-8 grid gap-6 lg:grid-cols-2">
           {/* Rides per hour chart */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <h3 className="mb-4 text-sm font-semibold text-[#e4e4e7]">Rides Per Hour (24h)</h3>
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+            <h3 className="mb-4 text-sm font-semibold text-[#1d1d1f]">Rides Per Hour (24h)</h3>
             <div className="h-[250px] w-full">
               <RidesPerHourChart data={metrics?.hourly ?? []} />
             </div>
           </div>
 
           {/* Revenue chart */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-5">
-            <h3 className="mb-4 text-sm font-semibold text-[#e4e4e7]">Revenue (7 Days)</h3>
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-5">
+            <h3 className="mb-4 text-sm font-semibold text-[#1d1d1f]">Revenue (7 Days)</h3>
             <div className="h-[250px] w-full">
               <RevenueChart data={metrics?.dailyRevenue ?? []} />
             </div>
@@ -274,12 +274,12 @@ export default function AdminDashboard() {
         {/* ── Recent Activity ────────────────────────────────────────── */}
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Recent Rides (2/3 width) */}
-          <div className="lg:col-span-2 rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
-            <div className="flex items-center justify-between border-b border-[#1e1e2e] px-5 py-4">
-              <h3 className="text-sm font-semibold text-[#e4e4e7]">Recent Rides</h3>
+          <div className="lg:col-span-2 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] overflow-hidden">
+            <div className="flex items-center justify-between border-b border-[#d2d2d7] px-5 py-4">
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Recent Rides</h3>
               <Link
                 href="/admin/rides"
-                className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="text-xs font-medium text-[#0071e3] hover:text-[#005bb5] transition-colors"
               >
                 View all
               </Link>
@@ -287,11 +287,11 @@ export default function AdminDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-[#1e1e2e]">
+                  <tr className="border-b border-[#d2d2d7]">
                     {['Status', 'Pickup', 'Dropoff', 'Class', 'Fare', 'When'].map(h => (
                       <th
                         key={h}
-                        className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#71717a]"
+                        className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-[#86868b]"
                       >
                         {h}
                       </th>
@@ -302,31 +302,31 @@ export default function AdminDashboard() {
                   {data.recentRides.slice(0, 10).map(r => (
                     <tr
                       key={r.id}
-                      className="border-b border-[#1e1e2e]/50 transition-colors hover:bg-[#1e1e2e]/30"
+                      className="border-b border-[#d2d2d7]/50 transition-colors hover:bg-[#d2d2d7]/30"
                     >
                       <td className="px-4 py-3">
                         <StatusBadge status={r.status} />
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">
+                      <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[140px] truncate">
                         {r.pickup_address}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#a1a1aa] max-w-[140px] truncate">
+                      <td className="px-4 py-3 text-xs text-[#6e6e73] max-w-[140px] truncate">
                         {r.dropoff_address}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#a1a1aa] capitalize">
+                      <td className="px-4 py-3 text-xs text-[#6e6e73] capitalize">
                         {r.vehicle_class}
                       </td>
-                      <td className="px-4 py-3 text-xs font-medium text-[#e4e4e7]">
+                      <td className="px-4 py-3 text-xs font-medium text-[#1d1d1f]">
                         {usd(Number(r.final_fare ?? r.estimated_fare))}
                       </td>
-                      <td className="px-4 py-3 text-xs text-[#71717a]">
+                      <td className="px-4 py-3 text-xs text-[#86868b]">
                         {ago(r.requested_at)}
                       </td>
                     </tr>
                   ))}
                   {data.recentRides.length === 0 && (
                     <tr>
-                      <td colSpan={6} className="px-4 py-10 text-center text-sm text-[#71717a]">
+                      <td colSpan={6} className="px-4 py-10 text-center text-sm text-[#86868b]">
                         No recent rides
                       </td>
                     </tr>
@@ -337,32 +337,32 @@ export default function AdminDashboard() {
           </div>
 
           {/* Pending Driver Applications (1/3 width) */}
-          <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] overflow-hidden">
-            <div className="flex items-center justify-between border-b border-[#1e1e2e] px-5 py-4">
-              <h3 className="text-sm font-semibold text-[#e4e4e7]">Pending Applications</h3>
+          <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] overflow-hidden">
+            <div className="flex items-center justify-between border-b border-[#d2d2d7] px-5 py-4">
+              <h3 className="text-sm font-semibold text-[#1d1d1f]">Pending Applications</h3>
               <Link
                 href="/admin/drivers"
-                className="text-xs font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
+                className="text-xs font-medium text-[#0071e3] hover:text-[#005bb5] transition-colors"
               >
                 View all
               </Link>
             </div>
-            <div className="divide-y divide-[#1e1e2e]/50">
+            <div className="divide-y divide-[#d2d2d7]/50">
               {data.pendingApplications.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-[#71717a]">
+                <div className="px-5 py-10 text-center text-sm text-[#86868b]">
                   No pending applications
                 </div>
               ) : (
                 data.pendingApplications.slice(0, 8).map(app => (
                   <div
                     key={app.id}
-                    className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-[#1e1e2e]/30"
+                    className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-[#d2d2d7]/30"
                   >
                     <div>
-                      <p className="text-sm font-medium text-[#e4e4e7]">{app.full_name}</p>
-                      <p className="text-xs text-[#71717a]">{app.email}</p>
+                      <p className="text-sm font-medium text-[#1d1d1f]">{app.full_name}</p>
+                      <p className="text-xs text-[#86868b]">{app.email}</p>
                     </div>
-                    <span className="text-xs text-[#71717a]">{ago(app.created_at)}</span>
+                    <span className="text-xs text-[#86868b]">{ago(app.created_at)}</span>
                   </div>
                 ))
               )}
@@ -408,12 +408,12 @@ function MetricCard({
 
   return (
     <div
-      className={`rounded-xl border bg-[#0f0f17] p-4 transition-colors ${
-        alert ? 'border-red-500/30 bg-red-500/5' : 'border-[#1e1e2e]'
+      className={`rounded-xl border bg-[#f5f5f7] p-4 transition-colors ${
+        alert ? 'border-red-500/30 bg-red-500/5' : 'border-[#d2d2d7]'
       }`}
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">
           {label}
         </span>
         <div className={`flex h-7 w-7 items-center justify-center rounded-lg ${accentMap[accent]}`}>
@@ -437,16 +437,16 @@ function StatCard({
   color: string;
 }) {
   return (
-    <div className="rounded-xl border border-[#1e1e2e] bg-[#0f0f17] p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#71717a]">{label}</p>
+    <div className="rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">{label}</p>
       <p className={`mt-2 text-xl font-bold ${color}`}>{value}</p>
-      <p className="mt-1 text-[11px] text-[#52525b]">{description}</p>
+      <p className="mt-1 text-[11px] text-[#86868b]">{description}</p>
     </div>
   );
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const classes = STATUS_COLORS[status] ?? 'text-[#71717a] bg-[#71717a]/10';
+  const classes = STATUS_COLORS[status] ?? 'text-[#86868b] bg-[#86868b]/10';
   return (
     <span className={`inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${classes}`}>
       {status.replace(/_/g, ' ')}

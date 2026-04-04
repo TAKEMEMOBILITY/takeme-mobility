@@ -165,7 +165,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
           options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
         >
-          {pickup && <Marker position={pickup} icon={{ url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
+          {pickup && <Marker position={pickup} icon={{ url: pinSvg('#0071e3'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
           {dropoff && <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
           {directions && <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />}
         </GoogleMap>
@@ -179,8 +179,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const renderAutocomplete = (type: 'pickup' | 'dropoff') => {
     if (!isLoaded) {
       return (
-        <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#34C759]' : 'bg-[#1D1D1F]'}`} />
+        <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
           <input
             type="text"
             placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -199,8 +199,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           onPlaceChanged={type === 'pickup' ? onPickup : onDropoff}
           options={{ fields: ['formatted_address', 'geometry', 'place_id'] }}
         >
-          <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#34C759]' : 'bg-[#1D1D1F]'}`} />
+          <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
             <input
               type="text"
               placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -215,8 +215,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
       console.error('[HeroBooking] Autocomplete failed:', err);
       // Fall back to plain input
       return (
-        <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3.5">
-          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#34C759]' : 'bg-[#1D1D1F]'}`} />
+        <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
           <input
             type="text"
             placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -234,8 +234,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     return (
       <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="p-6 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#34C759]/10">
-            <svg className="h-7 w-7 text-[#34C759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
+            <svg className="h-7 w-7 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           </div>
@@ -296,8 +296,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         {hasRoute && (
           <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#34C759] opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#34C759]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0071e3] opacity-40" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0071e3]" />
             </span>
             <span className="text-[12px] font-semibold text-[#1D1D1F]">{route!.durationMin} min · {route!.distanceKm} km</span>
           </div>
@@ -321,13 +321,13 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
 
         {/* Date/Time */}
         <div className="mt-3 grid grid-cols-2 gap-2">
-          <div className="flex items-center gap-2 rounded-xl bg-[#F5F5F7] px-4 py-3">
+          <div className="flex items-center gap-2 rounded-xl bg-[#f5f5f7] px-4 py-3">
             <svg className="h-4 w-4 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
             </svg>
             <span className="text-[14px] font-medium text-[#1D1D1F]">Today</span>
           </div>
-          <div className="flex items-center gap-2 rounded-xl bg-[#F5F5F7] px-4 py-3">
+          <div className="flex items-center gap-2 rounded-xl bg-[#f5f5f7] px-4 py-3">
             <svg className="h-4 w-4 text-[#86868B]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
@@ -345,7 +345,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
                 key={tier.id}
                 onClick={() => setSelectedTier(tier.id)}
                 className={`flex-1 rounded-xl px-2 py-3 text-center transition-all duration-150 ${
-                  active ? 'bg-[#1D1D1F] text-white' : 'bg-[#F5F5F7] text-[#1D1D1F] hover:bg-[#E8E8ED]'
+                  active ? 'bg-[#1D1D1F] text-white' : 'bg-[#f5f5f7] text-[#1D1D1F] hover:bg-[#E8E8ED]'
                 }`}
               >
                 <p className="text-[16px] leading-none">{tier.icon}</p>
@@ -359,7 +359,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         </div>
 
         {/* Fare */}
-        <div className="mt-4 flex items-center justify-between rounded-xl bg-[#F5F5F7] px-4 py-3">
+        <div className="mt-4 flex items-center justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
           <div>
             <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Estimated fare</p>
             <p className="mt-0.5 text-[22px] font-bold tabular-nums tracking-tight text-[#1D1D1F]">
