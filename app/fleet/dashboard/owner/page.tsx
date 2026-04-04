@@ -665,7 +665,7 @@ export default function OwnerDashboardPage() {
             <span style={{
               fontFamily: "'DM Serif Display', Georgia, serif",
               fontSize: '1.125rem', color: '#1d1d1f', letterSpacing: '-0.02em',
-            }}>TakeMe <span style={{ color: '#0071e3' }}>Fleet</span></span>
+            }}>TakeMe <span style={{ color: '#1D6AE5' }}>Fleet</span></span>
           </div>
 
           {/* Nav */}

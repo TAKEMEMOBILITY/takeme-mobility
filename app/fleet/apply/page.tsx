@@ -41,7 +41,7 @@ export default function FleetApplyPage() {
       </nav>
 
       <div className="mx-auto max-w-lg px-6 py-20">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#0071e3]">Fleet Partner Program</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#1D6AE5]">Fleet Partner Program</p>
         <h1 className="mt-4 text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
           List your EV. Earn passive income.
         </h1>
@@ -52,15 +52,15 @@ export default function FleetApplyPage() {
         <div className="mt-10 space-y-4">
           <div>
             <label className="text-[13px] font-medium text-[#1D1D1F]">Full name</label>
-            <input value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#0071E3] focus:bg-white" />
+            <input value={form.fullName} onChange={e => setForm(f => ({ ...f, fullName: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#1D6AE5] focus:bg-white" />
           </div>
           <div>
             <label className="text-[13px] font-medium text-[#1D1D1F]">Email</label>
-            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#0071E3] focus:bg-white" />
+            <input type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#1D6AE5] focus:bg-white" />
           </div>
           <div>
             <label className="text-[13px] font-medium text-[#1D1D1F]">Phone</label>
-            <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#0071E3] focus:bg-white" />
+            <input type="tel" value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="mt-1.5 w-full rounded-xl border border-[#E8E8ED] bg-[#FAFAFA] px-4 py-3 text-[15px] text-[#1D1D1F] outline-none focus:border-[#1D6AE5] focus:bg-white" />
           </div>
           {error && <p className="text-[14px] text-[#FF3B30]">{error}</p>}
           <button onClick={handleSubmit} disabled={loading} className="mt-4 flex w-full items-center justify-center rounded-[999px] bg-[#1D1D1F] py-3.5 text-[16px] font-medium text-white transition-colors hover:bg-[#333] disabled:opacity-50">

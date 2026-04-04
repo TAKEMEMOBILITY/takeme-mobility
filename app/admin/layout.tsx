@@ -46,7 +46,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className={`flex flex-col border-r border-[#d2d2d7] bg-[#f5f5f7] transition-all duration-200 ${collapsed ? 'w-16' : 'w-56'}`}>
         {/* Brand */}
         <div className="flex h-14 items-center gap-2.5 border-b border-[#d2d2d7] px-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#0071e3]/20 text-[#0071e3] font-bold text-sm">T</div>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#1D6AE5]/20 text-[#1D6AE5] font-bold text-sm">T</div>
           {!collapsed && <span className="text-sm font-semibold tracking-wide">TakeMe Ops</span>}
         </div>
 

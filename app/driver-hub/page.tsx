@@ -308,11 +308,11 @@ export default function DriverHubPage() {
             </div>
             {/* After */}
             <div style={{ background: 'rgba(0,113,227,0.04)', border: '1px solid rgba(0,113,227,0.12)', borderRadius: 16, padding: 36 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#0071e3', marginBottom: 24, marginTop: 0 }}>With TakeMe Hub</p>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1D6AE5', marginBottom: 24, marginTop: 0 }}>With TakeMe Hub</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {AFTER.map((item) => (
                   <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <span style={{ fontSize: 14, color: '#0071e3', marginTop: 2, flexShrink: 0 }}>✓</span>
+                    <span style={{ fontSize: 14, color: '#1D6AE5', marginTop: 2, flexShrink: 0 }}>✓</span>
                     <span style={{ fontSize: 15, lineHeight: 1.5, color: 'rgba(255,255,255,0.75)' }}>{item}</span>
                   </div>
                 ))}
@@ -389,7 +389,7 @@ export default function DriverHubPage() {
               <Link href="/driver/apply" style={{
                 display: 'inline-flex', alignItems: 'center', height: 48,
                 padding: '0 28px', borderRadius: 8, fontWeight: 600, fontSize: 15,
-                background: '#0071e3', color: '#ffffff', textDecoration: 'none',
+                background: '#1D6AE5', color: '#ffffff', textDecoration: 'none',
                 transition: 'background 0.3s',
               }}>
                 Apply to Drive

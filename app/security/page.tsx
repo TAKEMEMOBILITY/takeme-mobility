@@ -210,7 +210,7 @@ export default function SecurityPage() {
         <div className="mt-6 flex gap-0.5 overflow-x-auto border-b border-[#d2d2d7]">
           {tabs.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-[13px] font-medium transition-colors ${tab === t.key ? 'border-b-2 border-[#0071e3] text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#6e6e73]'}`}>
+              className={`flex items-center gap-1.5 whitespace-nowrap px-4 py-2.5 text-[13px] font-medium transition-colors ${tab === t.key ? 'border-b-2 border-[#1D6AE5] text-[#1d1d1f]' : 'text-[#86868b] hover:text-[#6e6e73]'}`}>
               {t.label}
               {t.badge !== undefined && <span className="rounded-full bg-red-500/20 px-1.5 text-[10px] font-bold text-red-400">{t.badge}</span>}
             </button>

@@ -128,7 +128,7 @@ export default function HomePage() {
               <Link key={item} href={NAV_ROUTES[item] || '/'} className="relative flex items-center gap-1.5 text-[14px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
                 {item}
                 {NAV_BADGES.has(item) && (
-                  <span className="rounded-full bg-[#0071e3] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
+                  <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">
                     New
                   </span>
                 )}
@@ -143,7 +143,7 @@ export default function HomePage() {
               <>
                 <Link href="/driver" className="hidden items-center gap-1.5 text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:flex">
                   Driver Hub
-                  <span className="rounded-full bg-[#0071e3] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
+                  <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase leading-none text-white">New</span>
                 </Link>
                 <Link href="/driver/apply" className="hidden text-[13px] font-medium text-[#86868b] transition-opacity duration-200 hover:opacity-60 lg:block">
                   Drive with us
@@ -154,7 +154,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-10 items-center rounded-[999px] bg-[#0071e3] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                  className="inline-flex h-10 items-center rounded-[999px] bg-[#1D6AE5] px-5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
                 >
                   Book a ride
                 </Link>
@@ -188,7 +188,7 @@ export default function HomePage() {
               <div className="mt-7 flex items-center gap-3.5 animate-fade-in stagger-2">
                 <Link
                   href={ctaHref}
-                  className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                  className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
                 >
                   Book your ride
                 </Link>
@@ -385,7 +385,7 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            <span className="text-[15px] font-medium text-[#0071e3] transition-transform duration-200 group-hover:translate-x-1">
+            <span className="text-[15px] font-medium text-[#1D6AE5] transition-transform duration-200 group-hover:translate-x-1">
               View plans &rarr;
             </span>
           </Link>

@@ -146,7 +146,7 @@ export default function AdminAlertsPage() {
     return (
       <div className="flex h-full items-center justify-center bg-[#FFFFFF] text-[#86868b]">
         <div className="flex items-center gap-3">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3]" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#1D6AE5]" />
           Loading alerts...
         </div>
       </div>

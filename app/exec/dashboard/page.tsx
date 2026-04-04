@@ -68,7 +68,7 @@ export default function ExecDashboard() {
 
   if (loading) return (
     <div className="flex min-h-[80vh] items-center justify-center">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1D6AE5] border-t-transparent" />
     </div>
   );
   if (error) return (

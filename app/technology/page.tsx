@@ -508,7 +508,7 @@ export default function TechnologyPage() {
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/"
-                className="inline-flex items-center justify-center rounded-[999px] bg-[#0071e3] px-8 py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                className="inline-flex items-center justify-center rounded-[999px] bg-[#1D6AE5] px-8 py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Get started
               </Link>

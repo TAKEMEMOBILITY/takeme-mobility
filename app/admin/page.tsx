@@ -129,7 +129,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1D6AE5] border-t-transparent" />
           <p className="text-sm text-[#86868b]">Loading dashboard...</p>
         </div>
       </div>
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
               <h3 className="text-sm font-semibold text-[#1d1d1f]">Recent Rides</h3>
               <Link
                 href="/admin/rides"
-                className="text-xs font-medium text-[#0071e3] hover:text-[#005bb5] transition-colors"
+                className="text-xs font-medium text-[#1D6AE5] hover:text-[#005bb5] transition-colors"
               >
                 View all
               </Link>
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
               <h3 className="text-sm font-semibold text-[#1d1d1f]">Pending Applications</h3>
               <Link
                 href="/admin/drivers"
-                className="text-xs font-medium text-[#0071e3] hover:text-[#005bb5] transition-colors"
+                className="text-xs font-medium text-[#1D6AE5] hover:text-[#005bb5] transition-colors"
               >
                 View all
               </Link>

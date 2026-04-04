@@ -569,7 +569,7 @@ function PendingVehiclesTab() {
                     display: 'flex',
                     alignItems: 'center',
                     gap: 6,
-                    background: '#0071e3',
+                    background: '#1D6AE5',
                     color: '#FFFFFF',
                     border: 'none',
                     borderRadius: 100,
@@ -580,7 +580,7 @@ function PendingVehiclesTab() {
                     cursor: 'pointer',
                   }}
                   onMouseEnter={e => { e.currentTarget.style.background = '#004c99' }}
-                  onMouseLeave={e => { e.currentTarget.style.background = '#0071e3' }}
+                  onMouseLeave={e => { e.currentTarget.style.background = '#1D6AE5' }}
                 >
                   {actionLoading[v.id]
                     ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
@@ -807,7 +807,7 @@ function PendingOwnersTab() {
                       display: 'flex',
                       alignItems: 'center',
                       gap: 6,
-                      background: '#0071e3',
+                      background: '#1D6AE5',
                       color: '#FFFFFF',
                       border: 'none',
                       borderRadius: 100,
@@ -818,7 +818,7 @@ function PendingOwnersTab() {
                       cursor: 'pointer',
                     }}
                     onMouseEnter={e => { e.currentTarget.style.background = '#004c99' }}
-                    onMouseLeave={e => { e.currentTarget.style.background = '#0071e3' }}
+                    onMouseLeave={e => { e.currentTarget.style.background = '#1D6AE5' }}
                   >
                     {actionLoading[o.id]
                       ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
@@ -1203,7 +1203,7 @@ function PayoutQueueTab() {
                 alignItems: 'center',
                 gap: 6,
                 opacity: p.status === 'processing' ? 0.5 : 1,
-                background: '#0071e3',
+                background: '#1D6AE5',
                 color: '#FFFFFF',
                 border: 'none',
                 borderRadius: 100,
@@ -1214,7 +1214,7 @@ function PayoutQueueTab() {
                 cursor: p.status === 'processing' ? 'not-allowed' : 'pointer',
               }}
               onMouseEnter={e => { if (p.status !== 'processing') e.currentTarget.style.background = '#004c99' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#0071e3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#1D6AE5' }}
             >
               {actionLoading[p.id]
                 ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />

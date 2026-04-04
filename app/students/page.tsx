@@ -113,7 +113,7 @@ export default function StudentsPage() {
         <div className="mx-auto max-w-[1200px] px-6 py-24 md:py-32 lg:px-10">
           <div className="mx-auto max-w-2xl text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-[#d2d2d7] bg-white px-4 py-1.5 text-[13px] font-medium text-[#6e6e73]">
-              <svg className="h-4 w-4 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+              <svg className="h-4 w-4 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
               </svg>
               Student Program
@@ -133,7 +133,7 @@ export default function StudentsPage() {
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f5f5f7]">
                     {verified ? (
-                      <svg className="h-5 w-5 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <svg className="h-5 w-5 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.745 3.745 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                       </svg>
                     ) : (
@@ -159,11 +159,11 @@ export default function StudentsPage() {
                         value={email}
                         onChange={(e) => { setEmail(e.target.value); setError(''); }}
                         placeholder="you@university.edu"
-                        className="flex-1 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2.5 text-[14px] text-[#1d1d1f] placeholder-[#D1D5DB] outline-none transition-colors duration-200 focus:border-[#0071e3] focus:bg-white"
+                        className="flex-1 rounded-xl border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2.5 text-[14px] text-[#1d1d1f] placeholder-[#D1D5DB] outline-none transition-colors duration-200 focus:border-[#1D6AE5] focus:bg-white"
                       />
                       <button
                         onClick={handleVerify}
-                        className="shrink-0 rounded-xl bg-[#0071e3] px-5 py-2.5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                        className="shrink-0 rounded-xl bg-[#1D6AE5] px-5 py-2.5 text-[14px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
                       >
                         Verify
                       </button>
@@ -211,7 +211,7 @@ export default function StudentsPage() {
                 }`}
               >
                 {plan.accent && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#0071e3] px-4 py-1 text-[12px] font-semibold text-white">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[#1D6AE5] px-4 py-1 text-[12px] font-semibold text-white">
                     Best value
                   </span>
                 )}
@@ -223,7 +223,7 @@ export default function StudentsPage() {
                 <div className="mt-8 flex flex-1 flex-col gap-3.5">
                   {plan.features.map((feature) => (
                     <div key={feature} className="flex items-center gap-3">
-                      <svg className={`h-4 w-4 shrink-0 ${plan.accent ? 'text-[#0071e3]' : 'text-[#0071e3]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                      <svg className={`h-4 w-4 shrink-0 ${plan.accent ? 'text-[#1D6AE5]' : 'text-[#1D6AE5]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                       </svg>
                       <span className={`text-[14px] ${plan.accent ? 'text-white/80' : 'text-[#6e6e73]'}`}>{feature}</span>
@@ -234,7 +234,7 @@ export default function StudentsPage() {
                   className={`mt-8 flex h-[48px] w-full items-center justify-center rounded-[999px] text-[15px] font-medium transition-colors duration-200 ${
                     plan.accent
                       ? 'bg-white text-[#1d1d1f] hover:bg-white/90'
-                      : 'bg-[#0071e3] text-white hover:bg-[#005bb5]'
+                      : 'bg-[#1D6AE5] text-white hover:bg-[#005bb5]'
                   }`}
                 >
                   Choose {plan.name}
@@ -273,8 +273,8 @@ export default function StudentsPage() {
                   {uni.abbr}
                 </div>
                 <h3 className="text-[15px] font-semibold text-[#1d1d1f]">{uni.name}</h3>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d2d2d7] px-3 py-1 text-[12px] font-medium text-[#0071e3]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#0071e3]" />
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-[#d2d2d7] px-3 py-1 text-[12px] font-medium text-[#1D6AE5]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#1D6AE5]" />
                   Active partner
                 </span>
               </div>
@@ -301,7 +301,7 @@ export default function StudentsPage() {
             <div className="mt-10">
               <button
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Verify student email
               </button>

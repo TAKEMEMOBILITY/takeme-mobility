@@ -384,7 +384,7 @@ export default function PaymentsPage() {
                     value={actionReason}
                     onChange={(e) => setActionReason(e.target.value)}
                     placeholder="Reason (required for refund/resolve)"
-                    className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
+                    className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5]/50"
                   />
 
                   {/* Retry Capture */}
@@ -406,7 +406,7 @@ export default function PaymentsPage() {
                         value={refundAmount}
                         onChange={(e) => setRefundAmount(e.target.value)}
                         placeholder={`Partial amount in dollars (leave blank for full ${usd(selectedPayment.amount, selectedPayment.currency)})`}
-                        className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
+                        className="w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5]/50"
                       />
                       <button
                         onClick={() => performAction('refund', selectedPayment.id)}
@@ -427,7 +427,7 @@ export default function PaymentsPage() {
                     <button
                       onClick={() => performAction('mark_resolved', selectedPayment.id)}
                       disabled={!!actionLoading || !actionReason.trim()}
-                      className="w-full rounded-lg bg-[#0071e3] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40"
+                      className="w-full rounded-lg bg-[#1D6AE5] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40"
                     >
                       {actionLoading === 'mark_resolved' ? 'Resolving...' : 'Mark Resolved'}
                     </button>

@@ -46,7 +46,7 @@ function AnimatedStat({ value, suffix, label }: { value: string; suffix?: string
       <div style={{
         fontFamily: "'DM Serif Display', Georgia, serif",
         fontSize: 'clamp(2rem, 4vw, 3rem)',
-        color: '#0071e3',
+        color: '#1D6AE5',
         letterSpacing: '-0.03em',
       }}>
         {prefix}{count}{trailChar}{suffix}
@@ -148,7 +148,7 @@ export default function FleetPage() {
                 fontWeight: 600,
                 textTransform: 'uppercase' as const,
                 letterSpacing: '0.15em',
-                color: '#0071e3',
+                color: '#1D6AE5',
                 marginBottom: 16,
               }}>
                 TakeMe Fleet
@@ -289,7 +289,7 @@ export default function FleetPage() {
             {/* Max Daily Rate */}
             <div style={{ flex: '1 1 200px' }}>
               <label style={{ display: 'block', fontFamily: "'DM Sans', sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
-                Max Daily Rate: <span style={{ color: '#0071e3', fontWeight: 600 }}>${maxRate}</span>
+                Max Daily Rate: <span style={{ color: '#1D6AE5', fontWeight: 600 }}>${maxRate}</span>
               </label>
               <input
                 type="range"
@@ -300,7 +300,7 @@ export default function FleetPage() {
                 onChange={e => setMaxRate(Number(e.target.value))}
                 style={{
                   width: '100%',
-                  accentColor: '#0071e3',
+                  accentColor: '#1D6AE5',
                   cursor: 'pointer',
                 }}
               />
@@ -368,7 +368,7 @@ export default function FleetPage() {
             textAlign: 'center',
             padding: '80px 24px',
           }}>
-            <Zap size={48} color="#0071e3" style={{ marginBottom: 16 }} />
+            <Zap size={48} color="#1D6AE5" style={{ marginBottom: 16 }} />
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
               color: '#6e6e73',
@@ -463,7 +463,7 @@ export default function FleetPage() {
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               background: howTab === 'drivers' ? '#f0f5ff' : 'transparent',
-              color: howTab === 'drivers' ? '#0071e3' : '#6e6e73',
+              color: howTab === 'drivers' ? '#1D6AE5' : '#6e6e73',
             }}
           >
             For Drivers
@@ -481,7 +481,7 @@ export default function FleetPage() {
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               background: howTab === 'owners' ? '#f0f5ff' : 'transparent',
-              color: howTab === 'owners' ? '#0071e3' : '#6e6e73',
+              color: howTab === 'owners' ? '#1D6AE5' : '#6e6e73',
             }}
           >
             For Owners
@@ -504,15 +504,15 @@ export default function FleetPage() {
         >
           {howTab === 'drivers' ? (
             <>
-              <StepCard num={1} icon={<Search size={28} color="#0071e3" />} title="Browse EVs" description="Explore our curated selection of premium electric vehicles available in your area." />
-              <StepCard num={2} icon={<CalendarCheck size={28} color="#0071e3" />} title="Book Instantly" description="Reserve your vehicle in seconds with transparent pricing and flexible terms." />
-              <StepCard num={3} icon={<Car size={28} color="#0071e3" />} title="Drive & Earn" description="Hit the road with zero gas costs and maximize your earnings as a rideshare driver." />
+              <StepCard num={1} icon={<Search size={28} color="#1D6AE5" />} title="Browse EVs" description="Explore our curated selection of premium electric vehicles available in your area." />
+              <StepCard num={2} icon={<CalendarCheck size={28} color="#1D6AE5" />} title="Book Instantly" description="Reserve your vehicle in seconds with transparent pricing and flexible terms." />
+              <StepCard num={3} icon={<Car size={28} color="#1D6AE5" />} title="Drive & Earn" description="Hit the road with zero gas costs and maximize your earnings as a rideshare driver." />
             </>
           ) : (
             <>
-              <StepCard num={1} icon={<Upload size={28} color="#0071e3" />} title="List Your EV" description="Add your electric vehicle to the marketplace in minutes with our simple listing process." />
-              <StepCard num={2} icon={<ShieldCheck size={28} color="#0071e3" />} title="Get Approved" description="Our team verifies your vehicle and sets you up for success with insurance and support." />
-              <StepCard num={3} icon={<DollarSign size={28} color="#0071e3" />} title="Earn Passive Income" description="Your EV earns money while you sleep. Track earnings and manage bookings from your dashboard." />
+              <StepCard num={1} icon={<Upload size={28} color="#1D6AE5" />} title="List Your EV" description="Add your electric vehicle to the marketplace in minutes with our simple listing process." />
+              <StepCard num={2} icon={<ShieldCheck size={28} color="#1D6AE5" />} title="Get Approved" description="Our team verifies your vehicle and sets you up for success with insurance and support." />
+              <StepCard num={3} icon={<DollarSign size={28} color="#1D6AE5" />} title="Earn Passive Income" description="Your EV earns money while you sleep. Track earnings and manage bookings from your dashboard." />
             </>
           )}
         </motion.div>
@@ -542,7 +542,7 @@ export default function FleetPage() {
               letterSpacing: '-0.03em',
               marginBottom: 12,
             }}>
-              TakeMe <span style={{ color: '#0071e3' }}>Fleet</span>
+              TakeMe <span style={{ color: '#1D6AE5' }}>Fleet</span>
             </div>
             <p style={{
               fontFamily: "'DM Sans', sans-serif",
@@ -643,7 +643,7 @@ function StepCard({ num, icon, title, description }: {
         height: 36,
         borderRadius: '50%',
         background: '#f0f5ff',
-        color: '#0071e3',
+        color: '#1D6AE5',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',

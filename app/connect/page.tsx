@@ -24,7 +24,7 @@ export default function ConnectPage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Left */}
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#0071e3]">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#1D6AE5]">
               For drivers
             </p>
             <h1 className="mt-4 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]">
@@ -56,7 +56,7 @@ export default function ConnectPage() {
             <div className="mt-10">
               <Link
                 href="/driver/connect"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] active:scale-[0.98]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] active:scale-[0.98]"
               >
                 Start earning without interruptions
               </Link>
@@ -105,7 +105,7 @@ export default function ConnectPage() {
           <div className="mt-8">
             <Link
               href="/driver/connect"
-              className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5]"
+              className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5]"
             >
               Activate plan
             </Link>

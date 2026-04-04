@@ -102,7 +102,7 @@ export default function FleetPage() {
           <div className="grid items-start gap-10 lg:grid-cols-[1fr_440px] lg:gap-16">
             {/* Left */}
             <div className="pt-2 lg:pt-6">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#0071e3]">TakeMe Fleet</p>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#1D6AE5]">TakeMe Fleet</p>
               <h1 className="mt-4 text-[clamp(2.25rem,5vw,3.75rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
                 Turn vehicles into
                 <br />income infrastructure.
@@ -121,7 +121,7 @@ export default function FleetPage() {
               </div>
 
               <div className="mt-8 flex items-center gap-3.5">
-                <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-medium text-white transition-colors hover:bg-[#005bb5]">
+                <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-medium text-white transition-colors hover:bg-[#005bb5]">
                   Start driving
                 </a>
                 <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] border border-[#E0E0E0] px-8 text-[16px] font-medium text-[#1d1d1f] transition-colors hover:bg-white">
@@ -139,13 +139,13 @@ export default function FleetPage() {
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[12px] font-medium text-[#6e6e73]">Vehicle type</label>
-                  <select value={heroVehicleType} onChange={e => setHeroVehicleType(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] text-[#1d1d1f] outline-none focus:border-[#0071e3]">
+                  <select value={heroVehicleType} onChange={e => setHeroVehicleType(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] text-[#1d1d1f] outline-none focus:border-[#1D6AE5]">
                     {CATEGORIES.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-[12px] font-medium text-[#6e6e73]">Commitment</label>
-                  <select value={heroCommitment} onChange={e => setHeroCommitment(e.target.value as 'weekly' | 'monthly')} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] text-[#1d1d1f] outline-none focus:border-[#0071e3]">
+                  <select value={heroCommitment} onChange={e => setHeroCommitment(e.target.value as 'weekly' | 'monthly')} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] text-[#1d1d1f] outline-none focus:border-[#1D6AE5]">
                     <option value="weekly">Weekly</option>
                     <option value="monthly">Monthly</option>
                   </select>
@@ -365,7 +365,7 @@ export default function FleetPage() {
                         <p className="text-[16px] font-bold text-emerald-600">{usd(driverNet)}/day</p>
                       </div>
                     </div>
-                    <button onClick={() => setBookingVehicle(v)} className="mt-4 flex w-full items-center justify-center rounded-[999px] bg-[#0071e3] py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#005bb5]">
+                    <button onClick={() => setBookingVehicle(v)} className="mt-4 flex w-full items-center justify-center rounded-[999px] bg-[#1D6AE5] py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#005bb5]">
                       Start driving
                     </button>
                   </div>
@@ -396,13 +396,13 @@ export default function FleetPage() {
               <div className="mt-8 space-y-4">
                 {['Deploy once', 'Earn continuously', 'Managed by TakeMe', 'Withdraw anytime'].map(t => (
                   <div key={t} className="flex items-center gap-3">
-                    <svg className="h-5 w-5 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                    <svg className="h-5 w-5 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                     <span className="text-[16px] text-[#1d1d1f]">{t}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-10">
-                <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-medium text-white hover:bg-[#005bb5]">
+                <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-medium text-white hover:bg-[#005bb5]">
                   List your vehicle
                 </Link>
               </div>
@@ -494,7 +494,7 @@ export default function FleetPage() {
           </h2>
           <p className="mt-4 text-[16px] text-[#6e6e73]">Drivers earn. Owners earn. TakeMe runs the system.</p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[16px] font-medium text-white hover:bg-[#005bb5]">
+            <a href="#marketplace" className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-medium text-white hover:bg-[#005bb5]">
               Start driving
             </a>
             <Link href="/fleet/apply" className="inline-flex h-[52px] items-center rounded-[999px] border border-[#d2d2d7] px-8 text-[16px] font-medium text-[#1d1d1f] hover:bg-white">
@@ -570,7 +570,7 @@ function BookingModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => v
             </div>
             <h3 className="text-[20px] font-bold text-[#1d1d1f]">Booking confirmed.</h3>
             <p className="mt-2 text-[14px] text-[#6e6e73]">Check your email for pickup details.</p>
-            <button onClick={onClose} className="mt-6 rounded-[999px] bg-[#0071e3] px-6 py-2.5 text-[14px] font-medium text-white">Done</button>
+            <button onClick={onClose} className="mt-6 rounded-[999px] bg-[#1D6AE5] px-6 py-2.5 text-[14px] font-medium text-white">Done</button>
           </div>
         ) : (
           <>
@@ -582,16 +582,16 @@ function BookingModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => v
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="text-[12px] font-medium text-[#6e6e73]">Pickup</label>
-                  <input type="date" min={today} value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#0071e3]" />
+                  <input type="date" min={today} value={pickupDate} onChange={e => setPickupDate(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#1D6AE5]" />
                 </div>
                 <div>
                   <label className="text-[12px] font-medium text-[#6e6e73]">Return</label>
-                  <input type="date" min={pickupDate || today} value={returnDate} onChange={e => setReturnDate(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#0071e3]" />
+                  <input type="date" min={pickupDate || today} value={returnDate} onChange={e => setReturnDate(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#1D6AE5]" />
                 </div>
               </div>
               <div>
                 <label className="text-[12px] font-medium text-[#6e6e73]">Location</label>
-                <select value={location} onChange={e => setLocation(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#0071e3]">
+                <select value={location} onChange={e => setLocation(e.target.value)} className="mt-1 w-full rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-3 py-2 text-[14px] outline-none focus:border-[#1D6AE5]">
                   {PICKUP_LOCATIONS.map(l => <option key={l}>{l}</option>)}
                 </select>
               </div>
@@ -602,7 +602,7 @@ function BookingModal({ vehicle, onClose }: { vehicle: Vehicle; onClose: () => v
                 <div className="mt-2 flex justify-between text-[13px]"><span className="text-emerald-600">Est. net earnings</span><span className="font-semibold text-emerald-600">${(DRIVER_DAILY_GROSS - vehicle.dailyRate) * days}</span></div>
               </div>
             )}
-            <button onClick={handleBook} disabled={!days || submitting} className="mt-5 flex w-full items-center justify-center rounded-[999px] bg-[#0071e3] py-3 text-[15px] font-medium text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40">
+            <button onClick={handleBook} disabled={!days || submitting} className="mt-5 flex w-full items-center justify-center rounded-[999px] bg-[#1D6AE5] py-3 text-[15px] font-medium text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40">
               {submitting ? 'Processing...' : days ? `Rent for ${usd(total)}` : 'Select dates'}
             </button>
           </>

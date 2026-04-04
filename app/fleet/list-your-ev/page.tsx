@@ -197,7 +197,7 @@ export default function ListYourEvPage() {
             className="fleet-btn-primary"
             style={{
               display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px',
-              background: '#0071e3', color: '#FFFFFF', borderRadius: 12,
+              background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12,
               fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '1rem',
               textDecoration: 'none', border: 'none', cursor: 'pointer',
             }}
@@ -387,7 +387,7 @@ export default function ListYourEvPage() {
                   disabled={loading}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 8, padding: '12px 28px',
-                    background: '#0071e3', color: '#FFFFFF', borderRadius: 12,
+                    background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12,
                     fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '0.95rem',
                     border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
                     transition: 'opacity 0.2s',
@@ -466,7 +466,7 @@ export default function ListYourEvPage() {
                     disabled={loading}
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 8, padding: '14px 32px',
-                      background: '#0071e3', color: '#FFFFFF', borderRadius: 12,
+                      background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12,
                       fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '1rem',
                       border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
                     }}
@@ -496,7 +496,7 @@ export default function ListYourEvPage() {
                     onClick={goForward}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 8, padding: '12px 28px',
-                      background: '#0071e3', color: '#FFFFFF', borderRadius: 12,
+                      background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12,
                       fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '0.95rem',
                       border: 'none', cursor: 'pointer',
                     }}
@@ -641,7 +641,7 @@ export default function ListYourEvPage() {
                   <ChevronLeft size={18} /> Back
                 </button>
                 <button className="fleet-btn-primary" onClick={handleStep3Submit} disabled={loading}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#0071e3', color: '#FFFFFF', borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '0.95rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '12px 28px', background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '0.95rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
                   {loading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : null}
                   Continue <ChevronRight size={18} />
                 </button>
@@ -674,7 +674,7 @@ export default function ListYourEvPage() {
                   </div>
                   <input
                     type="range" min={30} max={300} value={dailyRate} onChange={e => setDailyRate(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#0071e3', cursor: 'pointer' }}
+                    style={{ width: '100%', accentColor: '#1D6AE5', cursor: 'pointer' }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '0.75rem', color: '#86868b' }}>
                     <span>$30</span><span>$300</span>
@@ -705,7 +705,7 @@ export default function ListYourEvPage() {
                   </div>
                   <input
                     type="range" min={200} max={1000} step={50} value={securityDeposit} onChange={e => setSecurityDeposit(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#0071e3', cursor: 'pointer' }}
+                    style={{ width: '100%', accentColor: '#1D6AE5', cursor: 'pointer' }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '0.75rem', color: '#86868b' }}>
                     <span>$200</span><span>$1,000</span>
@@ -720,7 +720,7 @@ export default function ListYourEvPage() {
                   </div>
                   <input
                     type="range" min={0} max={200} step={10} value={cleaningFee} onChange={e => setCleaningFee(Number(e.target.value))}
-                    style={{ width: '100%', accentColor: '#0071e3', cursor: 'pointer' }}
+                    style={{ width: '100%', accentColor: '#1D6AE5', cursor: 'pointer' }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: '0.75rem', color: '#86868b' }}>
                     <span>$0</span><span>$200</span>
@@ -754,7 +754,7 @@ export default function ListYourEvPage() {
                   <ChevronLeft size={18} /> Back
                 </button>
                 <button className="fleet-btn-primary" onClick={handleStep4Submit} disabled={loading}
-                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: '#0071e3', color: '#FFFFFF', borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '14px 32px', background: '#1D6AE5', color: '#FFFFFF', borderRadius: 12, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: '1rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1 }}>
                   {loading ? <Loader2 size={18} style={{ animation: 'spin 1s linear infinite' }} /> : <Zap size={18} />}
                   Submit for Review
                 </button>
@@ -774,7 +774,7 @@ export default function ListYourEvPage() {
           width: 20px;
           height: 20px;
           border-radius: 50%;
-          background: #0071e3;
+          background: #1D6AE5;
           cursor: pointer;
           border: 2px solid #FFFFFF;
         }

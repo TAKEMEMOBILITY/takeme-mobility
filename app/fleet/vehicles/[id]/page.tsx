@@ -581,7 +581,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ id: st
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: 8,
-                  background: '#0071e3',
+                  background: '#1D6AE5',
                   color: '#FFFFFF',
                   border: 'none',
                   borderRadius: 12,

@@ -97,7 +97,7 @@ const STATUS_CLASSES: Record<string, string> = {
 };
 
 const RIDE_STATUS_CLASSES: Record<string, string> = {
-  completed: 'bg-[#0071e3]/10 text-[#0071e3]',
+  completed: 'bg-[#1D6AE5]/10 text-[#1D6AE5]',
   cancelled: 'bg-red-500/15 text-red-400',
   in_progress: 'bg-emerald-500/15 text-emerald-400',
   driver_assigned: 'bg-blue-500/15 text-blue-400',
@@ -276,7 +276,7 @@ export default function AdminDriversPage() {
         <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-[#86868b]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#1D6AE5] mr-3" />
               Loading drivers...
             </div>
           ) : drivers.length === 0 ? (
@@ -365,7 +365,7 @@ export default function AdminDriversPage() {
 
           {detailLoading ? (
             <div className="flex items-center justify-center py-20 text-[#86868b]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#1D6AE5] mr-3" />
               Loading...
             </div>
           ) : detail ? (

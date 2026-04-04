@@ -212,7 +212,7 @@ export default function DriverDashboardPage() {
         <Link href="/auth/login" className="fleet-btn-primary" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '12px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600,
-          background: '#0071e3', color: '#FFFFFF',
+          background: '#1D6AE5', color: '#FFFFFF',
         }}>
           Sign In <ChevronRight size={16} />
         </Link>
@@ -280,7 +280,7 @@ export default function DriverDashboardPage() {
         <Link href="/fleet" className="fleet-btn-primary" style={{
           display: 'inline-flex', alignItems: 'center', gap: 8,
           padding: '12px 28px', borderRadius: 10, textDecoration: 'none', fontWeight: 600,
-          background: '#0071e3', color: '#FFFFFF',
+          background: '#1D6AE5', color: '#FFFFFF',
         }}>
           Browse Available EVs <ChevronRight size={16} />
         </Link>
@@ -392,7 +392,7 @@ export default function DriverDashboardPage() {
                   marginTop: 24, display: 'inline-flex', alignItems: 'center', gap: 8,
                   padding: '12px 28px', borderRadius: 10, border: 'none', cursor: 'pointer',
                   fontWeight: 600, fontSize: '0.9rem', fontFamily: "'DM Sans', sans-serif",
-                  background: '#0071e3', color: '#FFFFFF',
+                  background: '#1D6AE5', color: '#FFFFFF',
                   opacity: completingId === activeBooking.id ? 0.6 : 1,
                 }}
               >

@@ -11,8 +11,8 @@ function SuccessContent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-6">
       <div className="max-w-md text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#0071e3]/10">
-          <svg className="h-8 w-8 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1D6AE5]/10">
+          <svg className="h-8 w-8 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
           </svg>
         </div>
@@ -31,7 +31,7 @@ function SuccessContent() {
         <div className="mt-8 flex flex-col gap-3">
           <Link
             href="/dashboard"
-            className="flex items-center justify-center rounded-xl bg-[#0071e3] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#005bb5]"
+            className="flex items-center justify-center rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-medium text-white transition-colors hover:bg-[#005bb5]"
           >
             Track your ride
           </Link>
@@ -51,7 +51,7 @@ export default function BookingSuccessPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#d2d2d7] border-t-[#0071e3]" />
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#d2d2d7] border-t-[#1D6AE5]" />
       </div>
     }>
       <SuccessContent />

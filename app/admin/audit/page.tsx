@@ -145,7 +145,7 @@ export default function AuditLogPage() {
               <select
                 value={filterAction}
                 onChange={e => setFilterAction(e.target.value)}
-                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#0071e3]/50"
+                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#1D6AE5]/50"
               >
                 <option value="">All Actions</option>
                 {actionOptions.map(a => (
@@ -161,7 +161,7 @@ export default function AuditLogPage() {
                 value={filterAdminEmail}
                 onChange={e => setFilterAdminEmail(e.target.value)}
                 placeholder="Search admin..."
-                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50 w-48"
+                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5]/50 w-48"
               />
             </div>
 
@@ -171,7 +171,7 @@ export default function AuditLogPage() {
                 type="date"
                 value={filterDateFrom}
                 onChange={e => setFilterDateFrom(e.target.value)}
-                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#0071e3]/50"
+                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#1D6AE5]/50"
               />
             </div>
 
@@ -181,7 +181,7 @@ export default function AuditLogPage() {
                 type="date"
                 value={filterDateTo}
                 onChange={e => setFilterDateTo(e.target.value)}
-                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#0071e3]/50"
+                className="rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-3 py-2 text-xs text-[#1d1d1f] outline-none focus:border-[#1D6AE5]/50"
               />
             </div>
 
@@ -223,7 +223,7 @@ export default function AuditLogPage() {
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
+                        <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1D6AE5] border-t-transparent" />
                         <span className="text-sm text-[#86868b]">Loading...</span>
                       </div>
                     </td>
@@ -261,7 +261,7 @@ export default function AuditLogPage() {
                             {Object.keys(entry.details).length > 0 && (
                               <button
                                 onClick={() => toggleExpand(entry.id)}
-                                className="text-[11px] font-medium text-[#0071e3] hover:text-[#005bb5] transition-colors"
+                                className="text-[11px] font-medium text-[#1D6AE5] hover:text-[#005bb5] transition-colors"
                               >
                                 {isExpanded ? 'Collapse' : 'Expand'}
                               </button>

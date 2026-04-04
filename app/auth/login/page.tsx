@@ -200,7 +200,7 @@ function PhoneAuth() {
             <button
               type="submit"
               disabled={loading || (method === 'phone' ? phone.replace(/\D/g, '').length < 10 : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))}
-              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#0071e3] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#0077ed] disabled:opacity-40"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0] disabled:opacity-40"
             >
               {loading ? 'Sending code...' : 'Send verification code'}
             </button>
@@ -228,7 +228,7 @@ function PhoneAuth() {
             <button
               type="submit"
               disabled={loading || code.length < 6}
-              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#0071e3] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#0077ed] disabled:opacity-40"
+              className="mt-4 flex w-full items-center justify-center rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0] disabled:opacity-40"
             >
               {loading ? 'Verifying...' : 'Verify & continue'}
             </button>
@@ -245,7 +245,7 @@ function PhoneAuth() {
                 type="button"
                 onClick={handleResend}
                 disabled={cooldown > 0 || loading}
-                className="text-[13px] text-[#0071E3] hover:opacity-70 disabled:text-[#A1A1A6]"
+                className="text-[13px] text-[#1D6AE5] hover:opacity-70 disabled:text-[#A1A1A6]"
               >
                 {cooldown > 0 ? `Resend in ${cooldown}s` : 'Resend code'}
               </button>
@@ -256,8 +256,8 @@ function PhoneAuth() {
         {/* ── Success step ─────────────────────────────────── */}
         {step === 'success' && (
           <div className="flex flex-col items-center py-4">
-            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
-              <svg className="h-7 w-7 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#1D6AE5]/10">
+              <svg className="h-7 w-7 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>
@@ -278,7 +278,7 @@ export default function LoginPage() {
   return (
     <Suspense fallback={
       <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#0071e3]" />
+        <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#E8E8ED] border-t-[#1D6AE5]" />
       </div>
     }>
       <PhoneAuth />

@@ -31,7 +31,7 @@ export default function ConnectPage() {
                 'Cancel anytime — no contract',
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-[10px] font-bold text-white">{i + 1}</span>
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#1D6AE5] text-[10px] font-bold text-white">{i + 1}</span>
                   <p className="text-[14px] text-[#6e6e73]">{step}</p>
                 </div>
               ))}

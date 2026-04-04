@@ -117,14 +117,14 @@ export default function DriverApplyPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6">
         <div className="max-w-sm text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
-            <svg className="h-6 w-6 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1D6AE5]/10">
+            <svg className="h-6 w-6 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
             </svg>
           </div>
           <h1 className="mt-5 text-[22px] font-semibold text-[#1d1d1f]">Application under review</h1>
           <p className="mt-2 text-[15px] text-[#6e6e73]">We&apos;ll notify you once your application is approved.</p>
-          <Link href="/" className="mt-6 inline-flex items-center text-[14px] font-medium text-[#0071e3] hover:opacity-70">&larr; Back to home</Link>
+          <Link href="/" className="mt-6 inline-flex items-center text-[14px] font-medium text-[#1D6AE5] hover:opacity-70">&larr; Back to home</Link>
         </div>
       </div>
     );
@@ -135,14 +135,14 @@ export default function DriverApplyPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6">
         <div className="max-w-sm text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
-            <svg className="h-7 w-7 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1D6AE5]/10">
+            <svg className="h-7 w-7 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           </div>
           <h1 className="mt-5 text-[22px] font-semibold text-[#1d1d1f]">Application submitted</h1>
           <p className="mt-2 text-[15px] text-[#6e6e73]">We&apos;ll review your application and get back to you within 24-48 hours.</p>
-          <Link href="/" className="mt-6 inline-flex items-center text-[14px] font-medium text-[#0071e3] hover:opacity-70">&larr; Back to home</Link>
+          <Link href="/" className="mt-6 inline-flex items-center text-[14px] font-medium text-[#1D6AE5] hover:opacity-70">&larr; Back to home</Link>
         </div>
       </div>
     );
@@ -160,11 +160,11 @@ export default function DriverApplyPage() {
               <span className="ml-1 font-light text-[#6e6e73]">Driver</span>
             </Link>
             {user ? (
-              <button onClick={() => setStatus('form')} className="rounded-full bg-[#0071e3] px-5 py-2 text-[13px] font-semibold text-white hover:bg-[#005bb5]">
+              <button onClick={() => setStatus('form')} className="rounded-full bg-[#1D6AE5] px-5 py-2 text-[13px] font-semibold text-white hover:bg-[#005bb5]">
                 Apply now
               </button>
             ) : (
-              <Link href="/auth/login?redirect=/driver/apply" className="rounded-full bg-[#0071e3] px-5 py-2 text-[13px] font-semibold text-white hover:bg-[#005bb5]">
+              <Link href="/auth/login?redirect=/driver/apply" className="rounded-full bg-[#1D6AE5] px-5 py-2 text-[13px] font-semibold text-white hover:bg-[#005bb5]">
                 Sign in to apply
               </Link>
             )}
@@ -175,7 +175,7 @@ export default function DriverApplyPage() {
         <section className="mx-auto max-w-4xl px-6 py-16 md:py-24">
           <div className="grid gap-12 md:grid-cols-2 md:items-center">
             <div>
-              <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#0071e3]">Now accepting drivers</p>
+              <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#1D6AE5]">Now accepting drivers</p>
               <h1 className="mt-3 text-[36px] font-bold leading-[1.1] tracking-tight text-[#1d1d1f] md:text-[48px]">
                 Drive electric.<br />Earn more.
               </h1>
@@ -193,7 +193,7 @@ export default function DriverApplyPage() {
                   'Valid insurance and registration',
                 ].map(req => (
                   <div key={req} className="flex items-center gap-3">
-                    <svg className="h-4 w-4 shrink-0 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <svg className="h-4 w-4 shrink-0 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                     <span className="text-[14px] text-[#1d1d1f]">{req}</span>
@@ -203,7 +203,7 @@ export default function DriverApplyPage() {
 
               <button
                 onClick={() => user ? setStatus('form') : router.push('/auth/login?redirect=/driver/apply')}
-                className="mt-8 rounded-2xl bg-[#0071e3] px-8 py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#005bb5]"
+                className="mt-8 rounded-2xl bg-[#1D6AE5] px-8 py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#005bb5]"
               >
                 Start your application
               </button>
@@ -218,7 +218,7 @@ export default function DriverApplyPage() {
                   type="range"
                   min={5} max={60} value={hoursPerWeek}
                   onChange={e => setHoursPerWeek(parseInt(e.target.value))}
-                  className="mt-2 w-full accent-[#0071e3]"
+                  className="mt-2 w-full accent-[#1D6AE5]"
                 />
                 <div className="mt-1 flex justify-between text-[12px] text-[#86868b]">
                   <span>5 hrs</span>
@@ -236,7 +236,7 @@ export default function DriverApplyPage() {
                       onClick={() => setVehicleClass(vc.id)}
                       className={`rounded-xl border px-3 py-2.5 text-left transition-all ${
                         vehicleClass === vc.id
-                          ? 'border-[#0071e3] bg-[#0071e3] text-white'
+                          ? 'border-[#1D6AE5] bg-[#1D6AE5] text-white'
                           : 'border-[#d2d2d7] bg-white hover:border-[#86868b]'
                       }`}
                     >
@@ -280,7 +280,7 @@ export default function DriverApplyPage() {
   }
 
   // ── APPLICATION FORM ─────────────────────────────────────────────────────
-  const inputCls = "w-full rounded-xl border border-[#d2d2d7] bg-white px-4 py-3 text-[15px] font-medium text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3] transition-colors";
+  const inputCls = "w-full rounded-xl border border-[#d2d2d7] bg-white px-4 py-3 text-[15px] font-medium text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5] transition-colors";
 
   const allDocsUploaded = REQUIRED_DOCS.every(d => docs[d.key] !== null);
   const formValid = fullName && phone && licenseNumber && vehicleMake && vehicleModel && plateNumber && bgCheckConsent;
@@ -302,7 +302,7 @@ export default function DriverApplyPage() {
         {!user && (
           <div className="mt-4 rounded-xl bg-[#FFF8E1] px-4 py-3">
             <p className="text-[13px] text-[#1d1d1f]">
-              <Link href="/auth/login?redirect=/driver/apply" className="font-semibold text-[#0071e3] hover:underline">Sign in</Link> to save your progress and submit.
+              <Link href="/auth/login?redirect=/driver/apply" className="font-semibold text-[#1D6AE5] hover:underline">Sign in</Link> to save your progress and submit.
             </p>
           </div>
         )}
@@ -352,7 +352,7 @@ export default function DriverApplyPage() {
                   onClick={() => setVehicleClass(vc.id)}
                   className={`rounded-xl border px-3 py-3 text-left transition-all ${
                     vehicleClass === vc.id
-                      ? 'border-[#0071e3] bg-[#0071e3] text-white'
+                      ? 'border-[#1D6AE5] bg-[#1D6AE5] text-white'
                       : 'border-[#d2d2d7] hover:border-[#86868b]'
                   }`}
                 >
@@ -372,11 +372,11 @@ export default function DriverApplyPage() {
                 <label
                   key={doc.key}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all ${
-                    docs[doc.key] ? 'border-[#0071e3] bg-[#0071e3]/5' : 'border-dashed border-[#d2d2d7] hover:border-[#86868b]'
+                    docs[doc.key] ? 'border-[#1D6AE5] bg-[#1D6AE5]/5' : 'border-dashed border-[#d2d2d7] hover:border-[#86868b]'
                   }`}
                 >
                   {docs[doc.key] ? (
-                    <svg className="h-5 w-5 shrink-0 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <svg className="h-5 w-5 shrink-0 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                   ) : (
@@ -412,7 +412,7 @@ export default function DriverApplyPage() {
                 type="checkbox"
                 checked={bgCheckConsent}
                 onChange={e => setBgCheckConsent(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[#0071e3]"
+                className="mt-0.5 h-4 w-4 shrink-0 accent-[#1D6AE5]"
               />
               <div>
                 <p className="text-[14px] font-medium text-[#1d1d1f]">I consent to a background check</p>
@@ -426,7 +426,7 @@ export default function DriverApplyPage() {
           <button
             type="submit"
             disabled={status === 'submitting' || !formValid}
-            className="mt-2 flex w-full items-center justify-center rounded-2xl bg-[#0071e3] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40"
+            className="mt-2 flex w-full items-center justify-center rounded-2xl bg-[#1D6AE5] py-4 text-[16px] font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40"
           >
             {status === 'submitting' ? 'Submitting...' : 'Submit application'}
           </button>
@@ -444,7 +444,7 @@ export default function DriverApplyPage() {
               <div className="-ml-1.5 h-4 w-4 rounded-full bg-[#FF9500] opacity-80" />
             </div>
             <span className="text-[14px] font-semibold text-white">TAKEME Card</span>
-            <span className="rounded-full bg-[#0071e3] px-1.5 py-[1px] text-[9px] font-bold uppercase text-white">Free</span>
+            <span className="rounded-full bg-[#1D6AE5] px-1.5 py-[1px] text-[9px] font-bold uppercase text-white">Free</span>
           </div>
           <p className="mt-3 text-[13px] leading-relaxed text-white/50">
             Get instant payouts, cashback on EV charging, and exclusive driver rewards — all in one card.
@@ -452,7 +452,7 @@ export default function DriverApplyPage() {
           <div className="mt-3 flex flex-wrap gap-3">
             {['Instant payouts', 'Cashback rewards', 'No fees'].map(b => (
               <span key={b} className="flex items-center gap-1.5 text-[11px] font-medium text-white/60">
-                <svg className="h-3 w-3 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                <svg className="h-3 w-3 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                 {b}
               </span>
             ))}

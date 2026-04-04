@@ -57,7 +57,7 @@ export function FleetNav() {
               fontFamily: "'DM Serif Display', Georgia, serif",
               fontSize: '1.2rem', color: '#1d1d1f', letterSpacing: '-0.02em',
             }}>
-              TakeMe <span style={{ color: '#0071e3' }}>Fleet</span>
+              TakeMe <span style={{ color: '#1D6AE5' }}>Fleet</span>
             </span>
           </Link>
         </div>

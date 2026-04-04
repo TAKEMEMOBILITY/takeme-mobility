@@ -182,7 +182,7 @@ export default function CitiesPage() {
           <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
             Seattle, Washington
           </h2>
-          <p className="mt-2 text-[19px] font-medium text-[#0071e3]">
+          <p className="mt-2 text-[19px] font-medium text-[#1D6AE5]">
             America's most EV-ready city.
           </p>
           <p className="mt-5 max-w-[680px] text-[17px] leading-[1.6] text-[#6e6e73]">
@@ -227,7 +227,7 @@ export default function CitiesPage() {
                   <div className="flex items-center gap-3">
                     <span className="text-[15px] font-semibold tabular-nums text-[#1d1d1f]">{route.time}</span>
                     {route.note && (
-                      <span className="hidden rounded-full bg-[#0071e3]/10 px-3 py-1 text-[12px] font-medium text-[#0071e3] sm:inline-block">
+                      <span className="hidden rounded-full bg-[#1D6AE5]/10 px-3 py-1 text-[12px] font-medium text-[#1D6AE5] sm:inline-block">
                         {route.note}
                       </span>
                     )}
@@ -263,7 +263,7 @@ export default function CitiesPage() {
                 key={item.title}
                 className="group rounded-2xl border border-[#f5f5f7] bg-[#f5f5f7] p-6 transition-all duration-200 hover:border-[#d2d2d7] hover:shadow-[0_2px_12px_rgba(0,0,0,0.04)]"
               >
-                <p className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-bold tracking-[-0.02em] text-[#0071e3]">
+                <p className="text-[clamp(1.25rem,2.5vw,1.5rem)] font-bold tracking-[-0.02em] text-[#1D6AE5]">
                   {item.amount}
                 </p>
                 <h3 className="mt-2 text-[15px] font-semibold text-[#1d1d1f]">
@@ -412,7 +412,7 @@ export default function CitiesPage() {
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/auth/signup"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Book a ride
               </Link>

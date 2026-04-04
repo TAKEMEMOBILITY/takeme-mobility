@@ -144,7 +144,7 @@ export default function AdminMapPage() {
     return (
       <div className="flex h-full items-center justify-center bg-[#FFFFFF] text-[#86868b]">
         <div className="flex items-center gap-3">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3]" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#1D6AE5]" />
           Loading map data...
         </div>
       </div>
@@ -227,7 +227,7 @@ export default function AdminMapPage() {
                   setSelectedDriver(null);
                 }}
               >
-                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#0071e3] bg-emerald-400/30">
+                <div className="flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#1D6AE5] bg-emerald-400/30">
                   <div className="h-2 w-2 rounded-full bg-emerald-400" />
                 </div>
               </button>
@@ -462,7 +462,7 @@ function StatusBadge({ status }: { status: string }) {
     driver_arriving: 'bg-violet-500/20 text-violet-400',
     arrived: 'bg-indigo-500/20 text-indigo-400',
     in_progress: 'bg-emerald-500/20 text-emerald-400',
-    completed: 'bg-[#0071e3]/10 text-[#0071e3]',
+    completed: 'bg-[#1D6AE5]/10 text-[#1D6AE5]',
     cancelled: 'bg-red-500/20 text-red-400',
   };
   const cls = colors[status] ?? 'bg-zinc-500/20 text-[#86868b]';

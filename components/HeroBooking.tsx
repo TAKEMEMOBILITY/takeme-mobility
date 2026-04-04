@@ -165,7 +165,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
           options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
         >
-          {pickup && <Marker position={pickup} icon={{ url: pinSvg('#0071e3'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
+          {pickup && <Marker position={pickup} icon={{ url: pinSvg('#1D6AE5'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
           {dropoff && <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
           {directions && <DirectionsRenderer directions={directions} options={{ suppressMarkers: true, polylineOptions: { strokeColor: '#1D1D1F', strokeWeight: 4, strokeOpacity: 0.7 } }} />}
         </GoogleMap>
@@ -180,7 +180,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     if (!isLoaded) {
       return (
         <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
-          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#1D6AE5]' : 'bg-[#1D1D1F]'}`} />
           <input
             type="text"
             placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -200,7 +200,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           options={{ fields: ['formatted_address', 'geometry', 'place_id'] }}
         >
           <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
-            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
+            <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#1D6AE5]' : 'bg-[#1D1D1F]'}`} />
             <input
               type="text"
               placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -216,7 +216,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
       // Fall back to plain input
       return (
         <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-4 py-3.5">
-          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#0071e3]' : 'bg-[#1D1D1F]'}`} />
+          <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${type === 'pickup' ? 'bg-[#1D6AE5]' : 'bg-[#1D1D1F]'}`} />
           <input
             type="text"
             placeholder={type === 'pickup' ? 'Pickup location' : 'Where to?'}
@@ -234,8 +234,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
     return (
       <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="p-6 text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
-            <svg className="h-7 w-7 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1D6AE5]/10">
+            <svg className="h-7 w-7 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           </div>
@@ -296,8 +296,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
         {hasRoute && (
           <div className="absolute left-3 top-3 flex items-center gap-2 rounded-full bg-white/90 px-3 py-1.5 shadow-[0_1px_4px_rgba(0,0,0,0.06)] backdrop-blur-sm">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#0071e3] opacity-40" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#0071e3]" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#1D6AE5] opacity-40" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#1D6AE5]" />
             </span>
             <span className="text-[12px] font-semibold text-[#1D1D1F]">{route!.durationMin} min · {route!.distanceKm} km</span>
           </div>

@@ -175,7 +175,7 @@ export default function DriverProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1D6AE5] border-t-transparent" />
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function DriverProfilePage() {
       <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-400 text-sm mb-4">{error}</p>
-          <Link href="/admin" className="text-xs text-[#0071e3] hover:text-[#005bb5]">Back to dashboard</Link>
+          <Link href="/admin" className="text-xs text-[#1D6AE5] hover:text-[#005bb5]">Back to dashboard</Link>
         </div>
       </div>
     );
@@ -427,7 +427,7 @@ export default function DriverProfilePage() {
                 onChange={e => setNoteText(e.target.value)}
                 placeholder="Enter note..."
                 rows={4}
-                className="mb-4 w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50"
+                className="mb-4 w-full rounded-lg border border-[#d2d2d7] bg-[#FFFFFF] px-4 py-3 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5]/50"
               />
               <div className="flex justify-end gap-3">
                 <button

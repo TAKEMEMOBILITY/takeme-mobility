@@ -116,7 +116,7 @@ export default function OpsPage() {
   const impactBg = impact === 'none' ? 'bg-emerald-500/10 border-emerald-500/20' : impact === 'degraded' ? 'bg-amber-500/10 border-amber-500/20' : 'bg-red-500/10 border-red-500/20';
   const gateOpen = activeFailures.length === 0 && (policy?.drift_count ?? 0) === 0 && mode === 'NORMAL';
 
-  if (loading && !monitor) return <div className="flex min-h-screen items-center justify-center bg-[#FFFFFF]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071e3] border-t-transparent" /></div>;
+  if (loading && !monitor) return <div className="flex min-h-screen items-center justify-center bg-[#FFFFFF]"><div className="h-8 w-8 animate-spin rounded-full border-2 border-[#1D6AE5] border-t-transparent" /></div>;
 
   return (
     <div className={`min-h-screen bg-[#FFFFFF] text-[#1d1d1f] ${simMode ? 'ring-2 ring-amber-400/40 ring-inset' : ''}`}>

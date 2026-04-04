@@ -304,7 +304,7 @@ export default function SafetyPage() {
               <div key={item.step} className="relative flex gap-6">
                 {/* Timeline line */}
                 <div className="flex flex-col items-center">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#0071e3] text-[13px] font-bold tabular-nums text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1D6AE5] text-[13px] font-bold tabular-nums text-white">
                     {item.step}
                   </div>
                   {i < VERIFICATION_STEPS.length - 1 && (
@@ -434,15 +434,15 @@ export default function SafetyPage() {
 
           <div className="mt-14 grid grid-cols-3 gap-5">
             <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">0g</p>
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#1D6AE5]">0g</p>
               <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">CO2 per mile</p>
             </div>
             <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">100%</p>
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#1D6AE5]">100%</p>
               <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">Electric fleet</p>
             </div>
             <div className="rounded-2xl bg-[#f5f5f7] p-6 text-center md:p-8">
-              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#0071e3]">Zero</p>
+              <p className="text-[clamp(2rem,4vw,3.25rem)] font-bold tracking-[-0.03em] text-[#1D6AE5]">Zero</p>
               <p className="mt-2 text-[14px] font-medium text-[#6e6e73]">Tailpipe emissions</p>
             </div>
           </div>
@@ -462,7 +462,7 @@ export default function SafetyPage() {
             <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link
                 href="/auth/signup"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#0071e3] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
+                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
               >
                 Get started
               </Link>

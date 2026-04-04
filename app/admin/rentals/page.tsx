@@ -59,7 +59,7 @@ const STATUS_CLASSES: Record<string, string> = {
   pending: 'bg-amber-500/15 text-amber-400',
   confirmed: 'bg-blue-500/15 text-blue-400',
   active: 'bg-emerald-500/15 text-emerald-400',
-  completed: 'bg-[#0071e3]/10 text-[#0071e3]',
+  completed: 'bg-[#1D6AE5]/10 text-[#1D6AE5]',
   cancelled: 'bg-red-500/15 text-red-400',
   refunded: 'bg-violet-500/15 text-violet-400',
 };
@@ -174,7 +174,7 @@ export default function AdminRentalsPage() {
   const STAT_CARDS = [
     { label: 'Total Rentals', value: String(stats.total), color: 'text-[#1d1d1f]' },
     { label: 'Active', value: String(stats.active), color: 'text-emerald-400' },
-    { label: 'Revenue', value: usd(stats.revenue), color: 'text-[#0071e3]' },
+    { label: 'Revenue', value: usd(stats.revenue), color: 'text-[#1D6AE5]' },
     { label: 'Pending', value: String(stats.pending), color: 'text-amber-400' },
   ];
 
@@ -230,7 +230,7 @@ export default function AdminRentalsPage() {
         <div className="bg-[#f5f5f7] rounded-xl border border-[#d2d2d7] overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20 text-[#86868b]">
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#0071e3] mr-3" />
+              <div className="h-5 w-5 animate-spin rounded-full border-2 border-[#86868b] border-t-[#1D6AE5] mr-3" />
               Loading rentals...
             </div>
           ) : rentals.length === 0 ? (
@@ -386,7 +386,7 @@ export default function AdminRentalsPage() {
                   <button
                     onClick={() => performAction('mark_completed', selectedRental.id)}
                     disabled={actionLoading === 'mark_completed'}
-                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#0071e3]/10 border border-[#0071e3]/20 text-[#0071e3] hover:bg-[#0071e3]/20 transition-colors disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#1D6AE5]/10 border border-[#1D6AE5]/20 text-[#1D6AE5] hover:bg-[#1D6AE5]/20 transition-colors disabled:opacity-50"
                   >
                     {actionLoading === 'mark_completed' ? '...' : 'Mark Completed'}
                   </button>

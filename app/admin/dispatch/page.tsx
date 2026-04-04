@@ -89,7 +89,7 @@ const STATUS_COLORS: Record<string, string> = {
   driver_arriving: 'bg-purple-500/20 text-purple-400',
   arrived: 'bg-indigo-500/20 text-indigo-400',
   in_progress: 'bg-emerald-500/20 text-emerald-400',
-  completed: 'bg-[#0071e3]/10 text-[#0071e3]',
+  completed: 'bg-[#1D6AE5]/10 text-[#1D6AE5]',
   cancelled: 'bg-red-500/20 text-red-400',
 };
 
@@ -207,12 +207,12 @@ export default function DispatchDebugPage() {
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Enter Ride ID (UUID)"
-            className="flex-1 rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2.5 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#0071e3]/50 focus:ring-1 focus:ring-[#0071e3]/30"
+            className="flex-1 rounded-lg border border-[#d2d2d7] bg-[#f5f5f7] px-4 py-2.5 text-sm text-[#1d1d1f] placeholder-[#86868b] outline-none focus:border-[#1D6AE5]/50 focus:ring-1 focus:ring-[#1D6AE5]/30"
           />
           <button
             type="submit"
             disabled={loading || !searchInput.trim()}
-            className="rounded-lg bg-[#0071e3] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40 disabled:cursor-not-allowed"
+            className="rounded-lg bg-[#1D6AE5] px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#005bb5] disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center gap-2">

@@ -11,7 +11,7 @@ export default function NotFoundPage() {
         <p className="mt-4 text-lg text-[#86868b]">This page could not be found.</p>
         <Link
           href="/"
-          className="mt-8 inline-block rounded-lg bg-[#0071e3] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#005bb5]"
+          className="mt-8 inline-block rounded-lg bg-[#1D6AE5] px-6 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#005bb5]"
         >
           Go home
         </Link>
