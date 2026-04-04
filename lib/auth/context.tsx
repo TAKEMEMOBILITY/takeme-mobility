@@ -104,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [fetchUser]);
 
-  // Send OTP via AWS SNS
+  // Send OTP via Supabase (Twilio Verify)
   const sendOtp = useCallback(async (phone: string): Promise<{ error: string | null }> => {
     try {
       const res = await fetch('/api/auth/send-otp', {
