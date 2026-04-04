@@ -438,28 +438,7 @@ export default function DriverHubPage() {
         </div>
       </Section>
 
-      {/* ═══ FOOTER ══════════════════════════════════════════════════════ */}
-      <footer style={{ borderTop: '1px solid #d2d2d7', background: '#f5f5f7' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '56px 24px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center' }}>
-            <div style={{ fontSize: 17, color: '#1d1d1f' }}>
-              <span style={{ fontWeight: 600 }}>TakeMe</span>
-              <span style={{ marginLeft: 5, fontWeight: 300, color: '#86868b' }}>Mobility</span>
-            </div>
-            <p style={{ fontSize: 14, color: '#86868b', margin: 0 }}>
-              Reliable transportation. One standard, everywhere.
-            </p>
-            <div style={{ display: 'flex', gap: 32 }}>
-              {['Rides', 'TakeMe Fleet', 'Driver Hub', 'Safety'].map((l) => (
-                <span key={l} style={{ fontSize: 13, color: '#6e6e73', cursor: 'pointer', transition: 'color 0.2s' }}>{l}</span>
-              ))}
-            </div>
-            <p style={{ fontSize: 12, color: '#86868b', marginTop: 8 }}>
-              &copy; {new Date().getFullYear()} TakeMe Mobility Inc.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer rendered by root layout */}
 
       {/* ═══ RESPONSIVE ══════════════════════════════════════════════════ */}
       <style>{`

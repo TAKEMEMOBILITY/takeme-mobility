@@ -523,41 +523,7 @@ export default function TechnologyPage() {
         </div>
       </section>
 
-      {/* ── Footer ──────────────────────────────────────────────────── */}
-      <footer className="border-t border-[#d2d2d7] bg-white">
-        <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
-          <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
-            <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
-                <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
-              </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#86868b]">
-                Premium global transportation.<br />One standard, everywhere.
-              </p>
-            </div>
-            <div className="flex gap-16">
-              {[
-                { t: 'Product', items: [{l:'Rides',h:'/'},{l:'Technology',h:'/technology'},{l:'Safety',h:'/safety'},{l:'Cities',h:'/cities'}] },
-                { t: 'Company', items: [{l:'About',h:'#'},{l:'Careers',h:'#'},{l:'Press',h:'#'}] },
-                { t: 'Legal', items: [{l:'Privacy',h:'#'},{l:'Terms',h:'#'},{l:'Cookies',h:'#'}] },
-              ].map((col) => (
-                <div key={col.t}>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#86868b]">{col.t}</p>
-                  <div className="mt-4 flex flex-col gap-3.5">
-                    {col.items.map((item) => (
-                      <Link key={item.l} href={item.h} className="text-[14px] text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]">{item.l}</Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#d2d2d7] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer rendered by root layout */}
     </div>
   );
 }

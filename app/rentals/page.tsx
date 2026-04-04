@@ -504,17 +504,7 @@ export default function FleetPage() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ════════════════════════════════════════════════════════ */}
-      <footer className="border-t border-[#d2d2d7] bg-white">
-        <div className="mx-auto max-w-[1200px] px-6 py-10 lg:px-10">
-          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-            <div className="text-[15px] text-[#1d1d1f]">
-              <span className="font-semibold">TakeMe</span><span className="ml-1 font-light text-[#86868b]">Fleet</span>
-            </div>
-            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer rendered by root layout */}
 
       {/* ═══ BOOKING MODAL ═════════════════════════════════════════════════ */}
       {bookingVehicle && <BookingModal vehicle={bookingVehicle} onClose={() => setBookingVehicle(null)} />}

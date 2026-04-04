@@ -310,25 +310,7 @@ export default function StudentsPage() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══════════════════════════════════════════════════════ */}
-      <footer className="border-t border-[#d2d2d7] bg-white">
-        <div className="mx-auto max-w-[1200px] px-6 py-14 lg:px-10">
-          <div className="flex flex-col gap-12 md:flex-row md:items-start md:justify-between">
-            <div>
-              <div className="text-[17px] tracking-[0.01em] text-[#1d1d1f]">
-                <span className="font-semibold">TakeMe</span>
-                <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
-              </div>
-              <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-[#86868b]">
-                Premium global transportation.<br />One standard, everywhere.
-              </p>
-            </div>
-          </div>
-          <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-[#d2d2d7] pt-8 md:flex-row md:items-center">
-            <p className="text-[13px] text-[#86868b]">&copy; {new Date().getFullYear()} TakeMe Mobility Inc.</p>
-          </div>
-        </div>
-      </footer>
+      {/* Footer rendered by root layout */}
     </div>
   );
 }

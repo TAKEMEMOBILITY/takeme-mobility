@@ -456,19 +456,7 @@ export default function BusinessPage() {
         </div>
       </Reveal>
 
-      {/* ═══ FOOTER ══════════════════════════════════════════════════════ */}
-      <footer style={{
-        background: S.bgAlt, borderTop: `1px solid ${S.border}`, padding: '48px clamp(24px, 5vw, 64px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 24,
-      }}>
-        <div style={{ fontSize: 15, fontWeight: 600, color: S.text }}>TakeMe <span style={{ color: S.blue }}>Business</span></div>
-        <div style={{ fontSize: 13, color: S.gray }}>&copy; {new Date().getFullYear()} TakeMe Mobility LLC &middot; Seattle, WA</div>
-        <div style={{ display: 'flex', gap: 24 }}>
-          {['Home', 'Safety', 'Privacy'].map(l => (
-            <Link key={l} href={l === 'Home' ? '/' : `/${l.toLowerCase()}`} style={{ fontSize: 13, color: S.gray, textDecoration: 'none', transition: 'color .15s' }}>{l}</Link>
-          ))}
-        </div>
-      </footer>
+      {/* Footer rendered by root layout */}
 
       {/* ═══ ANIMATIONS ══════════════════════════════════════════════════ */}
       <style>{`
