@@ -8,11 +8,10 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 // ── Data ─────────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { label: 'Fleet', href: '/fleet' },
+  { label: 'TakeMe Fleet', href: '/fleet' },
   { label: 'Business', href: '/business' },
-  { label: 'Connect', href: '/connect' },
-  { label: 'Students', href: '/students' },
-  { label: 'Safety', href: '/safety' },
+  { label: 'TakeMe Connect', href: '/connect' },
+  { label: 'Students Membership', href: '/students' },
   { label: 'Driver Hub', href: '/driver-hub' },
 ];
 
