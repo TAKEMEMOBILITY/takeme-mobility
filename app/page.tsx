@@ -8,11 +8,11 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 // ── Data ─────────────────────────────────────────────────────────────────
 
 const NAV_LINKS = [
-  { label: 'TakeMe Fleet', href: '/fleet' },
-  { label: 'Business', href: '/business' },
-  { label: 'TakeMe Connect', href: '/connect' },
-  { label: 'Students Membership', href: '/students' },
-  { label: 'Driver Hub', href: '/driver-hub' },
+  { label: 'TakeMe Fleet', href: '/fleet', badge: true },
+  { label: 'Business', href: '/business', badge: false },
+  { label: 'TakeMe Connect', href: '/connect', badge: true },
+  { label: 'Students Membership', href: '/students', badge: true },
+  { label: 'Driver Hub', href: '/driver-hub', badge: true },
 ];
 
 const TRUST_CARDS = [
@@ -124,9 +124,12 @@ export default function HomePage() {
 
           {/* CENTER — Nav links */}
           <div className="hidden items-center gap-6 lg:flex">
-            {NAV_LINKS.map(({ label, href }) => (
-              <Link key={href} href={href} className="whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
+            {NAV_LINKS.map(({ label, href, badge }) => (
+              <Link key={href} href={href} className="flex items-center whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
                 {label}
+                {badge && (
+                  <span style={{ background: '#1D6AE5', color: 'white', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, marginLeft: 4, letterSpacing: '0.5px' }}>NEW</span>
+                )}
               </Link>
             ))}
           </div>
