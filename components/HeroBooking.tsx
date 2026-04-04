@@ -172,7 +172,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
       return (
         <GoogleMap
           mapContainerStyle={{ width: '100%', height: '100%' }}
-          center={pickup || { lat: 40.7128, lng: -74.006 }}
+          center={pickup || { lat: 47.6062, lng: -122.3321 }}
           zoom={12}
           onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
           options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}

@@ -5,7 +5,7 @@ import { GoogleMap, Marker, DirectionsRenderer } from '@react-google-maps/api';
 import { useGoogleMaps, type MapLoadStatus } from './GoogleMapsProvider';
 import type { TripSnapshot, TripPhase } from '@/lib/tripEngine';
 
-const defaultCenter = { lat: 40.7128, lng: -74.006 };
+const defaultCenter = { lat: 47.6062, lng: -122.3321 };
 const containerStyle = { width: '100%', height: '100%' };
 
 // ── Custom map style ──────────────────────────────────────────────────────
@@ -429,7 +429,10 @@ export default function Map({
   const phase: TripPhase = trip?.status ?? 'idle';
   const isActive = phase !== 'idle';
   const activeDirections = pickupLocation && dropoffLocation ? directions : null;
-  const initialPosition = currentLocation || pickupLocation || defaultCenter;
+
+  // Stable initial center — only set once, never changes to avoid map re-renders
+  const initialPositionRef = useRef(currentLocation || pickupLocation || defaultCenter);
+  const initialPosition = initialPositionRef.current;
 
   // ── Compute bearing for assigned driver rotation ────────────────────
   if (assignedDriverPosition) {
