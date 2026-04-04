@@ -89,20 +89,20 @@ export default function DriverHubPage() {
   }, [])
 
   return (
-    <div style={{ background: '#080808', color: '#ffffff', fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
+    <div style={{ background: '#ffffff', color: '#1d1d1f', fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
 
       {/* ═══ GOOGLE FONT ══════════════════════════════════════════════════ */}
       {/* eslint-disable-next-line @next/next/no-page-custom-font */}
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" />
 
       {/* ═══ NAV ═════════════════════════════════════════════════════════ */}
-      <header style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header style={{ borderBottom: '1px solid #d2d2d7', background: '#ffffff' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px' }}>
-          <Link href="/" style={{ fontSize: 18, color: '#ffffff', textDecoration: 'none', letterSpacing: '0.01em' }}>
+          <Link href="/" style={{ fontSize: 18, color: '#1d1d1f', textDecoration: 'none', letterSpacing: '0.01em' }}>
             <span style={{ fontWeight: 600 }}>TakeMe</span>
-            <span style={{ marginLeft: 5, fontWeight: 300, color: 'rgba(255,255,255,0.45)' }}>Driver Hub</span>
+            <span style={{ marginLeft: 5, fontWeight: 300, color: '#1D6AE5' }}>Driver Hub</span>
           </Link>
-          <Link href="/" style={{ fontSize: 14, fontWeight: 500, color: 'rgba(255,255,255,0.5)', textDecoration: 'none', transition: 'color 0.2s' }}>
+          <Link href="/" style={{ fontSize: 14, fontWeight: 500, color: '#86868b', textDecoration: 'none', transition: 'color 0.2s' }}>
             &larr; Back to home
           </Link>
         </div>
@@ -123,16 +123,16 @@ export default function DriverHubPage() {
           backgroundImage: 'url(https://images.unsplash.com/photo-1497366216548-37526070297c?w=1800&q=80)',
           backgroundSize: 'cover', backgroundPosition: 'center',
         }} />
-        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(8,8,8,0.75) 0%, rgba(8,8,8,0.88) 60%, #080808 100%)' }} />
+        <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.85) 100%)' }} />
 
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 1200, margin: '0 auto', padding: '0 24px', width: '100%' }}>
-          <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 20 }}>
+          <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: 20 }}>
             TakeMe Driver Hub
           </p>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', margin: 0, maxWidth: 700 }}>
+          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', margin: 0, maxWidth: 700, color: '#ffffff' }}>
             Your city.<br />Your home base.
           </h1>
-          <p style={{ fontSize: 19, lineHeight: 1.6, color: 'rgba(255,255,255,0.6)', marginTop: 24, maxWidth: 520 }}>
+          <p style={{ fontSize: 19, lineHeight: 1.6, color: 'rgba(255,255,255,0.75)', marginTop: 24, maxWidth: 520 }}>
             Seattle&apos;s most advanced driver center. Away from the city chaos — focus on driving.
           </p>
 
@@ -140,7 +140,7 @@ export default function DriverHubPage() {
             <Link href="/driver/apply" style={{
               display: 'inline-flex', alignItems: 'center', height: 52,
               padding: '0 32px', borderRadius: 8, fontWeight: 600, fontSize: 16,
-              background: '#c9a84c', color: '#080808', textDecoration: 'none',
+              background: '#1D6AE5', color: '#ffffff', textDecoration: 'none',
               transition: 'opacity 0.3s',
             }}>
               Apply Now
@@ -149,7 +149,7 @@ export default function DriverHubPage() {
               display: 'inline-flex', alignItems: 'center', height: 52,
               padding: '0 32px', borderRadius: 8, fontWeight: 500, fontSize: 16,
               background: 'transparent', color: '#ffffff',
-              border: '1px solid rgba(255,255,255,0.25)', cursor: 'pointer',
+              border: '1px solid rgba(255,255,255,0.4)', cursor: 'pointer',
               transition: 'border-color 0.3s, background 0.3s',
             }}>
               Explore the Hub
@@ -160,18 +160,17 @@ export default function DriverHubPage() {
         {/* Stats bar */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 2,
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          background: 'rgba(8,8,8,0.7)',
-          backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+          borderTop: '1px solid #d2d2d7',
+          background: '#ffffff',
         }}>
           <div style={{ maxWidth: 1200, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }}>
             {STATS.map((s, i) => (
               <div key={i} style={{
                 textAlign: 'center', padding: '24px 16px',
-                borderLeft: i > 0 ? '1px solid rgba(255,255,255,0.06)' : 'none',
+                borderLeft: i > 0 ? '1px solid #d2d2d7' : 'none',
               }}>
-                <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 700, color: '#c9a84c' }}>{s.value}</div>
-                <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', marginTop: 4 }}>{s.label}</div>
+                <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 700, color: '#1D6AE5' }}>{s.value}</div>
+                <div style={{ fontSize: 13, color: '#86868b', marginTop: 4 }}>{s.label}</div>
               </div>
             ))}
           </div>
@@ -179,22 +178,22 @@ export default function DriverHubPage() {
       </section>
 
       {/* ═══ INTRO ═══════════════════════════════════════════════════════ */}
-      <Section bg="#080808">
+      <Section bg="#ffffff">
         <div ref={exploreRef} style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="dh-grid">
           <div style={{ borderRadius: 16, overflow: 'hidden', aspectRatio: '4/3' }}>
             <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900&q=80" alt="TakeMe Hub interior" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
           </div>
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 16 }}>
+            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Why We Built This
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
               Drivers deserve better than city chaos.
             </h2>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: '#6e6e73', margin: 0 }}>
               No parking. Dead phones. Nowhere to rest. Eating in your car between rides. We saw the reality — and built a space that treats drivers like the professionals they are.
             </p>
-            <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,0.6)', marginTop: 20 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: '#6e6e73', marginTop: 20 }}>
               The TakeMe Driver Hub is a private, 24/7 facility with fast charging, premium coffee, rest pods, and clean restrooms. Your QR code gets you in. No membership fees. No catches.
             </p>
           </div>
@@ -202,24 +201,24 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ QR ACCESS ════════════════════════════════════════════════════ */}
-      <Section bg="#0e0e0e">
+      <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="dh-grid">
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 16 }}>
+            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Keyless Entry
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 40px' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 40px', color: '#1d1d1f' }}>
               Your phone is your key.
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
               {QR_FEATURES.map((f) => (
                 <div key={f.title} style={{
-                  background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                  background: '#ffffff', border: '1px solid #d2d2d7',
                   borderRadius: 12, padding: 20,
                   transition: 'border-color 0.3s',
                 }}>
-                  <h3 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 8px' }}>{f.title}</h3>
-                  <p style={{ fontSize: 13, lineHeight: 1.6, color: 'rgba(255,255,255,0.45)', margin: 0 }}>{f.desc}</p>
+                  <h3 style={{ fontSize: 15, fontWeight: 600, margin: '0 0 8px', color: '#1d1d1f' }}>{f.title}</h3>
+                  <p style={{ fontSize: 13, lineHeight: 1.6, color: '#86868b', margin: 0 }}>{f.desc}</p>
                 </div>
               ))}
             </div>
@@ -231,7 +230,8 @@ export default function DriverHubPage() {
               width: 280, height: 280, borderRadius: 24,
               background: '#ffffff', display: 'flex', flexDirection: 'column',
               alignItems: 'center', justifyContent: 'center', gap: 16,
-              boxShadow: '0 0 80px rgba(201,168,76,0.12)',
+              boxShadow: '0 4px 24px rgba(0,0,0,0.08)',
+              border: '1px solid #d2d2d7',
             }}>
               {/* QR pattern */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, width: 140, height: 140 }}>
@@ -240,11 +240,11 @@ export default function DriverHubPage() {
                   const col = i % 7
                   const isCorner = (row < 2 && col < 2) || (row < 2 && col > 4) || (row > 4 && col < 2)
                   const isCenter = row >= 2 && row <= 4 && col >= 2 && col <= 4
-                  const fill = isCorner ? '#080808' : isCenter ? '#c9a84c' : (row + col) % 3 === 0 ? '#080808' : '#d2d2d7'
+                  const fill = isCorner ? '#1d1d1f' : isCenter ? '#1D6AE5' : (row + col) % 3 === 0 ? '#1d1d1f' : '#d2d2d7'
                   return <div key={i} style={{ borderRadius: 2, background: fill, aspectRatio: '1' }} />
                 })}
               </div>
-              <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 13, fontWeight: 600, color: '#080808', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 13, fontWeight: 600, color: '#1d1d1f', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 TakeMe Hub
               </div>
             </div>
@@ -253,13 +253,13 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ AMENITIES ════════════════════════════════════════════════════ */}
-      <Section bg="#080808">
+      <Section bg="#ffffff">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 16 }}>
+            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Everything You Need
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0 }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
               Built for the driver lifestyle.
             </h2>
           </div>
@@ -268,16 +268,17 @@ export default function DriverHubPage() {
               <div key={a.title} style={{
                 position: 'relative', borderRadius: 16, overflow: 'hidden',
                 aspectRatio: '3/2', cursor: 'pointer',
+                border: '1px solid #d2d2d7',
               }}>
                 <img src={a.img} alt={a.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.6s ease' }} loading="lazy" />
                 <div style={{
                   position: 'absolute', inset: 0,
-                  background: 'linear-gradient(to top, rgba(8,8,8,0.85) 0%, rgba(8,8,8,0.1) 50%)',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.05) 50%)',
                   display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
                   padding: 24, transition: 'background 0.3s',
                 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, fontWeight: 600, margin: '0 0 6px' }}>{a.title}</h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.6)', margin: 0 }}>{a.desc}</p>
+                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: '#ffffff' }}>{a.title}</h3>
+                  <p style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.8)', margin: 0 }}>{a.desc}</p>
                 </div>
               </div>
             ))}
@@ -286,34 +287,34 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ BEFORE / AFTER ══════════════════════════════════════════════ */}
-      <Section bg="#0e0e0e">
+      <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0 }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
               The difference is night and day.
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }} className="dh-grid">
             {/* Before */}
-            <div style={{ background: 'rgba(255,59,48,0.04)', border: '1px solid rgba(255,59,48,0.1)', borderRadius: 16, padding: 36 }}>
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,59,48,0.6)', marginBottom: 24, marginTop: 0 }}>Without TakeMe Hub</p>
+            <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: 16, padding: 36 }}>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#dc2626', marginBottom: 24, marginTop: 0 }}>Without TakeMe Hub</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {BEFORE.map((item) => (
                   <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <span style={{ fontSize: 14, color: 'rgba(255,59,48,0.5)', marginTop: 2, flexShrink: 0 }}>✕</span>
-                    <span style={{ fontSize: 15, lineHeight: 1.5, color: 'rgba(255,255,255,0.55)' }}>{item}</span>
+                    <span style={{ fontSize: 14, color: '#dc2626', marginTop: 2, flexShrink: 0 }}>✕</span>
+                    <span style={{ fontSize: 15, lineHeight: 1.5, color: '#6e6e73' }}>{item}</span>
                   </div>
                 ))}
               </div>
             </div>
             {/* After */}
-            <div style={{ background: 'rgba(0,113,227,0.04)', border: '1px solid rgba(0,113,227,0.12)', borderRadius: 16, padding: 36 }}>
+            <div style={{ background: '#f0f5ff', border: '1px solid #bfdbfe', borderRadius: 16, padding: 36 }}>
               <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#1D6AE5', marginBottom: 24, marginTop: 0 }}>With TakeMe Hub</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                 {AFTER.map((item) => (
                   <div key={item} style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                     <span style={{ fontSize: 14, color: '#1D6AE5', marginTop: 2, flexShrink: 0 }}>✓</span>
-                    <span style={{ fontSize: 15, lineHeight: 1.5, color: 'rgba(255,255,255,0.75)' }}>{item}</span>
+                    <span style={{ fontSize: 15, lineHeight: 1.5, color: '#1d1d1f' }}>{item}</span>
                   </div>
                 ))}
               </div>
@@ -329,14 +330,14 @@ export default function DriverHubPage() {
           backgroundImage: 'url(https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=1800&q=80)',
           backgroundSize: 'cover', backgroundPosition: 'center',
         }}>
-          <div style={{ position: 'absolute', inset: 0, background: 'rgba(8,8,8,0.8)' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.75)' }} />
           <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
             <div style={{ width: 48, height: 2, background: '#c9a84c', margin: '0 auto 40px' }} />
             <blockquote style={{
               fontFamily: "'Playfair Display', Georgia, serif",
               fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 500,
               fontStyle: 'italic', lineHeight: 1.35,
-              letterSpacing: '-0.02em', margin: 0,
+              letterSpacing: '-0.02em', margin: 0, color: '#ffffff',
             }}>
               &ldquo;You are the face of TakeMe. The face deserves the best.&rdquo;
             </blockquote>
@@ -346,7 +347,7 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ THREE FEATURE CARDS ══════════════════════════════════════════ */}
-      <Section bg="#080808">
+      <Section bg="#ffffff">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(340px, 1fr))', gap: 24 }}>
             {[
@@ -355,7 +356,7 @@ export default function DriverHubPage() {
               { title: 'WiFi', desc: 'Enterprise-grade, uncapped WiFi. Stream in 4K, update your apps, video call — no throttling ever.', img: 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900&q=80' },
             ].map((card) => (
               <div key={card.title} style={{
-                background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+                background: '#ffffff', border: '1px solid #d2d2d7',
                 borderRadius: 16, overflow: 'hidden',
                 transition: 'border-color 0.3s',
               }}>
@@ -363,8 +364,8 @@ export default function DriverHubPage() {
                   <img src={card.img} alt={card.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
                 </div>
                 <div style={{ padding: 28 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 600, margin: '0 0 12px' }}>{card.title}</h3>
-                  <p style={{ fontSize: 15, lineHeight: 1.65, color: 'rgba(255,255,255,0.5)', margin: 0 }}>{card.desc}</p>
+                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 600, margin: '0 0 12px', color: '#1d1d1f' }}>{card.title}</h3>
+                  <p style={{ fontSize: 15, lineHeight: 1.65, color: '#86868b', margin: 0 }}>{card.desc}</p>
                 </div>
               </div>
             ))}
@@ -373,16 +374,16 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ JOIN ═════════════════════════════════════════════════════════ */}
-      <Section bg="#0e0e0e">
+      <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="dh-grid">
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#c9a84c', marginBottom: 16 }}>
+            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Get Started
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px' }}>
+            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
               Join the Hub.
             </h2>
-            <p style={{ fontSize: 17, lineHeight: 1.7, color: 'rgba(255,255,255,0.55)', margin: '0 0 36px', maxWidth: 420 }}>
+            <p style={{ fontSize: 17, lineHeight: 1.7, color: '#6e6e73', margin: '0 0 36px', maxWidth: 420 }}>
               Every TakeMe driver gets free, unlimited access to the Driver Hub. No membership fees, no catches — just apply and drive.
             </p>
             <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap' }}>
@@ -397,8 +398,8 @@ export default function DriverHubPage() {
               <Link href="/driver" style={{
                 display: 'inline-flex', alignItems: 'center', height: 48,
                 padding: '0 28px', borderRadius: 8, fontWeight: 500, fontSize: 15,
-                background: 'transparent', color: '#ffffff', textDecoration: 'none',
-                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'transparent', color: '#1d1d1f', textDecoration: 'none',
+                border: '1px solid #d2d2d7',
                 transition: 'border-color 0.3s',
               }}>
                 Learn More
@@ -408,27 +409,27 @@ export default function DriverHubPage() {
 
           {/* Steps card */}
           <div style={{
-            background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.06)',
+            background: '#ffffff', border: '1px solid #d2d2d7',
             borderRadius: 16, padding: 36,
           }}>
-            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.35)', marginBottom: 32, marginTop: 0 }}>4 Steps to Access</p>
+            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 32, marginTop: 0 }}>4 Steps to Access</p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 28 }}>
               {STEPS.map((step, i) => (
                 <div key={step.num} style={{ display: 'flex', gap: 20, alignItems: 'flex-start' }}>
                   <div style={{
                     width: 40, height: 40, borderRadius: 10, flexShrink: 0,
-                    background: i === 0 ? '#c9a84c' : 'rgba(255,255,255,0.04)',
-                    border: i === 0 ? 'none' : '1px solid rgba(255,255,255,0.08)',
+                    background: i === 0 ? '#1D6AE5' : '#f5f5f7',
+                    border: i === 0 ? 'none' : '1px solid #d2d2d7',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontFamily: "'Playfair Display', Georgia, serif",
                     fontSize: 14, fontWeight: 700,
-                    color: i === 0 ? '#080808' : 'rgba(255,255,255,0.4)',
+                    color: i === 0 ? '#ffffff' : '#86868b',
                   }}>
                     {step.num}
                   </div>
                   <div>
-                    <h4 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 4px' }}>{step.title}</h4>
-                    <p style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.4)', margin: 0 }}>{step.desc}</p>
+                    <h4 style={{ fontSize: 16, fontWeight: 600, margin: '0 0 4px', color: '#1d1d1f' }}>{step.title}</h4>
+                    <p style={{ fontSize: 14, lineHeight: 1.5, color: '#86868b', margin: 0 }}>{step.desc}</p>
                   </div>
                 </div>
               ))}
@@ -438,22 +439,22 @@ export default function DriverHubPage() {
       </Section>
 
       {/* ═══ FOOTER ══════════════════════════════════════════════════════ */}
-      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: '#080808' }}>
+      <footer style={{ borderTop: '1px solid #d2d2d7', background: '#f5f5f7' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '56px 24px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, textAlign: 'center' }}>
-            <div style={{ fontSize: 17 }}>
+            <div style={{ fontSize: 17, color: '#1d1d1f' }}>
               <span style={{ fontWeight: 600 }}>TakeMe</span>
-              <span style={{ marginLeft: 5, fontWeight: 300, color: 'rgba(255,255,255,0.4)' }}>Mobility</span>
+              <span style={{ marginLeft: 5, fontWeight: 300, color: '#86868b' }}>Mobility</span>
             </div>
-            <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.3)', margin: 0 }}>
+            <p style={{ fontSize: 14, color: '#86868b', margin: 0 }}>
               Reliable transportation. One standard, everywhere.
             </p>
             <div style={{ display: 'flex', gap: 32 }}>
               {['Rides', 'TakeMe Fleet', 'Driver Hub', 'Safety'].map((l) => (
-                <span key={l} style={{ fontSize: 13, color: 'rgba(255,255,255,0.35)', cursor: 'pointer', transition: 'color 0.2s' }}>{l}</span>
+                <span key={l} style={{ fontSize: 13, color: '#6e6e73', cursor: 'pointer', transition: 'color 0.2s' }}>{l}</span>
               ))}
             </div>
-            <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.2)', marginTop: 8 }}>
+            <p style={{ fontSize: 12, color: '#86868b', marginTop: 8 }}>
               &copy; {new Date().getFullYear()} TakeMe Mobility Inc.
             </p>
           </div>
