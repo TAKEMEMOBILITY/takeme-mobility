@@ -19,7 +19,7 @@
 
   /* ── Semantic ─────────────────────────────────────────────────────────── */
   --accent:    #0071e3;
-  --success:   #34c759;
+  --success:   #0071e3;
   --warning:   #ff9f0a;
   --danger:    #ff3b30;
 
@@ -148,8 +148,8 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #FFFFFF;
-    --foreground: #1D1D1F;
+    --background: #ffffff;
+    --foreground: #1d1d1f;
   }
 }
 

@@ -34,7 +34,7 @@ const PHASES: Record<RidePhase, {
   arrived: {
     label: 'Driver has arrived',
     sub: 'Head to the pickup point',
-    color: 'bg-[#34C759]',
+    color: 'bg-[#0071e3]',
     pulse: false,
   },
   in_progress: {
@@ -46,7 +46,7 @@ const PHASES: Record<RidePhase, {
   completed: {
     label: 'You\'ve arrived',
     sub: 'Thanks for riding with TakeMe',
-    color: 'bg-[#34C759]',
+    color: 'bg-[#0071e3]',
     pulse: false,
   },
   cancelled: {
@@ -179,7 +179,7 @@ export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
           >
             <Marker
               position={{ lat: ride.pickupLat, lng: ride.pickupLng }}
-              icon={google.maps.Size ? { url: pinSvg('#34C759'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) } : undefined}
+              icon={google.maps.Size ? { url: pinSvg('#0071e3'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) } : undefined}
             />
             <Marker
               position={{ lat: ride.dropoffLat, lng: ride.dropoffLng }}
@@ -247,7 +247,7 @@ export default function RideTracker({ rideId, onClose }: RideTrackerProps) {
         {/* Route summary */}
         <div className="mt-4 space-y-2">
           <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">
-            <span className="h-2 w-2 shrink-0 rounded-full bg-[#34C759]" />
+            <span className="h-2 w-2 shrink-0 rounded-full bg-[#0071e3]" />
             <span className="truncate text-[14px] text-[#1D1D1F]">{ride.pickupAddress}</span>
           </div>
           <div className="flex items-center gap-3 rounded-xl bg-[#F5F5F7] px-4 py-3">

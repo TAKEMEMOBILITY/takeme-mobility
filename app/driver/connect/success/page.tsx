@@ -6,8 +6,8 @@ export default function ConnectSuccessPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-white px-6">
       <div className="max-w-sm text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#34c759]/10">
-          <svg className="h-8 w-8 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#0071e3]/10">
+          <svg className="h-8 w-8 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
           </svg>
         </div>

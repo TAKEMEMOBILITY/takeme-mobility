@@ -124,59 +124,113 @@ export default function FleetPage() {
       {/*  HERO                                                        */}
       {/* ============================================================ */}
       <section style={{
-        position: 'relative',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
         overflow: 'hidden',
         background: '#FFFFFF',
-        paddingTop: 140,
+        paddingTop: 100,
         paddingBottom: 80,
       }}>
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="show"
-          style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 clamp(24px, 5vw, 80px)' }}
-        >
-          <motion.h1 variants={fadeUp} style={{
-            fontFamily: "'DM Serif Display', Georgia, serif",
-            fontSize: 'clamp(40px, 6vw, 72px)',
-            color: '#1d1d1f',
-            letterSpacing: '-0.04em',
-            lineHeight: 1.1,
-            margin: 0,
+        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 clamp(24px, 5vw, 80px)' }}>
+          <div className="fleet-hero-grid" style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: 64,
+            alignItems: 'center',
           }}>
-            Drive <span style={{ color: '#0071e3' }}>Electric</span>.
-            <br />
-            Earn <span style={{ color: '#0071e3' }}>More</span>.
-          </motion.h1>
+            {/* Left — text content */}
+            <motion.div
+              variants={stagger}
+              initial="hidden"
+              animate="show"
+            >
+              <motion.p variants={fadeUp} style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '0.8rem',
+                fontWeight: 600,
+                textTransform: 'uppercase' as const,
+                letterSpacing: '0.15em',
+                color: '#0071e3',
+                marginBottom: 16,
+              }}>
+                TakeMe Fleet
+              </motion.p>
 
-          <motion.p variants={fadeUp} style={{
-            fontFamily: "'DM Sans', sans-serif",
-            color: '#6e6e73',
-            fontSize: '1.125rem',
-            marginTop: 24,
-            marginBottom: 40,
-            maxWidth: 520,
-            marginLeft: 'auto',
-            marginRight: 'auto',
-          }}>
-            Seattle&apos;s first premium EV sharing marketplace
-          </motion.p>
+              <motion.h1 variants={fadeUp} style={{
+                fontFamily: "'DM Serif Display', Georgia, serif",
+                fontSize: 'clamp(36px, 5vw, 60px)',
+                color: '#1d1d1f',
+                letterSpacing: '-0.04em',
+                lineHeight: 1.1,
+                margin: 0,
+              }}>
+                Drive Electric.
+                <br />
+                Earn More.
+              </motion.h1>
 
-          <motion.div variants={fadeUp} style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <button className="fleet-btn-primary" onClick={scrollToGrid} type="button">
-              Browse Vehicles
-            </button>
-            <Link href="/fleet/list-your-ev" style={{ textDecoration: 'none' }}>
-              <button className="fleet-btn-ghost" type="button">
-                List Your EV <ChevronRight size={16} style={{ marginLeft: 4, verticalAlign: 'middle' }} />
-              </button>
-            </Link>
-          </motion.div>
-        </motion.div>
+              <motion.p variants={fadeUp} style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#6e6e73',
+                fontSize: '1.125rem',
+                marginTop: 20,
+                marginBottom: 36,
+                maxWidth: 420,
+                lineHeight: 1.6,
+              }}>
+                Seattle&apos;s first premium EV sharing marketplace. List your EV or rent one — zero gas costs.
+              </motion.p>
+
+              <motion.div variants={fadeUp} style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <button className="fleet-btn-primary" onClick={scrollToGrid} type="button">
+                  Browse Vehicles
+                </button>
+                <Link href="/fleet/list-your-ev" style={{ textDecoration: 'none' }}>
+                  <button className="fleet-btn-ghost" type="button">
+                    List Your EV
+                  </button>
+                </Link>
+              </motion.div>
+            </motion.div>
+
+            {/* Right — key metrics card */}
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              style={{
+                background: '#f5f5f7',
+                borderRadius: 20,
+                padding: '40px 36px',
+              }}
+            >
+              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.12em', color: '#86868b', marginBottom: 28, marginTop: 0 }}>
+                Platform at a glance
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+                {[
+                  { value: '47+', label: 'EVs listed' },
+                  { value: '$0', label: 'Gas costs' },
+                  { value: '80%', label: 'Owner earnings' },
+                  { value: '24/7', label: 'Support' },
+                ].map((stat) => (
+                  <div key={stat.label}>
+                    <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: '2rem', color: '#1d1d1f', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                      {stat.value}
+                    </div>
+                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.85rem', color: '#86868b', marginTop: 4 }}>
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        <style>{`
+          @media (max-width: 768px) {
+            .fleet-hero-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          }
+        `}</style>
       </section>
 
       {/* ============================================================ */}

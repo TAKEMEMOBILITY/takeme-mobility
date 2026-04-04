@@ -166,24 +166,7 @@ export default function HomePage() {
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
-        {/* Animated route line — subtle teal SVG */}
-        <svg
-          className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.07]"
-          width="900" height="500" viewBox="0 0 900 500" fill="none"
-        >
-          <path
-            d="M50 400 C150 380, 200 300, 280 280 S380 200, 420 180 S500 120, 560 140 S650 200, 700 180 S780 100, 850 80"
-            stroke="#d2d2d7" strokeWidth="2.5" strokeLinecap="round" fill="none"
-            strokeDasharray="1200" strokeDashoffset="1200"
-            style={{ animation: 'routeDraw 3s ease-out 0.5s forwards' }}
-          />
-          <circle cx="50" cy="400" r="6" fill="#d2d2d7" opacity="0" style={{ animation: 'dotFade 0.4s ease-out 0.3s forwards' }} />
-          <circle cx="850" cy="80" r="6" fill="#d2d2d7" opacity="0" style={{ animation: 'dotFade 0.4s ease-out 3.2s forwards' }} />
-        </svg>
-        <style>{`
-          @keyframes routeDraw { to { stroke-dashoffset: 0; } }
-          @keyframes dotFade { to { opacity: 0.6; } }
-        `}</style>
+        {/* Clean white hero — no animated decorations */}
 
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div className="grid items-start gap-8 lg:grid-cols-[1fr_480px] lg:gap-14">

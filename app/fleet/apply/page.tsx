@@ -41,7 +41,7 @@ export default function FleetApplyPage() {
       </nav>
 
       <div className="mx-auto max-w-lg px-6 py-20">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#34C759]">Fleet Partner Program</p>
+        <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#0071e3]">Fleet Partner Program</p>
         <h1 className="mt-4 text-[clamp(2rem,5vw,3rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1D1D1F]">
           List your EV. Earn passive income.
         </h1>

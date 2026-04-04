@@ -290,7 +290,7 @@ export default function DriverPage() {
           </div>
         </div>
         <div className={`h-3 w-3 rounded-full ${
-          isOnline ? 'bg-[#34c759]' : 'bg-[#d2d2d7]'
+          isOnline ? 'bg-[#0071e3]' : 'bg-[#d2d2d7]'
         }`} />
       </header>
 
@@ -321,7 +321,7 @@ export default function DriverPage() {
             <button
               onClick={toggleOnline}
               disabled={actionLoading}
-              className="h-[56px] w-full max-w-xs rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
+              className="h-[56px] w-full max-w-xs rounded-[999px] bg-[#0071e3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] disabled:opacity-50"
             >
               {actionLoading ? 'Going online...' : 'Go online'}
             </button>
@@ -337,9 +337,9 @@ export default function DriverPage() {
         {mode === 'online' && (
           <div className="flex flex-1 flex-col items-center justify-center gap-6">
             <div className="relative flex h-20 w-20 items-center justify-center">
-              <div className="h-20 w-20 rounded-full bg-[#34c759]/10" />
-              <div className="absolute h-12 w-12 animate-ping rounded-full bg-[#34c759] opacity-10" />
-              <div className="absolute h-4 w-4 rounded-full bg-[#34c759]" />
+              <div className="h-20 w-20 rounded-full bg-[#0071e3]/10" />
+              <div className="absolute h-12 w-12 animate-ping rounded-full bg-[#0071e3] opacity-10" />
+              <div className="absolute h-4 w-4 rounded-full bg-[#0071e3]" />
             </div>
             <div className="text-center">
               <p className="text-[20px] font-semibold">You're online</p>
@@ -396,9 +396,9 @@ export default function DriverPage() {
             {/* Route */}
             <div className="space-y-2">
               <div className={`flex items-center gap-3 rounded-xl px-4 py-3.5 ${
-                mode === 'on_trip' ? 'bg-[#f5f5f7]' : 'bg-[#34c759]/8 border border-[#34c759]/20'
+                mode === 'on_trip' ? 'bg-[#f5f5f7]' : 'bg-[#0071e3]/8 border border-[#0071e3]/20'
               }`}>
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#34c759]" />
+                <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#0071e3]" />
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-medium uppercase tracking-wider text-[#6e6e73]">Pickup</p>
                   <p className="mt-0.5 truncate text-[15px] font-medium">{ride.pickup_address}</p>
@@ -447,7 +447,7 @@ export default function DriverPage() {
                   <button
                     onClick={() => rideAction('accept')}
                     disabled={actionLoading}
-                    className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
+                    className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#0071e3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] disabled:opacity-50"
                   >
                     {actionLoading ? 'Accepting...' : 'Accept ride'}
                   </button>
@@ -485,7 +485,7 @@ export default function DriverPage() {
                 <button
                   onClick={() => rideAction('complete')}
                   disabled={actionLoading}
-                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#34c759] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#15803D] disabled:opacity-50"
+                  className="flex h-[56px] w-full items-center justify-center rounded-[999px] bg-[#0071e3] text-[17px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] disabled:opacity-50"
                 >
                   {actionLoading ? 'Completing...' : 'Complete trip'}
                 </button>
@@ -508,8 +508,8 @@ export default function DriverPage() {
         {/* ═══ COMPLETED ══════════════════════════════════════ */}
         {mode === 'completed' && ride && (
           <div className="flex flex-1 flex-col items-center justify-center gap-5">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#34c759]/10">
-              <svg className="h-8 w-8 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#0071e3]/10">
+              <svg className="h-8 w-8 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
               </svg>
             </div>

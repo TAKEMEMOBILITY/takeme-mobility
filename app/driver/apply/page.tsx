@@ -135,8 +135,8 @@ export default function DriverApplyPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white px-6">
         <div className="max-w-sm text-center">
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#34c759]/10">
-            <svg className="h-7 w-7 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0071e3]/10">
+            <svg className="h-7 w-7 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
             </svg>
           </div>
@@ -193,7 +193,7 @@ export default function DriverApplyPage() {
                   'Valid insurance and registration',
                 ].map(req => (
                   <div key={req} className="flex items-center gap-3">
-                    <svg className="h-4 w-4 shrink-0 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                    <svg className="h-4 w-4 shrink-0 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                     <span className="text-[14px] text-[#1d1d1f]">{req}</span>
@@ -372,11 +372,11 @@ export default function DriverApplyPage() {
                 <label
                   key={doc.key}
                   className={`flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition-all ${
-                    docs[doc.key] ? 'border-[#34c759] bg-[#34c759]/5' : 'border-dashed border-[#d2d2d7] hover:border-[#86868b]'
+                    docs[doc.key] ? 'border-[#0071e3] bg-[#0071e3]/5' : 'border-dashed border-[#d2d2d7] hover:border-[#86868b]'
                   }`}
                 >
                   {docs[doc.key] ? (
-                    <svg className="h-5 w-5 shrink-0 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <svg className="h-5 w-5 shrink-0 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>
                   ) : (
@@ -444,7 +444,7 @@ export default function DriverApplyPage() {
               <div className="-ml-1.5 h-4 w-4 rounded-full bg-[#FF9500] opacity-80" />
             </div>
             <span className="text-[14px] font-semibold text-white">TAKEME Card</span>
-            <span className="rounded-full bg-[#34c759] px-1.5 py-[1px] text-[9px] font-bold uppercase text-white">Free</span>
+            <span className="rounded-full bg-[#0071e3] px-1.5 py-[1px] text-[9px] font-bold uppercase text-white">Free</span>
           </div>
           <p className="mt-3 text-[13px] leading-relaxed text-white/50">
             Get instant payouts, cashback on EV charging, and exclusive driver rewards — all in one card.
@@ -452,7 +452,7 @@ export default function DriverApplyPage() {
           <div className="mt-3 flex flex-wrap gap-3">
             {['Instant payouts', 'Cashback rewards', 'No fees'].map(b => (
               <span key={b} className="flex items-center gap-1.5 text-[11px] font-medium text-white/60">
-                <svg className="h-3 w-3 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
+                <svg className="h-3 w-3 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg>
                 {b}
               </span>
             ))}

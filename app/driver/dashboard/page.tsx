@@ -88,12 +88,12 @@ export default function DriverDashboard() {
           </div>
           <div className="flex items-center gap-4">
             <div className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-[12px] font-semibold ${
-              driverStatus === 'online' ? 'bg-[#34c759]/10 text-[#34c759]'
+              driverStatus === 'online' ? 'bg-[#0071e3]/10 text-[#0071e3]'
               : driverStatus === 'review' ? 'bg-[#FF9F0A]/10 text-[#FF9F0A]'
               : 'bg-[#d2d2d7] text-[#6e6e73]'
             }`}>
               <span className={`h-2 w-2 rounded-full ${
-                driverStatus === 'online' ? 'bg-[#34c759]'
+                driverStatus === 'online' ? 'bg-[#0071e3]'
                 : driverStatus === 'review' ? 'bg-[#FF9F0A]'
                 : 'bg-[#6e6e73]'
               }`} />
@@ -180,7 +180,7 @@ export default function DriverDashboard() {
                 <div className="flex items-center gap-2">
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">TAKEME</p>
                   {CARD.virtualReady && (
-                    <span className="rounded-full bg-[#34c759]/20 px-2 py-[1px] text-[8px] font-bold uppercase text-[#34c759]">Virtual active</span>
+                    <span className="rounded-full bg-[#0071e3]/20 px-2 py-[1px] text-[8px] font-bold uppercase text-[#0071e3]">Virtual active</span>
                   )}
                 </div>
                 <p className="mt-0.5 text-[17px] font-semibold text-white">Debit Card</p>
@@ -194,7 +194,7 @@ export default function DriverDashboard() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-wider text-white/25">Cashback earned</p>
-                    <p className="mt-0.5 text-[16px] font-bold tabular-nums text-[#34c759]">${CARD.totalCashback.toFixed(2)}</p>
+                    <p className="mt-0.5 text-[16px] font-bold tabular-nums text-[#0071e3]">${CARD.totalCashback.toFixed(2)}</p>
                   </div>
                 </div>
               </div>
@@ -215,7 +215,7 @@ export default function DriverDashboard() {
                   {/* Physical card status */}
                   <div className="flex items-center gap-1.5">
                     <span className={`h-1.5 w-1.5 rounded-full ${
-                      CARD.physicalStatus === 'delivered' ? 'bg-[#34c759]'
+                      CARD.physicalStatus === 'delivered' ? 'bg-[#0071e3]'
                       : CARD.physicalStatus === 'shipping' ? 'bg-[#FF9500]'
                       : 'bg-white/20'
                     }`} />
@@ -233,7 +233,7 @@ export default function DriverDashboard() {
               <div className="border-t border-white/8 px-6 py-3">
                 <div className="flex items-center gap-4">
                   {[
-                    { label: 'EV charging', rate: '5%', color: '#34c759' },
+                    { label: 'EV charging', rate: '5%', color: '#0071e3' },
                     { label: 'Gas', rate: '3%', color: '#FF9500' },
                     { label: 'Everything else', rate: '1%', color: '#0071e3' },
                   ].map(cb => (
@@ -339,7 +339,7 @@ export default function DriverDashboard() {
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-[#86868b]">On card</p>
-                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#34c759]">${DRIVER_BALANCE.cardBalance.toFixed(2)}</p>
+                  <p className="mt-1 text-[22px] font-bold tabular-nums text-[#0071e3]">${DRIVER_BALANCE.cardBalance.toFixed(2)}</p>
                 </div>
               </div>
 
@@ -349,7 +349,7 @@ export default function DriverDashboard() {
                   onClick={() => setShowFund(true)}
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-[#d2d2d7] py-3 text-[14px] font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]"
                 >
-                  <svg className="h-4 w-4 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                  <svg className="h-4 w-4 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
                   Add funds to card
@@ -426,7 +426,7 @@ export default function DriverDashboard() {
               <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Payout method</h2>
               <div className="mt-3 space-y-2">
                 {([
-                  { id: 'takeme_card' as const, label: 'TAKEME Card', desc: 'Instant · Cashback rewards', badge: 'Best', badgeColor: 'bg-[#34c759] text-white' },
+                  { id: 'takeme_card' as const, label: 'TAKEME Card', desc: 'Instant · Cashback rewards', badge: 'Best', badgeColor: 'bg-[#0071e3] text-white' },
                   { id: 'bank' as const, label: 'Bank account', desc: '1–3 business days', badge: null, badgeColor: '' },
                   { id: 'debit' as const, label: 'Debit card', desc: 'Within 30 minutes', badge: null, badgeColor: '' },
                 ]).map(opt => (
@@ -469,7 +469,7 @@ export default function DriverDashboard() {
                   <div key={trip.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#34c759]" />
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#0071e3]" />
                         <p className="truncate text-[14px] font-medium text-[#1d1d1f]">{trip.pickup}</p>
                       </div>
                       <div className="mt-0.5 flex items-center gap-2">
@@ -500,9 +500,9 @@ export default function DriverDashboard() {
                 ].map(action => (
                   <Link key={action.label} href={action.href}
                     className={`flex flex-col items-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors ${
-                      action.green ? 'border-[#34c759]/20 bg-[#34c759]/5 hover:bg-[#34c759]/10' : 'border-[#d2d2d7] hover:bg-[#f5f5f7]'
+                      action.green ? 'border-[#0071e3]/20 bg-[#0071e3]/5 hover:bg-[#0071e3]/10' : 'border-[#d2d2d7] hover:bg-[#f5f5f7]'
                     }`}>
-                    <svg className={`h-5 w-5 ${action.green ? 'text-[#34c759]' : 'text-[#6e6e73]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg className={`h-5 w-5 ${action.green ? 'text-[#0071e3]' : 'text-[#6e6e73]'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d={action.icon} />
                     </svg>
                     <span className="text-[11px] font-medium text-[#1d1d1f]">{action.label}</span>
@@ -519,7 +519,7 @@ export default function DriverDashboard() {
             <div className="rounded-2xl bg-white p-5">
               <div className="flex items-center justify-between">
                 <h2 className="text-[15px] font-semibold text-[#1d1d1f]">Driver Hub</h2>
-                <span className="rounded-full bg-[#34c759]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#34c759]">Active</span>
+                <span className="rounded-full bg-[#0071e3]/10 px-2.5 py-0.5 text-[11px] font-semibold text-[#0071e3]">Active</span>
               </div>
               <div className="mt-4 space-y-3">
                 <div className="flex items-center justify-between">
@@ -532,7 +532,7 @@ export default function DriverDashboard() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] text-[#6e6e73]">Benefits</span>
-                  <span className="text-[13px] font-medium text-[#34c759]">All unlocked</span>
+                  <span className="text-[13px] font-medium text-[#0071e3]">All unlocked</span>
                 </div>
               </div>
               <button className="mt-4 w-full rounded-xl border border-[#d2d2d7] py-2.5 text-[13px] font-semibold text-[#1d1d1f] transition-colors hover:bg-[#f5f5f7]">
@@ -545,13 +545,13 @@ export default function DriverDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10">
-                    <svg className="h-4 w-4 text-[#34c759]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                    <svg className="h-4 w-4 text-[#0071e3]" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M8.288 15.038a5.25 5.25 0 0 1 7.424 0M5.106 11.856c3.807-3.808 9.98-3.808 13.788 0M1.924 8.674c5.565-5.565 14.587-5.565 20.152 0M12.53 18.22l-.53.53-.53-.53a.75.75 0 0 1 1.06 0Z" />
                     </svg>
                   </div>
                   <span className="text-[14px] font-semibold text-white">TAKEME CONNECT</span>
                 </div>
-                <span className="rounded-full bg-[#34c759]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#34c759]">Active</span>
+                <span className="rounded-full bg-[#0071e3]/20 px-2.5 py-0.5 text-[11px] font-semibold text-[#0071e3]">Active</span>
               </div>
               <div className="mt-4 flex items-baseline gap-1">
                 <span className="text-[24px] font-bold tabular-nums text-white">$29.90</span>
@@ -593,7 +593,7 @@ export default function DriverDashboard() {
                   <span className="text-[13px] text-[#1d1d1f]">Seattle driver meetup — Apr 5</span>
                 </div>
                 <div className="flex items-center gap-3 rounded-xl bg-[#f5f5f7] px-3.5 py-2.5">
-                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#34c759]" />
+                  <span className="h-2 w-2 shrink-0 rounded-full bg-[#0071e3]" />
                   <span className="text-[13px] text-[#1d1d1f]">EV charging guide updated</span>
                 </div>
               </div>
@@ -652,7 +652,7 @@ export default function DriverDashboard() {
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
                     <span className="text-[13px] text-[#6e6e73]">{item.label}</span>
-                    <span className={`text-[13px] font-medium ${item.ok ? 'text-[#34c759]' : 'text-[#FF9F0A]'}`}>{item.status}</span>
+                    <span className={`text-[13px] font-medium ${item.ok ? 'text-[#0071e3]' : 'text-[#FF9F0A]'}`}>{item.status}</span>
                   </div>
                 ))}
               </div>
