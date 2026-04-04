@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGoogleMaps } from './GoogleMapsProvider';
 import { useAuth } from '@/lib/auth/context';
+import PaymentModal from './PaymentModal';
 import type { QuoteResult } from '@/lib/pricing';
 
 // ── Types ────────────────────────────────────────────────────────────────
@@ -36,6 +37,8 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   const [booking, setBooking] = useState(false);
   const [bookingError, setBookingError] = useState('');
   const [booked, setBooked] = useState(false);
+  const [showPayment, setShowPayment] = useState(false);
+  const [rideData, setRideData] = useState<{ id: string; distanceKm: number; durationMin: number; totalFare: number; currency: string } | null>(null);
 
   const mapRef = useRef<google.maps.Map | null>(null);
   const pickupAcRef = useRef<google.maps.places.Autocomplete | null>(null);
@@ -128,10 +131,19 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
       });
       if (!res.ok) {
         if (res.status === 401) { router.push('/auth/signup'); return; }
-        const data = await res.json();
-        throw new Error(data.error || 'Booking failed');
+        const errData = await res.json();
+        throw new Error(errData.error || 'Booking failed');
       }
-      setBooked(true);
+      const data = await res.json();
+      const rideId = data.ride?.id || data.id || 'unknown';
+      setRideData({
+        id: rideId,
+        distanceKm: route.distanceKm,
+        durationMin: route.durationMin,
+        totalFare: quote.fare.total,
+        currency: quote.fare.currency || 'USD',
+      });
+      setShowPayment(true);
     } catch (err) {
       setBookingError(err instanceof Error ? err.message : 'Could not book ride. Please try again.');
     } finally { setBooking(false); }
@@ -228,6 +240,50 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
       );
     }
   };
+
+  // ── Payment state ──────────────────────────────────────────────────
+  if (showPayment && rideData) {
+    return (
+      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+        <div className="p-6">
+          <p className="mb-4 text-center text-[16px] font-semibold text-[#1D1D1F]">Complete payment</p>
+          <div className="mb-4 flex items-center justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
+            <div>
+              <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Total fare</p>
+              <p className="mt-0.5 text-[20px] font-bold tabular-nums text-[#1D1D1F]">
+                ${rideData.totalFare.toFixed(2)}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868B]">Distance</p>
+              <p className="mt-0.5 text-[15px] font-semibold tabular-nums text-[#1D1D1F]">
+                {rideData.distanceKm} km
+              </p>
+            </div>
+          </div>
+          <PaymentModal
+            trip={{
+              tripId: rideData.id,
+              distance: rideData.distanceKm,
+              duration: rideData.durationMin,
+              fare: rideData.totalFare,
+              currency: rideData.currency,
+            }}
+            onComplete={() => {
+              setShowPayment(false);
+              setBooked(true);
+            }}
+            onDismiss={() => {
+              setShowPayment(false);
+              setBookingError('Payment cancelled. Your ride has been saved — you can pay later from your dashboard.');
+            }}
+            formatCurrency={(amount: number) => `$${amount.toFixed(2)}`}
+            formatDistance={(km: number) => `${km} km`}
+          />
+        </div>
+      </div>
+    );
+  }
 
   // ── Booked state ───────────────────────────────────────────────────
   if (booked) {
