@@ -37,30 +37,14 @@ export function FleetNav() {
           height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <a
-            href="https://www.takememobility.com"
-            style={{
-              fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem',
-              color: '#86868b', textDecoration: 'none',
-              display: 'flex', alignItems: 'center', gap: 4,
-              transition: 'color 150ms ease', whiteSpace: 'nowrap',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#6e6e73')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#86868b')}
-          >
-            <span style={{ fontSize: '0.75rem' }}>&larr;</span> TakeMe
-          </a>
-          <div style={{ width: 1, height: 16, background: '#d2d2d7' }} />
-          <Link href="/fleet" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
-            <span style={{
-              fontFamily: "'DM Serif Display', Georgia, serif",
-              fontSize: '1.2rem', color: '#1d1d1f', letterSpacing: '-0.02em',
-            }}>
-              TakeMe <span style={{ color: '#1D6AE5' }}>Fleet</span>
-            </span>
-          </Link>
-        </div>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
+          <span style={{
+            fontFamily: "'DM Serif Display', Georgia, serif",
+            fontSize: '1.2rem', color: '#1d1d1f', letterSpacing: '-0.02em',
+          }}>
+            TakeMe <span style={{ color: '#1D6AE5' }}>Fleet</span>
+          </span>
+        </Link>
 
         {/* Desktop nav */}
         <div className="fleet-nav-desktop" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
