@@ -116,19 +116,19 @@ export default function HomePage() {
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
+        scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-white'
       }`}>
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
           {/* LEFT — Logo */}
-          <Link href="/" className={`shrink-0 text-[17px] tracking-[0.01em] transition-colors duration-500 ${scrolled ? 'text-[#1d1d1f]' : 'text-white'}`}>
+          <Link href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span>
-            <span className={`ml-[4px] font-light transition-colors duration-500 ${scrolled ? 'text-[#86868b]' : 'text-white/60'}`}>Mobility</span>
+            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
           </Link>
 
           {/* CENTER — Nav links */}
           <div className="hidden items-center gap-6 lg:flex">
             {NAV_LINKS.map(({ label, href, badge }) => (
-              <Link key={href} href={href} className={`flex items-center whitespace-nowrap text-[13px] font-medium transition-colors duration-200 ${scrolled ? 'text-[#86868b] hover:text-[#1d1d1f]' : 'text-white/60 hover:text-white'}`}>
+              <Link key={href} href={href} className="flex items-center whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
                 {label}
                 {badge && (
                   <span style={{ background: '#1D6AE5', color: 'white', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, marginLeft: 4, letterSpacing: '0.5px' }}>NEW</span>
@@ -140,10 +140,10 @@ export default function HomePage() {
           {/* RIGHT — Auth + CTA */}
           <div className="flex shrink-0 items-center gap-4">
             {loading ? (
-              <div className={`h-4 w-4 animate-spin rounded-full border-[1.5px] ${scrolled ? 'border-[#d2d2d7] border-t-[#1d1d1f]' : 'border-white/30 border-t-white'}`} />
+              <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#d2d2d7] border-t-[#1d1d1f]" />
             ) : (
               <>
-                <Link href={signInHref} className={`hidden text-[13px] font-medium transition-colors duration-200 sm:block ${scrolled ? 'text-[#86868b] hover:text-[#1d1d1f]' : 'text-white/60 hover:text-white'}`}>
+                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f] sm:block">
                   Sign in
                 </Link>
                 <Link
@@ -158,41 +158,17 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ═══ HERO — Cinematic WebGL ═════════════════════════════════════ */}
-      <HeroCanvas />
-
-      {/* ═══ ORIGINAL HERO (below cinematic) ══════════════════════════════ */}
-      <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
-        <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
-          <div className="grid items-start gap-8 lg:grid-cols-[1fr_480px] lg:gap-14">
-            <div className="pt-2 lg:pt-4">
-              <h2 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
-                Book your ride now.
-              </h2>
-              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6e6e73]">
-                Every ride, on your terms. Ready when you are.
-              </p>
-              <div className="mt-7 grid max-w-[420px] grid-cols-2 gap-4">
-                <Link
-                  href={ctaHref}
-                  className="flex h-[52px] items-center justify-center rounded-[999px] bg-[#1D6AE5] text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0]"
-                >
-                  Book your ride
-                </Link>
-                <Link
-                  href="#how-it-works"
-                  className="flex h-[52px] items-center justify-center rounded-[999px] border border-[#d2d2d7] text-[15px] font-medium text-[#1d1d1f] transition-colors duration-200 hover:bg-[#f5f5f7]"
-                >
-                  See how it works
-                </Link>
-              </div>
-            </div>
-            <div>
-              <HeroBookingWrapper ctaHref={ctaHref} />
-            </div>
+      {/* ═══ BOOKING WIDGET ═════════════════════════════════════════════ */}
+      <section className="bg-white pt-20 md:pt-24">
+        <div className="w-full px-6 py-6 lg:px-10">
+          <div className="mx-auto max-w-[1200px]">
+            <HeroBookingWrapper ctaHref={ctaHref} />
           </div>
         </div>
       </section>
+
+      {/* ═══ HERO — Cinematic WebGL ═════════════════════════════════════ */}
+      <HeroCanvas />
 
       {/* ═══ TRUST LAYER ══════════════════════════════════════════════════ */}
       <section className="border-t border-[#f5f5f7] bg-white">
