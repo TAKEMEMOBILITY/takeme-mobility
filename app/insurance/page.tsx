@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '@/lib/auth/context';
+import { PageTitle, SectionTitle, Eyebrow, BodyText } from '@/components/ui/Typography';
 
 // ── Shared nav links (mirror homepage) ──────────────────────────────────
 
@@ -49,11 +50,7 @@ function useReveal(threshold = 0.18) {
 // ── Eyebrow tag (blue pill, matches homepage) ───────────────────────────
 
 function EyebrowTag({ children }: { children: React.ReactNode }) {
-  return (
-    <span className="inline-flex items-center rounded-full bg-[#1D6AE5]/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#1D6AE5]">
-      {children}
-    </span>
-  );
+  return <Eyebrow>{children}</Eyebrow>;
 }
 
 // ── Phone frame ─────────────────────────────────────────────────────────
@@ -393,25 +390,17 @@ export default function InsurancePage() {
           }}
         >
           <div className="mx-auto max-w-[820px] text-center">
-            <EyebrowTag>New · TakeMe Insurance</EyebrowTag>
+            <Eyebrow>New · TakeMe Insurance</Eyebrow>
 
-            <h1
-              className="mt-6 text-[#1d1d1f]"
-              style={{
-                fontFamily: 'var(--font-dm-serif), Georgia, serif',
-                fontSize: 'clamp(2.5rem, 5.5vw, 4.25rem)',
-                lineHeight: 1.05,
-                letterSpacing: '-0.03em',
-              }}
-            >
+            <PageTitle style={{ marginTop: 24 }}>
               Insurance You Control.
-            </h1>
+            </PageTitle>
 
-            <p className="mx-auto mt-5 max-w-[560px] text-[19px] leading-[1.6] text-[#6e6e73]">
+            <BodyText className="mx-auto mt-5 max-w-[560px]">
               Every safe ride lowers your rate.
               <br />
               Drive well. Pay less.
-            </p>
+            </BodyText>
 
             <div className="mx-auto mt-8 flex max-w-[420px] flex-col gap-3 sm:flex-row sm:justify-center">
               <Link
@@ -477,22 +466,14 @@ export default function InsurancePage() {
           }}
         >
           <div className="text-center">
-            <EyebrowTag>How it works</EyebrowTag>
-            <h2
-              className="mt-5 text-[#1d1d1f]"
-              style={{
-                fontFamily: 'var(--font-dm-serif), Georgia, serif',
-                fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.025em',
-              }}
-            >
+            <Eyebrow>How it works</Eyebrow>
+            <SectionTitle style={{ marginTop: 20 }}>
               Your driving is your rate.
-            </h2>
-            <p className="mx-auto mt-4 max-w-[560px] text-[17px] leading-[1.65] text-[#6e6e73]">
+            </SectionTitle>
+            <BodyText className="mx-auto mt-4 max-w-[560px]">
               Every trip you take is analyzed. Safe patterns move your score up,
               and your monthly premium down.
-            </p>
+            </BodyText>
           </div>
 
           {/* Score gauge */}
@@ -570,18 +551,10 @@ export default function InsurancePage() {
           }}
         >
           <div className="text-center">
-            <EyebrowTag>Plans</EyebrowTag>
-            <h2
-              className="mt-5 text-[#1d1d1f]"
-              style={{
-                fontFamily: 'var(--font-dm-serif), Georgia, serif',
-                fontSize: 'clamp(2rem, 4.5vw, 3.25rem)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.025em',
-              }}
-            >
+            <Eyebrow>Plans</Eyebrow>
+            <SectionTitle style={{ marginTop: 20 }}>
               Pick a plan. Pay less for driving well.
-            </h2>
+            </SectionTitle>
 
             {/* Discount badge */}
             <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-[#1D6AE5]/10 px-4 py-2">
@@ -654,20 +627,12 @@ export default function InsurancePage() {
           }}
         >
           <div className="mx-auto max-w-xl text-center">
-            <h2
-              className="text-white"
-              style={{
-                fontFamily: 'var(--font-dm-serif), Georgia, serif',
-                fontSize: 'clamp(2rem, 5vw, 3.25rem)',
-                lineHeight: 1.1,
-                letterSpacing: '-0.03em',
-              }}
-            >
+            <SectionTitle style={{ color: '#ffffff' }}>
               Drive well. Pay less.
-            </h2>
-            <p className="mt-5 text-[17px] leading-[1.65] text-[#86868b]">
+            </SectionTitle>
+            <BodyText className="mt-5" style={{ color: '#86868b' }}>
               Get covered in minutes. Cancel anytime.
-            </p>
+            </BodyText>
 
             <Link
               href={ctaHref}

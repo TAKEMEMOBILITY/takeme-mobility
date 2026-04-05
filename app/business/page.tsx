@@ -100,15 +100,15 @@ const S = {
   blue2: '#1558C0',
   gold: '#C9A84C',
   white: '#ffffff',
-  text: '#1d1d1f',
-  gray: '#6e6e73',
-  light: '#86868b',
+  text: '#0A0A0A',
+  gray: '#3A3A3C',
+  light: '#636366',
   border: '#d2d2d7',
   borderFaint: '#e8e8ed',
 }
 
-const font = "'Playfair Display', Georgia, serif"
-const body = "'DM Sans', system-ui, sans-serif"
+const font = "var(--font-dm-serif), Georgia, serif"
+const body = "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif"
 
 /* ── Page ──────────────────────────────────────────────────────────────── */
 export default function BusinessPage() {
@@ -123,8 +123,6 @@ export default function BusinessPage() {
 
   return (
     <div style={{ background: S.bg, color: S.text, fontFamily: body, overflowX: 'hidden' }}>
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&display=swap" />
 
       {/* ═══ NAV ═════════════════════════════════════════════════════════ */}
       <nav style={{
@@ -170,8 +168,8 @@ export default function BusinessPage() {
           </div>
 
           <h1 style={{
-            fontFamily: font, fontSize: 'clamp(48px, 7vw, 110px)', fontWeight: 900,
-            lineHeight: 0.95, letterSpacing: '-4px', margin: '0 0 40px', maxWidth: 900,
+            fontFamily: font, fontSize: 'clamp(48px, 7vw, 110px)', fontWeight: 400,
+            lineHeight: 1.0, letterSpacing: '-2px', margin: '0 0 40px', maxWidth: 900,
             color: S.text,
             opacity: 0, animation: 'fadeUp .8s .3s forwards',
           }}>
@@ -253,7 +251,7 @@ export default function BusinessPage() {
           </div>
         </Reveal>
         <Reveal>
-          <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 80, maxWidth: 700, color: S.text }}>
+          <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 400, lineHeight: 1.1, letterSpacing: '-2px', marginBottom: 80, maxWidth: 700, color: S.text }}>
             Your employees deserve<br />rides that <em style={{ fontStyle: 'normal', color: S.gold }}>work.</em>
           </h2>
         </Reveal>
@@ -283,7 +281,7 @@ export default function BusinessPage() {
               <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: S.blue, fontWeight: 600, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
                 <span style={{ width: 24, height: 1, background: S.blue }} />Platform Features
               </div>
-              <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-2.5px', maxWidth: 700, color: S.text }}>
+              <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 400, lineHeight: 1.1, letterSpacing: '-2px', maxWidth: 700, color: S.text }}>
                 Built for <em style={{ fontStyle: 'normal', color: S.blue }}>enterprise.</em><br />Designed for humans.
               </h2>
             </div>
@@ -315,7 +313,7 @@ export default function BusinessPage() {
           <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: S.blue, fontWeight: 600, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 12 }}>
             <span style={{ width: 24, height: 1, background: S.blue }} />Industries We Serve
           </div>
-          <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-2.5px', marginBottom: 64, color: S.text }}>
+          <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 400, lineHeight: 1.1, letterSpacing: '-2px', marginBottom: 64, color: S.text }}>
             Every industry.<br />Every need.
           </h2>
         </Reveal>
@@ -350,7 +348,7 @@ export default function BusinessPage() {
           <Reveal>
             <div style={{ textAlign: 'center', marginBottom: 64 }}>
               <div style={{ fontSize: 11, letterSpacing: 3, textTransform: 'uppercase', color: S.blue, fontWeight: 600, marginBottom: 20 }}>Pricing</div>
-              <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-2.5px', margin: 0, color: S.text }}>Simple, transparent pricing.</h2>
+              <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 4.5vw, 68px)', fontWeight: 400, lineHeight: 1.1, letterSpacing: '-2px', margin: 0, color: S.text }}>Simple, transparent pricing.</h2>
               <p style={{ fontSize: 18, color: S.gray, marginTop: 16 }}>No hidden fees. No per-seat licenses. Pay only for rides taken.</p>
             </div>
           </Reveal>
@@ -421,7 +419,7 @@ export default function BusinessPage() {
           padding: '100px clamp(24px, 5vw, 80px)', textAlign: 'center', position: 'relative', overflow: 'hidden',
         }}>
           <div style={{ position: 'relative', zIndex: 5 }}>
-            <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 5vw, 72px)', fontWeight: 900, lineHeight: 1, letterSpacing: '-3px', marginBottom: 20, color: S.text }}>
+            <h2 style={{ fontFamily: font, fontSize: 'clamp(40px, 5vw, 72px)', fontWeight: 400, lineHeight: 1.05, letterSpacing: '-2px', marginBottom: 20, color: S.text }}>
               Ready to move<br /><span style={{ color: S.blue }}>smarter?</span>
             </h2>
             <p style={{ fontSize: 20, color: S.light, marginBottom: 48, lineHeight: 1.6 }}>

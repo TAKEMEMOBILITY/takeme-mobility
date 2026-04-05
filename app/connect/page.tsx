@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import ConnectCard from '@/components/ConnectCard';
+import { PageTitle, SectionTitle, Eyebrow, BodyText, PrimaryButton } from '@/components/ui/Typography';
 
 export default function ConnectPage() {
   return (
@@ -24,19 +25,17 @@ export default function ConnectPage() {
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Left */}
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#1D6AE5]">
-              For drivers
-            </p>
-            <h1 className="mt-4 text-[clamp(2rem,5vw,3.5rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]">
+            <Eyebrow>For drivers</Eyebrow>
+            <PageTitle style={{ marginTop: 20 }}>
               Never lose a ride
               <br />
               again.
-            </h1>
-            <p className="mt-5 max-w-md text-[17px] leading-[1.65] text-[#6e6e73]">
+            </PageTitle>
+            <BodyText className="mt-5 max-w-md">
               Zero dropped trips. Zero missed income.
               <br />
-              Built for drivers who don't tolerate downtime.
-            </p>
+              Built for drivers who don&apos;t tolerate downtime.
+            </BodyText>
             <p className="mt-4 text-[28px] font-bold tracking-[-0.02em] text-[#1d1d1f]">
               $29.90<span className="text-[15px] font-medium text-[#6e6e73]">/month</span>
             </p>
@@ -54,12 +53,9 @@ export default function ConnectPage() {
             </div>
 
             <div className="mt-10">
-              <Link
-                href="/driver/connect"
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5] active:scale-[0.98]"
-              >
+              <PrimaryButton href="/driver/connect">
                 Start earning without interruptions
-              </Link>
+              </PrimaryButton>
             </div>
           </div>
 
@@ -96,19 +92,12 @@ export default function ConnectPage() {
       {/* Footer CTA */}
       <section className="bg-white">
         <div className="mx-auto max-w-xl px-6 py-20 text-center">
-          <h2 className="text-[clamp(1.75rem,4vw,2.5rem)] font-semibold leading-[1.1] tracking-[-0.02em] text-[#1d1d1f]">
-            Stay on the road.
-          </h2>
-          <p className="mt-4 text-[16px] text-[#6e6e73]">
+          <SectionTitle>Stay on the road.</SectionTitle>
+          <BodyText className="mt-4">
             Activate in under a minute. Cancel anytime.
-          </p>
+          </BodyText>
           <div className="mt-8">
-            <Link
-              href="/driver/connect"
-              className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[16px] font-semibold text-white transition-colors duration-200 hover:bg-[#005bb5]"
-            >
-              Activate plan
-            </Link>
+            <PrimaryButton href="/driver/connect">Activate plan</PrimaryButton>
           </div>
         </div>
       </section>

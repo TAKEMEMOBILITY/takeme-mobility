@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { PageTitle, SectionTitle, Eyebrow, BodyText, PrimaryButton } from '@/components/ui/Typography';
 
 // ── Hooks ────────────────────────────────────────────────────────────────
 
@@ -119,13 +120,13 @@ export default function StudentsPage() {
               Student Program
             </div>
 
-            <h1 className="mt-8 text-[clamp(2.5rem,6vw,4rem)] font-semibold leading-[1.05] tracking-[-0.035em] text-[#1d1d1f]">
+            <PageTitle style={{ marginTop: 32 }}>
               Save on every ride.
-            </h1>
+            </PageTitle>
 
-            <p className="mt-5 text-[clamp(1.1rem,2.5vw,1.35rem)] leading-[1.5] text-[#6e6e73]">
+            <BodyText className="mt-5">
               Verified student pricing. Instant activation.
-            </p>
+            </BodyText>
 
             {/* .edu verification badge */}
             <div className="mx-auto mt-10 max-w-md">
@@ -191,13 +192,13 @@ export default function StudentsPage() {
           }`}
         >
           <div className="text-center">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">Pricing</p>
-            <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
+            <Eyebrow>Pricing</Eyebrow>
+            <SectionTitle style={{ marginTop: 16 }}>
               Plans built for students.
-            </h2>
-            <p className="mt-4 text-[17px] leading-[1.65] text-[#6e6e73]">
+            </SectionTitle>
+            <BodyText className="mt-4">
               Every plan includes verified status and activates instantly.
-            </p>
+            </BodyText>
           </div>
 
           <div className="mt-16 grid gap-6 md:grid-cols-3">
@@ -254,10 +255,10 @@ export default function StudentsPage() {
           }`}
         >
           <div className="text-center">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#86868b]">Partner universities</p>
-            <h2 className="mt-4 text-[clamp(1.75rem,4vw,3rem)] font-semibold leading-[1.1] tracking-[-0.025em] text-[#1d1d1f]">
+            <Eyebrow>Partner universities</Eyebrow>
+            <SectionTitle style={{ marginTop: 16 }}>
               Partnered with Seattle campuses.
-            </h2>
+            </SectionTitle>
           </div>
 
           <div className="mt-16 grid gap-6 md:grid-cols-3">
@@ -292,19 +293,14 @@ export default function StudentsPage() {
           }`}
         >
           <div className="mx-auto max-w-xl text-center">
-            <h2 className="text-[clamp(2rem,5vw,3.25rem)] font-semibold leading-[1.1] tracking-[-0.03em] text-[#1d1d1f]">
-              Ready to ride for less.
-            </h2>
-            <p className="mt-5 text-[17px] leading-[1.65] text-[#6e6e73]">
+            <SectionTitle>Ready to ride for less.</SectionTitle>
+            <BodyText className="mt-5">
               Verify your .edu email to activate student pricing.
-            </p>
+            </BodyText>
             <div className="mt-10">
-              <button
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex h-[52px] items-center rounded-[999px] bg-[#1D6AE5] px-8 text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#005bb5]"
-              >
+              <PrimaryButton onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                 Verify student email
-              </button>
+              </PrimaryButton>
             </div>
           </div>
         </div>

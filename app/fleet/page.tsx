@@ -44,7 +44,7 @@ function AnimatedStat({ value, suffix, label }: { value: string; suffix?: string
       style={{ textAlign: 'center', padding: 32 }}
     >
       <div style={{
-        fontFamily: "'DM Serif Display', Georgia, serif",
+        fontFamily: "var(--font-dm-serif), Georgia, serif",
         fontSize: 'clamp(2rem, 4vw, 3rem)',
         color: '#1D6AE5',
         letterSpacing: '-0.03em',
@@ -52,7 +52,7 @@ function AnimatedStat({ value, suffix, label }: { value: string; suffix?: string
         {prefix}{count}{trailChar}{suffix}
       </div>
       <div style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
         color: '#6e6e73',
         fontSize: '1rem',
         marginTop: 4,
@@ -142,24 +142,30 @@ export default function FleetPage() {
               initial="hidden"
               animate="show"
             >
-              <motion.p variants={fadeUp} style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '0.8rem',
+              <motion.span variants={fadeUp} style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
+                fontSize: 13,
                 fontWeight: 600,
                 textTransform: 'uppercase' as const,
-                letterSpacing: '0.15em',
+                letterSpacing: '0.5px',
                 color: '#1D6AE5',
-                marginBottom: 16,
+                backgroundColor: 'rgba(29, 106, 229, 0.1)',
+                padding: '6px 14px',
+                borderRadius: 980,
+                marginBottom: 20,
               }}>
                 TakeMe Fleet
-              </motion.p>
+              </motion.span>
 
               <motion.h1 variants={fadeUp} style={{
-                fontFamily: "'DM Serif Display', Georgia, serif",
-                fontSize: 'clamp(36px, 5vw, 60px)',
-                color: '#1d1d1f',
-                letterSpacing: '-0.04em',
-                lineHeight: 1.1,
+                fontFamily: "var(--font-dm-serif), Georgia, serif",
+                fontSize: 'clamp(2.5rem, 5.5vw, 4.25rem)',
+                color: '#0A0A0A',
+                letterSpacing: '-0.02em',
+                lineHeight: 1.05,
+                fontWeight: 400,
                 margin: 0,
               }}>
                 Drive Electric.
@@ -168,13 +174,13 @@ export default function FleetPage() {
               </motion.h1>
 
               <motion.p variants={fadeUp} style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#6e6e73',
-                fontSize: '1.125rem',
+                fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
+                color: '#3A3A3C',
+                fontSize: 17,
                 marginTop: 20,
                 marginBottom: 36,
                 maxWidth: 420,
-                lineHeight: 1.6,
+                lineHeight: 1.65,
               }}>
                 Seattle&apos;s first premium EV sharing marketplace. List your EV or rent one — zero gas costs.
               </motion.p>
@@ -202,7 +208,7 @@ export default function FleetPage() {
                 padding: '40px 36px',
               }}
             >
-              <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.12em', color: '#86868b', marginBottom: 28, marginTop: 0 }}>
+              <p style={{ fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.12em', color: '#86868b', marginBottom: 28, marginTop: 0 }}>
                 Platform at a glance
               </p>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
@@ -213,10 +219,10 @@ export default function FleetPage() {
                   { value: '24/7', label: 'Support' },
                 ].map((stat) => (
                   <div key={stat.label}>
-                    <div style={{ fontFamily: "'DM Serif Display', Georgia, serif", fontSize: '2rem', color: '#1d1d1f', letterSpacing: '-0.03em', lineHeight: 1 }}>
+                    <div style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: '2rem', color: '#1d1d1f', letterSpacing: '-0.03em', lineHeight: 1 }}>
                       {stat.value}
                     </div>
-                    <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '0.85rem', color: '#86868b', marginTop: 4 }}>
+                    <div style={{ fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", fontSize: '0.85rem', color: '#86868b', marginTop: 4 }}>
                       {stat.label}
                     </div>
                   </div>
@@ -250,7 +256,7 @@ export default function FleetPage() {
           }}>
             {/* City */}
             <div style={{ flex: '1 1 180px' }}>
-              <label style={{ display: 'block', fontFamily: "'DM Sans', sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
                 City
               </label>
               <select
@@ -269,7 +275,7 @@ export default function FleetPage() {
 
             {/* Vehicle Type */}
             <div style={{ flex: '1 1 180px' }}>
-              <label style={{ display: 'block', fontFamily: "'DM Sans', sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
                 Vehicle Type
               </label>
               <select
@@ -288,7 +294,7 @@ export default function FleetPage() {
 
             {/* Max Daily Rate */}
             <div style={{ flex: '1 1 200px' }}>
-              <label style={{ display: 'block', fontFamily: "'DM Sans', sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
+              <label style={{ display: 'block', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", color: '#6e6e73', fontSize: '0.8rem', marginBottom: 6 }}>
                 Max Daily Rate: <span style={{ color: '#1D6AE5', fontWeight: 600 }}>${maxRate}</span>
               </label>
               <input
@@ -304,7 +310,7 @@ export default function FleetPage() {
                   cursor: 'pointer',
                 }}
               />
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "'DM Sans', sans-serif", color: '#86868b', fontSize: '0.7rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif", color: '#86868b', fontSize: '0.7rem' }}>
                 <span>$30</span>
                 <span>$300</span>
               </div>
@@ -333,7 +339,7 @@ export default function FleetPage() {
           style={{ textAlign: 'center', marginBottom: 56 }}
         >
           <h2 style={{
-            fontFamily: "'DM Serif Display', Georgia, serif",
+            fontFamily: "var(--font-dm-serif), Georgia, serif",
             fontSize: '2.5rem',
             color: '#1d1d1f',
             margin: 0,
@@ -342,7 +348,7 @@ export default function FleetPage() {
             Available Now
           </h2>
           <p style={{
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
             color: '#6e6e73',
             fontSize: '1.05rem',
             marginTop: 12,
@@ -370,7 +376,7 @@ export default function FleetPage() {
           }}>
             <Zap size={48} color="#1D6AE5" style={{ marginBottom: 16 }} />
             <p style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
               color: '#6e6e73',
               fontSize: '1.1rem',
             }}>
@@ -433,7 +439,7 @@ export default function FleetPage() {
           style={{ textAlign: 'center', marginBottom: 48 }}
         >
           <h2 style={{
-            fontFamily: "'DM Serif Display', Georgia, serif",
+            fontFamily: "var(--font-dm-serif), Georgia, serif",
             fontSize: '2.5rem',
             color: '#1d1d1f',
             margin: 0,
@@ -454,7 +460,7 @@ export default function FleetPage() {
             onClick={() => setHowTab('drivers')}
             type="button"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
               fontSize: '0.95rem',
               fontWeight: 600,
               padding: '10px 24px',
@@ -472,7 +478,7 @@ export default function FleetPage() {
             onClick={() => setHowTab('owners')}
             type="button"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
               fontSize: '0.95rem',
               fontWeight: 600,
               padding: '10px 24px',
@@ -550,7 +556,7 @@ function StepCard({ num, icon, title, description }: {
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
         fontWeight: 700,
         fontSize: '0.9rem',
         marginBottom: 20,
@@ -559,7 +565,7 @@ function StepCard({ num, icon, title, description }: {
       </div>
       <div style={{ marginBottom: 16 }}>{icon}</div>
       <h3 style={{
-        fontFamily: "'DM Serif Display', Georgia, serif",
+        fontFamily: "var(--font-dm-serif), Georgia, serif",
         color: '#1d1d1f',
         fontSize: '1.25rem',
         margin: '0 0 8px',
@@ -568,7 +574,7 @@ function StepCard({ num, icon, title, description }: {
         {title}
       </h3>
       <p style={{
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif",
         color: '#6e6e73',
         fontSize: '0.9rem',
         lineHeight: 1.6,

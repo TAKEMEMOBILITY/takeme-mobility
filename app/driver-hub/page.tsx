@@ -89,11 +89,7 @@ export default function DriverHubPage() {
   }, [])
 
   return (
-    <div style={{ background: '#ffffff', color: '#1d1d1f', fontFamily: "system-ui, -apple-system, 'Segoe UI', sans-serif" }}>
-
-      {/* ═══ GOOGLE FONT ══════════════════════════════════════════════════ */}
-      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap" />
+    <div style={{ background: '#ffffff', color: '#0A0A0A', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif" }}>
 
       {/* ═══ NAV ═════════════════════════════════════════════════════════ */}
       <header style={{ borderBottom: '1px solid #d2d2d7', background: '#ffffff' }}>
@@ -126,10 +122,10 @@ export default function DriverHubPage() {
         <div style={{ position: 'absolute', inset: 0, zIndex: 1, background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.7) 60%, rgba(0,0,0,0.85) 100%)' }} />
 
         <div style={{ position: 'relative', zIndex: 2, maxWidth: 1200, margin: '0 auto', padding: '0 24px', width: '100%' }}>
-          <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: 20 }}>
+          <p style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.7)', marginBottom: 20 }}>
             TakeMe Driver Hub
           </p>
-          <h1 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', margin: 0, maxWidth: 700, color: '#ffffff' }}>
+          <h1 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(40px, 6vw, 80px)', fontWeight: 700, lineHeight: 1.05, letterSpacing: '-0.03em', margin: 0, maxWidth: 700, color: '#ffffff' }}>
             Your city.<br />Your home base.
           </h1>
           <p style={{ fontSize: 19, lineHeight: 1.6, color: 'rgba(255,255,255,0.75)', marginTop: 24, maxWidth: 520 }}>
@@ -169,7 +165,7 @@ export default function DriverHubPage() {
                 textAlign: 'center', padding: '24px 16px',
                 borderLeft: i > 0 ? '1px solid #d2d2d7' : 'none',
               }}>
-                <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 700, color: '#1D6AE5' }}>{s.value}</div>
+                <div style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 22, fontWeight: 700, color: '#1D6AE5' }}>{s.value}</div>
                 <div style={{ fontSize: 13, color: '#86868b', marginTop: 4 }}>{s.label}</div>
               </div>
             ))}
@@ -184,10 +180,10 @@ export default function DriverHubPage() {
             <img src="https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=900&q=80" alt="TakeMe Hub interior" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
           </div>
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
+            <p style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Why We Built This
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
+            <h2 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
               Drivers deserve better than city chaos.
             </h2>
             <p style={{ fontSize: 16, lineHeight: 1.7, color: '#6e6e73', margin: 0 }}>
@@ -204,10 +200,10 @@ export default function DriverHubPage() {
       <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="dh-grid">
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
+            <p style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Keyless Entry
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 40px', color: '#1d1d1f' }}>
+            <h2 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 40px', color: '#1d1d1f' }}>
               Your phone is your key.
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
@@ -244,7 +240,7 @@ export default function DriverHubPage() {
                   return <div key={i} style={{ borderRadius: 2, background: fill, aspectRatio: '1' }} />
                 })}
               </div>
-              <div style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 13, fontWeight: 600, color: '#1d1d1f', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+              <div style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 13, fontWeight: 600, color: '#1d1d1f', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
                 TakeMe Hub
               </div>
             </div>
@@ -256,10 +252,10 @@ export default function DriverHubPage() {
       <Section bg="#ffffff">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
+            <p style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Everything You Need
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
+            <h2 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
               Built for the driver lifestyle.
             </h2>
           </div>
@@ -277,7 +273,7 @@ export default function DriverHubPage() {
                   display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
                   padding: 24, transition: 'background 0.3s',
                 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: '#ffffff' }}>{a.title}</h3>
+                  <h3 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 20, fontWeight: 600, margin: '0 0 6px', color: '#ffffff' }}>{a.title}</h3>
                   <p style={{ fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.8)', margin: 0 }}>{a.desc}</p>
                 </div>
               </div>
@@ -290,7 +286,7 @@ export default function DriverHubPage() {
       <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px' }}>
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
+            <h2 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, letterSpacing: '-0.025em', margin: 0, color: '#1d1d1f' }}>
               The difference is night and day.
             </h2>
           </div>
@@ -334,7 +330,7 @@ export default function DriverHubPage() {
           <div style={{ position: 'relative', zIndex: 1, maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
             <div style={{ width: 48, height: 2, background: '#c9a84c', margin: '0 auto 40px' }} />
             <blockquote style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
+              fontFamily: "var(--font-dm-serif), Georgia, serif",
               fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: 500,
               fontStyle: 'italic', lineHeight: 1.35,
               letterSpacing: '-0.02em', margin: 0, color: '#ffffff',
@@ -364,7 +360,7 @@ export default function DriverHubPage() {
                   <img src={card.img} alt={card.title} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} loading="lazy" />
                 </div>
                 <div style={{ padding: 28 }}>
-                  <h3 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 22, fontWeight: 600, margin: '0 0 12px', color: '#1d1d1f' }}>{card.title}</h3>
+                  <h3 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 22, fontWeight: 600, margin: '0 0 12px', color: '#1d1d1f' }}>{card.title}</h3>
                   <p style={{ fontSize: 15, lineHeight: 1.65, color: '#86868b', margin: 0 }}>{card.desc}</p>
                 </div>
               </div>
@@ -377,10 +373,10 @@ export default function DriverHubPage() {
       <Section bg="#f5f5f7">
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '120px 24px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="dh-grid">
           <div>
-            <p style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
+            <p style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 14, fontWeight: 500, letterSpacing: '0.15em', textTransform: 'uppercase', color: '#86868b', marginBottom: 16 }}>
               Get Started
             </p>
-            <h2 style={{ fontFamily: "'Playfair Display', Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
+            <h2 style={{ fontFamily: "var(--font-dm-serif), Georgia, serif", fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 600, lineHeight: 1.15, letterSpacing: '-0.025em', margin: '0 0 24px', color: '#1d1d1f' }}>
               Join the Hub.
             </h2>
             <p style={{ fontSize: 17, lineHeight: 1.7, color: '#6e6e73', margin: '0 0 36px', maxWidth: 420 }}>
@@ -421,7 +417,7 @@ export default function DriverHubPage() {
                     background: i === 0 ? '#1D6AE5' : '#f5f5f7',
                     border: i === 0 ? 'none' : '1px solid #d2d2d7',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontFamily: "var(--font-dm-serif), Georgia, serif",
                     fontSize: 14, fontWeight: 700,
                     color: i === 0 ? '#ffffff' : '#86868b',
                   }}>
