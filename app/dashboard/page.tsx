@@ -12,6 +12,7 @@ import { GoogleMapsProvider } from '@/components/GoogleMapsProvider';
 import { useTripEngine } from '@/lib/useTripEngine';
 import PaymentModal from '@/components/PaymentModal';
 import { useGeolocation, type GeoStatus } from '@/lib/useGeolocation';
+import { SectionTitle } from '@/components/ui/Typography';
 
 type LocaleOption = {
   code: string;
@@ -493,33 +494,44 @@ export default function DashboardPage() {
 
   return (
     <GoogleMapsProvider>
-    <div className="min-h-screen bg-background text-ink">
-      {/* ── Nav — matches main site ────────────────────────────────────── */}
-      <nav className="sticky top-0 z-50 border-b border-[#d2d2d7] bg-white/80 backdrop-blur-2xl">
+    <div
+      className="min-h-screen bg-white text-[#0A0A0A]"
+      style={{ fontFamily: 'var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif' }}
+    >
+      {/* ── Nav — exact match with homepage ──────────────────────────── */}
+      <nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
           {/* Logo */}
-          <a href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">
+          <a href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#0A0A0A]">
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
+            <span className="ml-[4px] font-light text-[#636366]">Mobility</span>
           </a>
 
-          {/* Center links */}
+          {/* Center nav links */}
           <div className="hidden items-center gap-6 lg:flex">
             {[
-              { label: 'TakeMe Fleet', href: '/fleet' },
-              { label: 'Business', href: '/business' },
-              { label: 'TakeMe Connect', href: '/connect' },
-              { label: 'Students Membership', href: '/students' },
-              { label: 'Driver Hub', href: '/driver-hub' },
-            ].map(({ label, href }) => (
-              <a key={href} href={href} className="whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
+              { label: 'TakeMe Fleet', href: '/fleet', badge: true },
+              { label: 'Business', href: '/business', badge: false },
+              { label: 'Insurance', href: '/insurance', badge: true },
+              { label: 'TakeMe Connect', href: '/connect', badge: true },
+              { label: 'Students Membership', href: '/students', badge: true },
+              { label: 'Driver Hub', href: '/driver-hub', badge: true },
+            ].map(({ label, href, badge }) => (
+              <a
+                key={href}
+                href={href}
+                className="flex items-center whitespace-nowrap text-[13px] font-medium text-[#636366] transition-colors duration-200 hover:text-[#0A0A0A]"
+              >
                 {label}
+                {badge && (
+                  <span style={{ background: '#1D6AE5', color: 'white', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, marginLeft: 4, letterSpacing: '0.5px' }}>NEW</span>
+                )}
               </a>
             ))}
           </div>
 
-          {/* Right — user actions */}
-          <div className="flex shrink-0 items-center gap-3">
+          {/* Right — auth actions */}
+          <div className="flex shrink-0 items-center gap-4">
             <select
               aria-label="Locale"
               value={locale.code}
@@ -527,7 +539,7 @@ export default function DashboardPage() {
                 const selected = localeOptions.find((opt) => opt.code === event.target.value);
                 if (selected) setLocale(selected);
               }}
-              className="hidden rounded-lg border border-[#d2d2d7] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#6e6e73] outline-none sm:block"
+              className="hidden rounded-lg border border-[#d2d2d7] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#636366] outline-none sm:block"
             >
               {localeOptions.map((option) => (
                 <option key={option.code} value={option.code}>{option.label}</option>
@@ -535,7 +547,7 @@ export default function DashboardPage() {
             </select>
             <button
               onClick={handleSignOut}
-              className="text-[13px] font-medium text-[#86868b] transition-colors hover:text-[#1d1d1f]"
+              className="text-[13px] font-medium text-[#636366] transition-colors duration-200 hover:text-[#0A0A0A]"
             >
               Sign out
             </button>
@@ -553,13 +565,13 @@ export default function DashboardPage() {
         </div>
       )}
 
-      <main className="mx-auto max-w-[1280px] px-6 pb-16 lg:px-10">
+      <main className="mx-auto max-w-[1200px] px-6 pb-16 pt-6 lg:px-12">
         {/* ── Two-column layout: booking panel + map ───────────────────── */}
-        <section className="mt-4 grid gap-6 overflow-hidden lg:grid-cols-[440px_minmax(0,1fr)]">
+        <section className="grid gap-8 overflow-hidden lg:grid-cols-2">
 
           {/* ── LEFT: Booking panel ─────────────────────────────────────── */}
           <div className="order-2 lg:order-1">
-            <div className="rounded-2xl border border-[#d2d2d7] bg-white p-6 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <div className="bg-white" style={{ borderRadius: 14 }}>
 
               {/* User-safe messages */}
               {userMessage && (
@@ -620,7 +632,14 @@ export default function DashboardPage() {
               ) : (
                 <>
                   {/* Booking mode */}
-                  <h2 className="mb-4 text-[20px] font-semibold text-[#1d1d1f]">Where to?</h2>
+                  <SectionTitle
+                    style={{
+                      fontSize: 'clamp(2rem, 4vw, 2.75rem)',
+                      marginBottom: 24,
+                    }}
+                  >
+                    Where to?
+                  </SectionTitle>
 
                   <LocationBanner geoStatus={geoStatus} onRequestPermission={requestPermission} />
 
@@ -630,9 +649,8 @@ export default function DashboardPage() {
                     <LocationInput placeholder="Where to?" value={dropoff} onChange={setDropoff} onPlaceSelect={handleDropoffSelect} icon="dropoff" />
                   </div>
 
-                  {/* Ride type selector */}
-                  <p className="mt-5 mb-2 text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Vehicle</p>
-                  <div className="flex gap-2">
+                  {/* Ride type selector — pill tabs */}
+                  <div className="mt-6 flex gap-2 rounded-full bg-[#F2F2F7] p-1.5">
                     {rideTypes.map((rideType) => {
                       const isSelected = selectedRideType === rideType.id;
                       const tierPrice = tierPrices?.[rideType.id];
@@ -646,16 +664,17 @@ export default function DashboardPage() {
                               calculateDistanceAndPrice(pickupLocation, dropoffLocation);
                             }
                           }}
-                          className={`flex-1 rounded-xl px-3 py-3 text-center transition-all duration-150 ${
+                          className={`flex-1 rounded-full px-4 py-3 text-center transition-all duration-200 ${
                             isSelected
-                              ? 'bg-[#1D6AE5] text-white shadow-lg shadow-[#1D6AE5]/20'
-                              : 'bg-[#f5f5f7] text-[#1d1d1f] hover:bg-[#e8e8ed]'
+                              ? 'bg-[#1D6AE5] text-white shadow-[0_4px_16px_rgba(29,106,229,0.25)]'
+                              : 'bg-transparent text-[#0A0A0A] hover:bg-white/60'
                           }`}
                         >
-                          <p className="text-lg leading-none">{rideType.icon}</p>
-                          <p className={`mt-1.5 text-xs font-semibold ${isSelected ? 'text-white' : 'text-[#1d1d1f]'}`}>{rideType.name}</p>
+                          <p className={`text-[13px] font-semibold ${isSelected ? 'text-white' : 'text-[#0A0A0A]'}`}>
+                            {rideType.icon} {rideType.name}
+                          </p>
                           {tierPrice && (
-                            <p className={`mt-0.5 text-[11px] tabular-nums ${isSelected ? 'text-white/70' : 'text-[#86868b]'}`}>
+                            <p className={`mt-0.5 text-[11px] tabular-nums ${isSelected ? 'text-white/80' : 'text-[#636366]'}`}>
                               {currencyFormatter.format(tierPrice)}
                             </p>
                           )}
@@ -665,26 +684,29 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Trip details */}
-                  <div className="mt-5 grid grid-cols-3 gap-4 rounded-xl bg-[#f5f5f7] p-4">
+                  <div
+                    className="mt-6 grid grid-cols-3 gap-4 bg-[#F2F2F7] p-5"
+                    style={{ borderRadius: 14 }}
+                  >
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Distance</p>
-                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{distance !== null ? `${distanceFormatter.format(distance)} mi` : '--'}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#636366]">Distance</p>
+                      <p className="mt-1 text-[17px] font-semibold tabular-nums text-[#0A0A0A]">{distance !== null ? `${distanceFormatter.format(distance)} mi` : '--'}</p>
                     </div>
                     <div>
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Duration</p>
-                      <p className="mt-1 text-base font-semibold tabular-nums text-[#1d1d1f]">{duration !== null ? `${duration} min` : '--'}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#636366]">Duration</p>
+                      <p className="mt-1 text-[17px] font-semibold tabular-nums text-[#0A0A0A]">{duration !== null ? `${duration} min` : '--'}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">Fare</p>
-                      <p className="mt-1 text-xl font-bold tabular-nums text-[#1d1d1f]">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : '--'}</p>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#636366]">Fare</p>
+                      <p className="mt-1 text-[22px] font-bold tabular-nums text-[#0A0A0A]">{estimatedPrice !== null ? currencyFormatter.format(estimatedPrice) : '--'}</p>
                     </div>
                   </div>
 
-                  {/* CTA */}
+                  {/* CTA — pill button matching homepage */}
                   <button
                     onClick={handleRequestRide}
                     disabled={bookingLoading || !pickupLocation || !dropoffLocation || !distance || !estimatedPrice}
-                    className="mt-5 w-full rounded-xl bg-[#1D6AE5] py-3.5 text-[15px] font-semibold text-white transition-all duration-150 hover:bg-[#1558C0] active:scale-[0.98] disabled:opacity-40 disabled:active:scale-100"
+                    className="mt-6 flex h-[52px] w-full items-center justify-center rounded-[999px] bg-[#1D6AE5] px-8 text-[15px] font-semibold text-white transition-colors duration-200 hover:bg-[#1558C0] disabled:opacity-40 disabled:hover:bg-[#1D6AE5]"
                   >
                     {bookingLoading ? 'Booking...' : estimatedPrice ? `Confirm ride · ${currencyFormatter.format(estimatedPrice)}` : 'Confirm ride'}
                   </button>
@@ -694,7 +716,10 @@ export default function DashboardPage() {
           </div>
 
           {/* ── RIGHT: Map ──────────────────────────────────────────────── */}
-          <div className="order-1 h-[50vh] w-full min-w-0 overflow-hidden rounded-2xl border border-[#d2d2d7] lg:order-2 lg:h-[75vh] lg:sticky lg:top-[80px]">
+          <div
+            className="order-1 h-[50vh] w-full min-w-0 overflow-hidden lg:order-2 lg:h-[75vh] lg:sticky lg:top-[80px]"
+            style={{ borderRadius: 12 }}
+          >
           <Map
             currentLocation={currentLocation || undefined}
             pickupLocation={pickupLocation || undefined}
@@ -705,29 +730,44 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ── Stats ────────────────────────────────────────────────────── */}
-        <section className="mt-6 grid gap-3 md:grid-cols-3">
+        {/* ── Stats — same card style as homepage feature cards ───────── */}
+        <section className="mt-10 grid gap-4 md:grid-cols-3">
           {[
             { label: 'Rides', value: String(stats.totalRides), icon: '↗' },
             { label: 'Spend', value: currencyFormatter.format(stats.totalSpent), icon: '◆' },
             { label: 'Rating', value: `${stats.rating.toFixed(1)}`, icon: '★' },
           ].map((stat) => (
-            <article key={stat.label} className="rounded-xl border border-[#d2d2d7] bg-white p-5">
+            <article
+              key={stat.label}
+              className="bg-[#F2F2F7] p-6"
+              style={{ borderRadius: 14 }}
+            >
               <div className="flex items-center justify-between">
-                <p className="text-[11px] font-medium uppercase tracking-wider text-[#86868b]">{stat.label}</p>
-                <span className="text-[#86868b] text-xs">{stat.icon}</span>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.5px] text-[#636366]">{stat.label}</p>
+                <span className="text-[#636366] text-xs">{stat.icon}</span>
               </div>
-              <p className="mt-2 text-2xl font-bold tabular-nums text-[#1d1d1f]">{stat.value}</p>
+              <p className="mt-3 text-[28px] font-bold tabular-nums text-[#0A0A0A]">{stat.value}</p>
             </article>
           ))}
         </section>
 
         {/* ── Ride history ─────────────────────────────────────────────── */}
-        <section className="mt-6 rounded-xl border border-[#d2d2d7] bg-white p-5">
+        <section
+          className="mt-6 bg-[#F2F2F7] p-6"
+          style={{ borderRadius: 14 }}
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-base font-semibold text-[#1d1d1f]">Recent Rides</h3>
+            <SectionTitle
+              as="h3"
+              style={{
+                fontSize: '22px',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              Recent Rides
+            </SectionTitle>
             {rides.length > 0 && (
-              <span className="text-xs text-ink-tertiary">{rides.length} ride{rides.length !== 1 ? 's' : ''}</span>
+              <span className="text-[13px] text-[#636366]">{rides.length} ride{rides.length !== 1 ? 's' : ''}</span>
             )}
           </div>
 
