@@ -383,7 +383,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
 
         {/* ── Passenger selection ────────────────────────────────── */}
         <div className="mt-3">
-          <div className="flex rounded-xl border border-[#E5E5EA] overflow-hidden">
+          <div className="flex rounded-xl border border-[#E5E5EA] overflow-x-auto md:overflow-hidden scrollbar-none">
             {([
               { id: 'me' as RideFor, label: 'For me' },
               { id: 'someone' as RideFor, label: 'Someone else' },
@@ -392,7 +392,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
               <button
                 key={opt.id}
                 onClick={() => setRideFor(opt.id)}
-                className={`flex-1 py-2.5 text-[13px] font-medium transition-colors duration-150 ${
+                className={`flex-1 shrink-0 min-w-[33.333%] px-3 py-2.5 text-[13px] font-medium whitespace-nowrap transition-colors duration-150 ${
                   i > 0 ? 'border-l border-[#E5E5EA]' : ''
                 } ${
                   rideFor === opt.id
@@ -604,7 +604,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
 
           {/* Cards */}
           <div className="-mx-5">
-            <div ref={carouselRef} className="flex gap-2 overflow-x-auto px-5 pb-2 scrollbar-none scroll-smooth">
+            <div ref={carouselRef} className="flex gap-2 overflow-x-auto pl-5 pr-8 md:pr-5 pb-2 scrollbar-none scroll-smooth">
               {SEATTLE_TIERS.map(tier => {
                 const active = selectedTier === tier.id;
                 const fare = fares.find(f => f.vehicleClass === tier.id);

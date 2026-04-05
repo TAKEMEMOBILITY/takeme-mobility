@@ -5,6 +5,19 @@
    White-first. Trust-first. Apple-level craft.
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── Mobile overflow guard ──────────────────────────────────────────────
+   Prevents any child element from pushing horizontal scroll on narrow
+   viewports. Applies to all sizes because desktop never overflows anyway.
+*/
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 :root {
   /* ── Ink — text hierarchy (Apple HIG) ─────────────────────────────────── */
   --ink:               #1d1d1f;
