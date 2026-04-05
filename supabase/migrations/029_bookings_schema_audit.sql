@@ -42,9 +42,15 @@ ALTER TABLE bookings ADD CONSTRAINT bookings_ride_for_check
   CHECK (ride_for IS NULL OR ride_for IN ('me', 'someone', 'vip'));
 
 -- ── vehicle_type constraint (re-assert full set including pet_ride) ────────
+-- NOTE: 'comfort' is a legacy value kept in the allowed list so existing
+-- historical rows pass the CHECK. The API Zod schema in
+-- app/api/bookings/create/route.ts blocks new writes of 'comfort' at the
+-- validation layer — only the 6 *_electric / women_rider / pet_ride values
+-- can reach the database going forward.
 ALTER TABLE bookings DROP CONSTRAINT IF EXISTS bookings_vehicle_type_check;
 ALTER TABLE bookings ADD CONSTRAINT bookings_vehicle_type_check
   CHECK (vehicle_type IN (
+    'comfort',          -- legacy; retained for historical rows only
     'electric',
     'comfort_electric',
     'premium_electric',
