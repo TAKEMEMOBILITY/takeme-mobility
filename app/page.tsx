@@ -10,6 +10,7 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 const NAV_LINKS = [
   { label: 'TakeMe Fleet', href: '/fleet', badge: true },
   { label: 'Business', href: '/business', badge: false },
+  { label: 'Insurance', href: '/insurance', badge: true },
   { label: 'TakeMe Connect', href: '/connect', badge: true },
   { label: 'Students Membership', href: '/students', badge: true },
   { label: 'Driver Hub', href: '/driver-hub', badge: true },
