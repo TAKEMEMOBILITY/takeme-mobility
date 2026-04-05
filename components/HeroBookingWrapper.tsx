@@ -64,6 +64,9 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const [petSize, setPetSize] = useState<PetSize>('medium');
   const [petNotes, setPetNotes] = useState('');
 
+  // Current location lookup state
+  const [locating, setLocating] = useState(false);
+
   // Passenger selection
   type RideFor = 'me' | 'someone' | 'vip';
   const [rideFor, setRideFor] = useState<RideFor>('me');
@@ -230,6 +233,64 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
     }
   }, [mapsReady]);
 
+  // ── Use current location ───────────────────────────────────────────
+  // Triggered by the navigation arrow inside the pickup input.
+  // Flow: geolocation permission → reverse geocode via Google Maps → fill pickup.
+  const handleUseCurrentLocation = useCallback(() => {
+    if (locating) return;
+    setBookingError('');
+
+    if (typeof navigator === 'undefined' || !navigator.geolocation) {
+      setBookingError('Location not supported on this device.');
+      return;
+    }
+    if (!mapsReady || typeof google === 'undefined' || !google.maps?.Geocoder) {
+      setBookingError('Map still loading. Try again in a moment.');
+      return;
+    }
+
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords;
+        try {
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ location: { lat, lng } }, (results, status) => {
+            if (status === 'OK' && results && results[0]) {
+              const address = results[0].formatted_address;
+              setPickup({ lat, lng, address });
+              setPickupText(address);
+              setBooked(false);
+            } else {
+              // Fall back to raw coords if reverse geocode fails
+              const fallback = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+              setPickup({ lat, lng, address: fallback });
+              setPickupText(fallback);
+              setBooked(false);
+            }
+            setLocating(false);
+          });
+        } catch {
+          setLocating(false);
+          setBookingError('Could not resolve address. Enter pickup manually.');
+        }
+      },
+      (err) => {
+        setLocating(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setBookingError('Location permission denied. Enter pickup manually.');
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          setBookingError('Could not determine your location.');
+        } else if (err.code === err.TIMEOUT) {
+          setBookingError('Location request timed out.');
+        } else {
+          setBookingError('Could not get your location.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10_000, maximumAge: 60_000 },
+    );
+  }, [locating, mapsReady]);
+
   // ── Confirm ride ───────────────────────────────────────────────────
   const confirmRide = useCallback(async () => {
     if (!user) { router.push('/auth/login?redirect=/'); return; }
@@ -363,11 +424,27 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
         )}
 
         <div className="space-y-2">
-          <div className="flex items-center gap-3 rounded-xl border border-[#E5E5EA] bg-white px-4 py-3.5 focus-within:border-[#1D1D1F] transition-colors">
+          <div className="flex items-center gap-3 rounded-xl border border-[#E5E5EA] bg-white pl-4 pr-2 py-3.5 focus-within:border-[#1D1D1F] transition-colors">
             <div className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#1D6AE5]" />
             <input ref={pickupInputRef} type="text" placeholder="Pickup location" value={pickupText}
               onChange={(e) => { setPickupText(e.target.value); setPickup(null); }}
-              className="w-full bg-transparent text-[15px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none" />
+              className="w-full min-w-0 bg-transparent text-[15px] font-medium text-[#1D1D1F] placeholder-[#C7C7CC] outline-none" />
+            <button
+              type="button"
+              onClick={handleUseCurrentLocation}
+              disabled={locating}
+              aria-label="Use current location"
+              title="Use current location"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#1D6AE5] transition-colors hover:bg-[#1D6AE5]/10 active:bg-[#1D6AE5]/20 disabled:opacity-40"
+            >
+              {locating ? (
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-[#1D6AE5]/30 border-t-[#1D6AE5]" />
+              ) : (
+                <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 11l19-9-9 19-2-8-8-2z" />
+                </svg>
+              )}
+            </button>
           </div>
           <div className="flex items-center gap-3 rounded-xl border border-[#E5E5EA] bg-white px-4 py-3.5 focus-within:border-[#1D1D1F] transition-colors">
             <div className="h-2.5 w-2.5 shrink-0 rounded-full bg-[#1D1D1F]" />
