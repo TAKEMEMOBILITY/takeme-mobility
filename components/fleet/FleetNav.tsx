@@ -17,8 +17,22 @@ export function FleetNav() {
   const pathname = usePathname()
 
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 20)
-    window.addEventListener('scroll', handler)
+    let ticking = false
+    let last = window.scrollY > 20
+    setScrolled(last)
+    const handler = () => {
+      if (ticking) return
+      ticking = true
+      requestAnimationFrame(() => {
+        const next = window.scrollY > 20
+        if (next !== last) {
+          last = next
+          setScrolled(next)
+        }
+        ticking = false
+      })
+    }
+    window.addEventListener('scroll', handler, { passive: true })
     return () => window.removeEventListener('scroll', handler)
   }, [])
 

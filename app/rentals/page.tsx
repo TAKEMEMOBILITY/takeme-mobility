@@ -27,7 +27,26 @@ const FAQ_ITEMS = [
   { q: 'How fast can drivers start earning?', a: 'If your profile is verified, you can rent and go online within minutes of booking confirmation.' },
 ];
 
-function useScrolled(t = 10) { const [s, set] = useState(false); useEffect(() => { const h = () => set(window.scrollY > t); window.addEventListener('scroll', h, { passive: true }); h(); return () => window.removeEventListener('scroll', h); }, [t]); return s; }
+function useScrolled(t = 10) {
+  const [s, set] = useState(false);
+  useEffect(() => {
+    let ticking = false;
+    let last = window.scrollY > t;
+    set(last);
+    const h = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const next = window.scrollY > t;
+        if (next !== last) { last = next; set(next); }
+        ticking = false;
+      });
+    };
+    window.addEventListener('scroll', h, { passive: true });
+    return () => window.removeEventListener('scroll', h);
+  }, [t]);
+  return s;
+}
 function useReveal(t = 0.18) { const ref = useRef<HTMLDivElement>(null); const [v, set] = useState(false); useEffect(() => { const el = ref.current; if (!el) return; const o = new IntersectionObserver(([e]) => { if (e.isIntersecting) set(true); }, { threshold: t }); o.observe(el); return () => o.disconnect(); }, [t]); return { ref, visible: v }; }
 
 const usd = (n: number) => `$${n.toLocaleString()}`;
@@ -84,7 +103,10 @@ export default function FleetPage() {
     <div className="min-h-screen bg-white">
 
       {/* ═══ NAV ═══════════════════════════════════════════════════════════ */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-2xl shadow-[0_1px_0_rgba(0,0,0,0.04)]' : 'bg-transparent'}`}>
+      <nav
+        className={`fixed top-0 z-50 w-full ${scrolled ? 'bg-white/85 backdrop-blur-lg shadow-[0_1px_0_rgba(0,0,0,0.04)]' : 'bg-transparent'}`}
+        style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+      >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
           <Link href="/" className="text-[18px] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span><span className="ml-1 font-light text-[#86868b]">Fleet</span>

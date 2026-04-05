@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
 import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 
@@ -70,14 +70,29 @@ const COMING_SOON_CITIES = [
 
 function useScrolled(threshold = 10) {
   const [scrolled, setScrolled] = useState(false);
-  const handler = useCallback(() => {
-    if (typeof window !== 'undefined') setScrolled(window.scrollY > threshold);
-  }, [threshold]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    // rAF-throttle scroll handler so we update state at most once per frame
+    // and bail out if the boolean hasn't changed — prevents React re-renders
+    // on every scroll pixel which was the main source of scroll jank.
+    let ticking = false;
+    let lastValue = window.scrollY > threshold;
+    setScrolled(lastValue);
+    const handler = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const next = window.scrollY > threshold;
+        if (next !== lastValue) {
+          lastValue = next;
+          setScrolled(next);
+        }
+        ticking = false;
+      });
+    };
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
-  }, [handler]);
+  }, [threshold]);
   return scrolled;
 }
 
@@ -113,9 +128,12 @@ export default function HomePage() {
     <div className="min-h-screen bg-white" style={{ overflowX: 'hidden' }}>
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-white'
-      }`}>
+      <nav
+        className={`fixed top-0 z-50 w-full ${
+          scrolled ? 'bg-white/85 backdrop-blur-lg' : 'bg-white'
+        }`}
+        style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+      >
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
           {/* LEFT — Logo */}
           <Link href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">

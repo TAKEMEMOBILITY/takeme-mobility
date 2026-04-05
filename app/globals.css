@@ -5,17 +5,28 @@
    White-first. Trust-first. Apple-level craft.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Mobile overflow guard ──────────────────────────────────────────────
+/* ── Mobile overflow guard + smooth scrolling ───────────────────────────
    Prevents any child element from pushing horizontal scroll on narrow
    viewports. Applies to all sizes because desktop never overflows anyway.
 */
 html, body {
   overflow-x: hidden;
   max-width: 100vw;
+  -webkit-overflow-scrolling: touch; /* momentum scroll on iOS */
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* ── Scroll performance helper ──────────────────────────────────────────
+   Kills the #1 cause of scroll jank: iframes (Google Maps) repainting on
+   every scroll frame because they are painted into the main thread.
+   Promoting them to their own compositor layer lets the browser scroll
+   the page without touching the map pixels.
+*/
+iframe {
+  transform: translateZ(0);
 }
 
 :root {

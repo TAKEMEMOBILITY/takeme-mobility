@@ -1,20 +1,32 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // ── Hooks ────────────────────────────────────────────────────────────────
 
 function useScrolled(threshold = 10) {
   const [scrolled, setScrolled] = useState(false);
-  const handler = useCallback(() => {
-    if (typeof window !== 'undefined') setScrolled(window.scrollY > threshold);
-  }, [threshold]);
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    let ticking = false;
+    let last = window.scrollY > threshold;
+    setScrolled(last);
+    const handler = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const next = window.scrollY > threshold;
+        if (next !== last) {
+          last = next;
+          setScrolled(next);
+        }
+        ticking = false;
+      });
+    };
     window.addEventListener('scroll', handler, { passive: true });
     return () => window.removeEventListener('scroll', handler);
-  }, [handler]);
+  }, [threshold]);
   return scrolled;
 }
 
@@ -215,9 +227,12 @@ export default function SafetyPage() {
     <div className="min-h-screen bg-white">
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
-      <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
-        scrolled ? 'bg-white/80 backdrop-blur-2xl' : 'bg-transparent'
-      }`}>
+      <nav
+        className={`fixed top-0 z-50 w-full ${
+          scrolled ? 'bg-white/85 backdrop-blur-lg' : 'bg-transparent'
+        }`}
+        style={{ willChange: 'transform', transform: 'translateZ(0)' }}
+      >
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
           <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1d1d1f]">
             <span className="font-semibold">TakeMe</span>
