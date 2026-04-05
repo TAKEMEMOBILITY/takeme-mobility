@@ -490,6 +490,9 @@ function MapComponent({
         zoomControl: true,
         zoomControlOptions: { position: typeof google !== 'undefined' ? google.maps.ControlPosition.RIGHT_CENTER : undefined },
         clickableIcons: false,
+        // Mobile scroll fix: let single-finger swipes scroll the page
+        // through the map instead of panning it.
+        gestureHandling: 'cooperative',
       }}
     >
       {/* User location */}

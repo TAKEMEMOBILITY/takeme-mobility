@@ -104,6 +104,13 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
       zoomControl: false,
       styles: MAP_STYLES,
       clickableIcons: false,
+      // Critical for mobile: 'cooperative' lets single-finger swipes
+      // scroll the page through the map instead of panning it. Two
+      // fingers (or ctrl+scroll on desktop) are required to interact
+      // with the map. Without this, touching the map area during a
+      // page scroll halts the scroll — the #1 cause of mobile scroll
+      // jank on this page.
+      gestureHandling: 'cooperative',
     });
 
     directionsRendererRef.current = new google.maps.DirectionsRenderer({

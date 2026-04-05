@@ -175,7 +175,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
           center={pickup || { lat: 47.6062, lng: -122.3321 }}
           zoom={12}
           onLoad={(map: google.maps.Map) => { mapRef.current = map; }}
-          options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false }}
+          options={{ styles, disableDefaultUI: true, zoomControl: false, clickableIcons: false, gestureHandling: 'cooperative' }}
         >
           {pickup && <Marker position={pickup} icon={{ url: pinSvg('#1D6AE5'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
           {dropoff && <Marker position={dropoff} icon={{ url: pinSvg('#1D1D1F'), scaledSize: new google.maps.Size(32, 32), anchor: new google.maps.Point(16, 16) }} />}
