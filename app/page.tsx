@@ -158,16 +158,50 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ═══ BOOKING WIDGET ═════════════════════════════════════════════ */}
-      <section className="bg-white pt-20 md:pt-24">
-        <div className="w-full px-6 py-6 lg:px-10">
-          <div className="mx-auto max-w-[1200px]">
-            <HeroBookingWrapper ctaHref={ctaHref} />
+      {/* ═══ HERO — Headline + Booking Widget (two-column) ═══════════════ */}
+      <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
+        <div className="mx-auto max-w-[1200px] px-6 lg:px-12">
+          <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
+
+            {/* LEFT — Headline */}
+            <div className="pt-2 lg:pt-4">
+              <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
+                Get anywhere
+                <br />
+                in minutes.
+              </h1>
+
+              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6e6e73]">
+                Every ride, on your terms.
+                <br />
+                Ready when you are.
+              </p>
+
+              <div className="mt-7 grid max-w-[420px] grid-cols-2 gap-4">
+                <Link
+                  href={ctaHref}
+                  className="flex h-[52px] items-center justify-center rounded-[999px] bg-[#1D6AE5] text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0]"
+                >
+                  Book your ride
+                </Link>
+                <Link
+                  href="#how-it-works"
+                  className="flex h-[52px] items-center justify-center rounded-[999px] border border-[#d2d2d7] text-[15px] font-medium text-[#1d1d1f] transition-colors duration-200 hover:bg-[#f5f5f7]"
+                >
+                  See how it works
+                </Link>
+              </div>
+            </div>
+
+            {/* RIGHT — Booking widget */}
+            <div>
+              <HeroBookingWrapper ctaHref={ctaHref} />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══ HERO — Cinematic WebGL ═════════════════════════════════════ */}
+      {/* ═══ HERO — Cinematic WebGL (below booking) ═════════════════════ */}
       <HeroCanvas />
 
       {/* ═══ TRUST LAYER ══════════════════════════════════════════════════ */}
