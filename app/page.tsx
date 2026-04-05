@@ -4,10 +4,6 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
 import HeroBookingWrapper from '@/components/HeroBookingWrapper';
-import dynamic from 'next/dynamic';
-
-const HeroCanvas = dynamic(() => import('@/components/HeroCanvas'), { ssr: false });
-const SummerHero = dynamic(() => import('@/components/SummerHero'), { ssr: false });
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -227,11 +223,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══ SUMMER HERO — Waymo-style aerial scene ═══════════════════ */}
-      <SummerHero />
-
-      {/* ═══ HERO — Cinematic WebGL (below booking) ═════════════════════ */}
-      <HeroCanvas />
 
       {/* ═══ TRUST LAYER ══════════════════════════════════════════════════ */}
       <section className="border-t border-[#f5f5f7] bg-white">
