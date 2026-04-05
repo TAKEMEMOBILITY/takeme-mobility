@@ -5,35 +5,15 @@
    White-first. Trust-first. Apple-level craft.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Mobile scroll performance + overflow guard ─────────────────────────
-   - overflow-x: hidden + max-width: 100vw prevents any child from
-     pushing horizontal scroll on narrow viewports.
-   - touch-action: pan-y tells iOS Safari the page only scrolls
-     vertically, so the browser can use fast-path compositor scroll
-     without waiting for touch handlers to run.
-   - overscroll-behavior: none disables rubber-band bounce at the
-     edges, which on iOS triggers extra main-thread work.
-   - -webkit-overflow-scrolling: touch enables momentum scrolling.
+/* ── Box sizing only ────────────────────────────────────────────────────
+   NOTE: Do NOT put overflow-x: hidden, max-width: 100vw, touch-action,
+   or overscroll-behavior on html/body. On iOS Safari that combination
+   can disable vertical scrolling entirely. Horizontal overflow is
+   contained on a wrapper div in layout.tsx (body > div.flex-1) and
+   on per-page root divs, NOT on html/body.
 */
-html, body {
-  overflow-x: hidden;
-  max-width: 100vw;
-  touch-action: pan-y;
-  overscroll-behavior: none;
-  -webkit-overflow-scrolling: touch;
-}
-
 * {
   box-sizing: border-box;
-}
-
-/* ── Scroll performance: promote iframes to their own layer ─────────────
-   iframes paint on the main thread by default — scrolling the page
-   forces them to recomposite every frame. translateZ puts them on a
-   GPU compositor layer so the page scrolls around them.
-*/
-iframe {
-  transform: translateZ(0);
 }
 
 :root {

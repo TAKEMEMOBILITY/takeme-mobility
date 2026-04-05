@@ -43,7 +43,10 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ClientProviders>
-          <div className="flex-1">{children}</div>
+          {/* Horizontal overflow is contained on this wrapper, NOT on
+              html/body — that combination breaks vertical scrolling on
+              iOS Safari. */}
+          <div className="flex-1" style={{ overflowX: 'hidden' }}>{children}</div>
           <Footer />
         </ClientProviders>
       </body>
