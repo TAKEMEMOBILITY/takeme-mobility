@@ -7,6 +7,7 @@ import HeroBookingWrapper from '@/components/HeroBookingWrapper';
 import dynamic from 'next/dynamic';
 
 const HeroCanvas = dynamic(() => import('@/components/HeroCanvas'), { ssr: false });
+const SummerHero = dynamic(() => import('@/components/SummerHero'), { ssr: false });
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -225,6 +226,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ═══ SUMMER HERO — Waymo-style aerial scene ═══════════════════ */}
+      <SummerHero />
 
       {/* ═══ HERO — Cinematic WebGL (below booking) ═════════════════════ */}
       <HeroCanvas />
