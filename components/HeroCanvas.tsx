@@ -20,12 +20,55 @@ interface QualityTier {
   bloom: boolean;
   lights: number;
   particles: number;
+  fpsCap: number; // 0 = uncapped
+}
+
+type GPUTier = 'low' | 'medium' | 'high';
+
+function detectGPUTier(): GPUTier {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+    if (!gl) return 'low';
+
+    const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+    const renderer = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '';
+
+    // HIGH: Apple Silicon, discrete NVIDIA / AMD
+    if (/Apple M/i.test(renderer) || /NVIDIA/i.test(renderer) || /Radeon/i.test(renderer)) {
+      return 'high';
+    }
+
+    // LOW: integrated mobile GPUs, older Apple (non-M), low-end Mali/Adreno
+    if (/Apple/i.test(renderer) || /Mali/i.test(renderer) || /Adreno 5/i.test(renderer)) {
+      return 'low';
+    }
+
+    // Everything else (Intel Iris, Adreno 6xx+, etc.) → medium
+    return 'medium';
+  } catch {
+    return 'medium';
+  }
 }
 
 function getQuality(w: number): QualityTier {
-  if (w < 768) return { buildings: 60, rainPrimary: 500, rainSecondary: 0, bloom: false, lights: 2, particles: 100 };
-  if (w <= 1024) return { buildings: 150, rainPrimary: 1500, rainSecondary: 250, bloom: true, lights: 3, particles: 300 };
-  return { buildings: 300, rainPrimary: 3000, rainSecondary: 500, bloom: true, lights: 3, particles: 500 };
+  const gpu = detectGPUTier();
+
+  // GPU-detected LOW overrides everything — silently cap to minimal scene
+  if (gpu === 'low') {
+    return { buildings: 40, rainPrimary: 300, rainSecondary: 0, bloom: false, lights: 2, particles: 60, fpsCap: 30 };
+  }
+
+  // GPU is medium or high — use screen-size tiers, let GPU tier boost/limit bloom
+  if (w < 768) {
+    return { buildings: 60, rainPrimary: 500, rainSecondary: 0, bloom: false, lights: 2, particles: 100, fpsCap: 0 };
+  }
+  if (w <= 1024) {
+    return { buildings: 150, rainPrimary: 1500, rainSecondary: 250, bloom: gpu === 'high', lights: 3, particles: 300, fpsCap: 0 };
+  }
+
+  // Desktop + high GPU → full scene
+  return { buildings: 300, rainPrimary: 3000, rainSecondary: 500, bloom: gpu === 'high', lights: 3, particles: 500, fpsCap: 0 };
 }
 
 // ── Window texture generation ────────────────────────────────────────────
@@ -447,9 +490,18 @@ export default function HeroCanvas() {
     // ── Animation loop ────────────────────────────────────────────────
     let animId: number;
     const clock = new THREE.Clock();
+    const fpsInterval = quality.fpsCap > 0 ? 1000 / quality.fpsCap : 0;
+    let lastFrameTime = 0;
 
-    function animate() {
+    function animate(now: number) {
       animId = requestAnimationFrame(animate);
+
+      // 30fps cap for LOW-tier GPUs
+      if (fpsInterval > 0) {
+        if (now - lastFrameTime < fpsInterval) return;
+        lastFrameTime = now;
+      }
+
       const elapsed = clock.getElapsedTime() * 1000;
       const p = scrollState.progress;
 
@@ -531,7 +583,7 @@ export default function HeroCanvas() {
       }
     }
 
-    animate();
+    animate(performance.now());
 
     // ── Resize handler ────────────────────────────────────────────────
     const onResize = () => {
