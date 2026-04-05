@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuth } from '@/lib/auth/context';
 import HeroBookingWrapper from '@/components/HeroBookingWrapper';
+import dynamic from 'next/dynamic';
+
+const HeroCanvas = dynamic(() => import('@/components/HeroCanvas'), { ssr: false });
 
 // ── Data ─────────────────────────────────────────────────────────────────
 
@@ -109,7 +112,7 @@ export default function HomePage() {
   const signInHref = user ? '/dashboard' : '/auth/login';
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ overflowX: 'hidden' }}>
 
       {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
       <nav className={`fixed top-0 z-50 w-full transition-all duration-500 ${
@@ -117,15 +120,15 @@ export default function HomePage() {
       }`}>
         <div className="mx-auto flex max-w-[1280px] items-center justify-between px-6 py-4 lg:px-10">
           {/* LEFT — Logo */}
-          <Link href="/" className="shrink-0 text-[17px] tracking-[0.01em] text-[#1d1d1f]">
+          <Link href="/" className={`shrink-0 text-[17px] tracking-[0.01em] transition-colors duration-500 ${scrolled ? 'text-[#1d1d1f]' : 'text-white'}`}>
             <span className="font-semibold">TakeMe</span>
-            <span className="ml-[4px] font-light text-[#86868b]">Mobility</span>
+            <span className={`ml-[4px] font-light transition-colors duration-500 ${scrolled ? 'text-[#86868b]' : 'text-white/60'}`}>Mobility</span>
           </Link>
 
           {/* CENTER — Nav links */}
           <div className="hidden items-center gap-6 lg:flex">
             {NAV_LINKS.map(({ label, href, badge }) => (
-              <Link key={href} href={href} className="flex items-center whitespace-nowrap text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f]">
+              <Link key={href} href={href} className={`flex items-center whitespace-nowrap text-[13px] font-medium transition-colors duration-200 ${scrolled ? 'text-[#86868b] hover:text-[#1d1d1f]' : 'text-white/60 hover:text-white'}`}>
                 {label}
                 {badge && (
                   <span style={{ background: '#1D6AE5', color: 'white', fontSize: 9, fontWeight: 700, padding: '2px 6px', borderRadius: 4, marginLeft: 4, letterSpacing: '0.5px' }}>NEW</span>
@@ -137,10 +140,10 @@ export default function HomePage() {
           {/* RIGHT — Auth + CTA */}
           <div className="flex shrink-0 items-center gap-4">
             {loading ? (
-              <div className="h-4 w-4 animate-spin rounded-full border-[1.5px] border-[#d2d2d7] border-t-[#1d1d1f]" />
+              <div className={`h-4 w-4 animate-spin rounded-full border-[1.5px] ${scrolled ? 'border-[#d2d2d7] border-t-[#1d1d1f]' : 'border-white/30 border-t-white'}`} />
             ) : (
               <>
-                <Link href={signInHref} className="hidden text-[13px] font-medium text-[#86868b] transition-colors duration-200 hover:text-[#1d1d1f] sm:block">
+                <Link href={signInHref} className={`hidden text-[13px] font-medium transition-colors duration-200 sm:block ${scrolled ? 'text-[#86868b] hover:text-[#1d1d1f]' : 'text-white/60 hover:text-white'}`}>
                   Sign in
                 </Link>
                 <Link
@@ -155,30 +158,21 @@ export default function HomePage() {
         </div>
       </nav>
 
-      {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
-        {/* Clean white hero — no animated decorations */}
+      {/* ═══ HERO — Cinematic WebGL ═════════════════════════════════════ */}
+      <HeroCanvas />
 
+      {/* ═══ ORIGINAL HERO (below cinematic) ══════════════════════════════ */}
+      <section className="relative overflow-hidden bg-white pt-20 pb-12 md:pt-24 md:pb-16">
         <div className="mx-auto max-w-[1200px] px-6 lg:px-10">
           <div className="grid items-start gap-8 lg:grid-cols-[1fr_480px] lg:gap-14">
-
-            {/* Left */}
             <div className="pt-2 lg:pt-4">
-              <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f] animate-fade-in">
-                Get anywhere
-                <br />
-                in minutes.
-              </h1>
-
-              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6e6e73] animate-fade-in stagger-1">
-                Every ride, on your terms.
-                <br />
-                Ready when you are.
+              <h2 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
+                Book your ride now.
+              </h2>
+              <p className="mt-4 max-w-[420px] text-[19px] leading-[1.6] text-[#6e6e73]">
+                Every ride, on your terms. Ready when you are.
               </p>
-
-              {/* Button grid — 2×2 aligned */}
-              <div className="mt-7 grid max-w-[420px] grid-cols-2 gap-4 animate-fade-in stagger-2">
-                {/* Row 1 */}
+              <div className="mt-7 grid max-w-[420px] grid-cols-2 gap-4">
                 <Link
                   href={ctaHref}
                   className="flex h-[52px] items-center justify-center rounded-[999px] bg-[#1D6AE5] text-[15px] font-medium text-white transition-colors duration-200 hover:bg-[#1558C0]"
@@ -191,33 +185,9 @@ export default function HomePage() {
                 >
                   See how it works
                 </Link>
-                {/* Row 2 */}
-                <a href="#" className="flex h-[48px] items-center justify-center gap-2.5 rounded-xl bg-[#1d1d1f] transition-colors duration-200 hover:bg-[#333]">
-                  <svg className="h-5 w-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 22 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 22C7.79 22.05 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.56C5.55 8.1 7.13 7.17 8.82 7.15C10.1 7.13 11.32 8.02 12.11 8.02C12.89 8.02 14.37 6.94 15.92 7.11C16.57 7.14 18.37 7.38 19.56 9.07C19.47 9.13 17.19 10.42 17.22 13.17C17.25 16.42 20.08 17.48 20.11 17.49C20.08 17.56 19.65 19.09 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z" />
-                  </svg>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-medium leading-none text-white/45">Download on the</span>
-                    <span className="mt-0.5 text-[13px] font-semibold leading-tight text-white">App Store</span>
-                  </div>
-                </a>
-                <a href="#" className="flex h-[48px] items-center justify-center gap-2.5 rounded-xl bg-[#1d1d1f] transition-colors duration-200 hover:bg-[#333]">
-                  <svg className="h-[18px] w-[18px]" viewBox="0 0 24 24">
-                    <path d="M3.61 1.814L13.793 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.61-.92z" fill="#4285F4" />
-                    <path d="M16.657 8.893L5.536.497A1.005 1.005 0 014.39.56L14.727 10.9l1.93-2.007z" fill="#EA4335" />
-                    <path d="M16.657 15.107l1.93 2.007 2.794-1.56a1 1 0 000-1.748l-2.795-1.56-1.93 2.008-.933.97.934-.117z" fill="#FBBC04" />
-                    <path d="M4.39 23.44a1.005 1.005 0 001.146.063l11.12-8.396-1.929-2.007L4.39 23.44z" fill="#34A853" />
-                  </svg>
-                  <div className="flex flex-col">
-                    <span className="text-[9px] font-medium leading-none text-white/45">Get it on</span>
-                    <span className="mt-0.5 text-[13px] font-semibold leading-tight text-white">Google Play</span>
-                  </div>
-                </a>
               </div>
             </div>
-
-            {/* Right: Booking card */}
-            <div className="animate-fade-in stagger-1">
+            <div>
               <HeroBookingWrapper ctaHref={ctaHref} />
             </div>
           </div>
