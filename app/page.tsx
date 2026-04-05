@@ -162,7 +162,7 @@ export default function HomePage() {
           <div className="grid items-start gap-8 lg:grid-cols-2 lg:gap-14">
 
             {/* LEFT — Headline */}
-            <div className="pt-2 lg:pt-4">
+            <div className="min-w-0 pt-2 lg:pt-4">
               <h1 className="text-[clamp(2.5rem,5.5vw,4.25rem)] font-bold leading-[1.08] tracking-[-0.035em] text-[#1d1d1f]">
                 Get anywhere
                 <br />
@@ -217,7 +217,7 @@ export default function HomePage() {
             </div>
 
             {/* RIGHT — Booking widget */}
-            <div>
+            <div className="min-w-0 w-full">
               <HeroBookingWrapper ctaHref={ctaHref} />
             </div>
           </div>

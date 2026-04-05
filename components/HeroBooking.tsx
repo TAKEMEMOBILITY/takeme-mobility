@@ -244,7 +244,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // ── Payment state ──────────────────────────────────────────────────
   if (showPayment && rideData) {
     return (
-      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+      <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="p-6">
           <p className="mb-4 text-center text-[16px] font-semibold text-[#1D1D1F]">Complete payment</p>
           <div className="mb-4 flex items-center justify-between rounded-xl bg-[#f5f5f7] px-4 py-3">
@@ -288,7 +288,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
   // ── Booked state ───────────────────────────────────────────────────
   if (booked) {
     return (
-      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+      <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
         <div className="p-6 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#1D6AE5]/10">
             <svg className="h-7 w-7 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -332,7 +332,7 @@ export default function HeroBooking({ ctaHref }: { ctaHref: string }) {
 
   // ── Render ─────────────────────────────────────────────────────────
   return (
-    <div className="overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
+    <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl bg-white shadow-[0_1px_20px_rgba(0,0,0,0.06),0_0_0_1px_rgba(0,0,0,0.03)]">
 
       {/* Map */}
       <div className="relative h-[260px] bg-[#F2F2F7] overflow-hidden">

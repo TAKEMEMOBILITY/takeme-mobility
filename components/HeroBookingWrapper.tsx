@@ -265,7 +265,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   // ── Booked ─────────────────────────────────────────────────────────
   if (booked) {
     return (
-      <div className="overflow-hidden rounded-3xl border border-[#E5E5EA] bg-white">
+      <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-[#E5E5EA] bg-white">
         <div className="p-8 text-center">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#1D6AE5]/10">
             <svg className="h-8 w-8 text-[#1D6AE5]" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
@@ -288,7 +288,7 @@ export default function HeroBookingWrapper({ ctaHref }: { ctaHref: string }) {
   const ctaAction = () => { if (!user) router.push('/auth/login?redirect=/'); else if (hasRoute) confirmRide(); };
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-[#E5E5EA] bg-white">
+    <div className="w-full max-w-full min-w-0 overflow-hidden rounded-3xl border border-[#E5E5EA] bg-white">
 
       {/* ── Live map ──────────────────────────────────────────────── */}
       <div className="relative h-[240px] bg-[#EEEEF2] overflow-hidden">
