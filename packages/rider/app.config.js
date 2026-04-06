@@ -8,6 +8,7 @@ module.exports = ({ config }) => ({
   ...config,
   name: 'Takeme',
   slug: 'takeme',
+  owner: 'takememobilitys-organization',
   version: '0.1.0',
   runtimeVersion: {
     policy: 'appVersion',

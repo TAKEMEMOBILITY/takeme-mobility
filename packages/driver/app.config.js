@@ -6,6 +6,7 @@ module.exports = ({ config }) => ({
   ...config,
   name: 'Takeme Driver',
   slug: 'takeme-driver',
+  owner: 'takememobilitys-organization',
   version: '0.1.0',
   runtimeVersion: {
     policy: 'appVersion',
