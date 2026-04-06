@@ -12,7 +12,7 @@ import { spacing, borderRadius } from '@/theme/spacing';
 export default function IncomingRideScreen() {
   const router = useRouter();
   const { activeTrip, clearTrip, apiClient } = useTrip();
-  const [timeLeft, setTimeLeft] = useState(DISPATCH.ACCEPT_TIMEOUT_SEC);
+  const [timeLeft, setTimeLeft] = useState<number>(DISPATCH.ACCEPT_TIMEOUT_SEC);
   const [accepting, setAccepting] = useState(false);
   const [rejecting, setRejecting] = useState(false);
 

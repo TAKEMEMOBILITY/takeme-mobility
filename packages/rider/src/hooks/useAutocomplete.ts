@@ -28,8 +28,8 @@ export function useAutocomplete(debounceMs = 300): UseAutocompleteReturn {
   const [predictions, setPredictions] = useState<PlacePrediction[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const sessionRef = useRef(createSessionToken());
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const sessionRef = useRef<string>(createSessionToken());
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastQueryRef = useRef('');
 
   const search = useCallback(

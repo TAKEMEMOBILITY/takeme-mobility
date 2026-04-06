@@ -143,7 +143,7 @@ export default function VerifyScreen() {
           <Pressable
             style={[styles.cta, code.length !== CODE_LENGTH && styles.ctaDisabled]}
             disabled={code.length !== CODE_LENGTH || loading}
-            onPress={handleVerify}
+            onPress={() => handleVerify(code)}
           >
             {loading ? (
               <ActivityIndicator color={colors.brand} />
