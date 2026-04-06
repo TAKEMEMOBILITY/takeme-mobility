@@ -1,13 +1,13 @@
-import { ExpoConfig, ConfigContext } from 'expo/config';
+/** @type {import('expo/config').ExpoConfig} */
 
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '';
 const MERCHANT_ID = process.env.EXPO_PUBLIC_MERCHANT_ID ?? 'merchant.com.takememobility.rider';
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
+module.exports = ({ config }) => ({
   ...config,
   name: 'Takeme',
-  slug: 'takeme-rider',
+  slug: 'takeme',
   version: '0.1.0',
   runtimeVersion: {
     policy: 'appVersion',
@@ -64,6 +64,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
   ],
+  extra: {
+    eas: {
+      projectId: 'f793a12f-748f-4da0-96b2-ee293210526b',
+    },
+  },
   experiments: {
     typedRoutes: true,
   },
