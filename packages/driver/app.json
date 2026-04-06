@@ -22,7 +22,11 @@
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "Takeme Driver needs your location to receive ride requests from nearby riders.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "Takeme Driver broadcasts your location to riders while you're online, even when the app is in the background.",
-        "UIBackgroundModes": ["location", "remote-notification", "fetch"]
+        "UIBackgroundModes": [
+          "location",
+          "remote-notification",
+          "fetch"
+        ]
       }
     },
     "android": {

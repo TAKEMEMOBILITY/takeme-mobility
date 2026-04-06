@@ -1,8 +1,8 @@
-import { ExpoConfig, ConfigContext } from 'expo/config';
+/** @type {import('expo/config').ExpoConfig} */
 
 const GOOGLE_MAPS_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY ?? '';
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
+module.exports = ({ config }) => ({
   ...config,
   name: 'Takeme Driver',
   slug: 'takeme-driver',
@@ -74,6 +74,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-task-manager',
   ],
+  extra: {
+    eas: {
+      projectId: '54d340d6-471d-4b38-aa64-31c8cb0cf354',
+    },
+  },
   experiments: {
     typedRoutes: true,
   },
