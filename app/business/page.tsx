@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { useRef, useState, useEffect, useCallback } from 'react'
 
 /* ── Scroll reveal ────────────────────────────────────────────────────── */
@@ -124,35 +123,10 @@ export default function BusinessPage() {
   return (
     <div style={{ background: S.bg, color: S.text, fontFamily: body, overflowX: 'hidden' }}>
 
-      {/* ═══ NAV ═════════════════════════════════════════════════════════ */}
-      <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 900,
-        padding: '0 clamp(24px, 5vw, 64px)', height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        background: S.white,
-        borderBottom: `1px solid ${S.border}`,
-      }}>
-        <Link href="/" style={{ fontSize: 16, fontWeight: 600, color: S.text, textDecoration: 'none' }}>
-          TakeMe <span style={{ color: S.blue }}>Business</span>
-        </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
-          <Link href="/" style={{ fontSize: 13, color: S.light, textDecoration: 'none', transition: 'color .2s' }}>
-            &larr; TakeMe
-          </Link>
-          <a href="#contact" style={{
-            background: S.blue, color: S.white, border: 'none', borderRadius: 8,
-            padding: '10px 24px', fontSize: 13, fontWeight: 600, textDecoration: 'none',
-            transition: 'background .15s', letterSpacing: '.3px',
-          }}>
-            Get a Demo
-          </a>
-        </div>
-      </nav>
-
       {/* ═══ HERO ════════════════════════════════════════════════════════ */}
       <section style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        padding: '160px clamp(24px, 5vw, 64px) 140px', position: 'relative', overflow: 'hidden',
+        padding: '100px clamp(24px, 5vw, 64px) 100px', position: 'relative', overflow: 'hidden',
         background: S.bgAlt,
       }}>
         <div style={{ position: 'relative', zIndex: 2 }}>

@@ -91,19 +91,6 @@ export default function DriverHubPage() {
   return (
     <div style={{ background: '#ffffff', color: '#0A0A0A', fontFamily: "var(--font-dm-sans), var(--font-geist-sans), system-ui, sans-serif" }}>
 
-      {/* ═══ NAV ═════════════════════════════════════════════════════════ */}
-      <header style={{ borderBottom: '1px solid #d2d2d7', background: '#ffffff' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px' }}>
-          <Link href="/" style={{ fontSize: 18, color: '#1d1d1f', textDecoration: 'none', letterSpacing: '0.01em' }}>
-            <span style={{ fontWeight: 600 }}>TakeMe</span>
-            <span style={{ marginLeft: 5, fontWeight: 300, color: '#1D6AE5' }}>Driver Hub</span>
-          </Link>
-          <Link href="/" style={{ fontSize: 14, fontWeight: 500, color: '#86868b', textDecoration: 'none', transition: 'color 0.2s' }}>
-            &larr; Back to home
-          </Link>
-        </div>
-      </header>
-
       {/* ═══ HERO ════════════════════════════════════════════════════════ */}
       <section style={{
         position: 'relative',
@@ -112,6 +99,7 @@ export default function DriverHubPage() {
         flexDirection: 'column',
         justifyContent: 'center',
         overflow: 'hidden',
+        paddingTop: 64,
       }}>
         {/* Background image */}
         <div style={{

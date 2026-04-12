@@ -1,27 +1,13 @@
 'use client';
 
-import Link from 'next/link';
 import ConnectCard from '@/components/ConnectCard';
 import { PageTitle, SectionTitle, Eyebrow, BodyText, PrimaryButton } from '@/components/ui/Typography';
 
 export default function ConnectPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Nav */}
-      <header className="border-b border-[#f5f5f7]">
-        <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 lg:px-10">
-          <Link href="/" className="text-[18px] tracking-[0.01em] text-[#1d1d1f]">
-            <span className="font-semibold">TakeMe</span>
-            <span className="ml-[5px] font-light text-[#86868b]">Connect</span>
-          </Link>
-          <Link href="/" className="text-[14px] font-medium text-[#6e6e73] hover:text-[#1d1d1f]">
-            Back to home
-          </Link>
-        </div>
-      </header>
-
       {/* Hero */}
-      <section className="mx-auto max-w-[1200px] px-6 pt-20 pb-16 lg:px-10">
+      <section className="mx-auto max-w-[1200px] px-6 pt-24 pb-16 lg:px-10">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           {/* Left */}
           <div>

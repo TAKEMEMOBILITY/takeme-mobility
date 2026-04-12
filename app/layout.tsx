@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, DM_Serif_Display, DM_Sans } from "next/font/google";
 import ClientProviders from "@/components/ClientProviders";
+import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import "./globals.css";
 
@@ -46,6 +47,7 @@ export default function RootLayout({
           {/* Horizontal overflow is contained on this wrapper, NOT on
               html/body — that combination breaks vertical scrolling on
               iOS Safari. */}
+          <Navbar />
           <div className="flex-1" style={{ overflowX: 'hidden' }}>{children}</div>
           <Footer />
         </ClientProviders>

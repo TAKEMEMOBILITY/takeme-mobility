@@ -1,35 +1,9 @@
 'use client';
 
-import Link from 'next/link';
 import { useState, useEffect, useRef } from 'react';
 import { PageTitle, SectionTitle, Eyebrow, BodyText, PrimaryButton } from '@/components/ui/Typography';
 
 // ── Hooks ────────────────────────────────────────────────────────────────
-
-function useScrolled(threshold = 10) {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    let ticking = false;
-    let last = window.scrollY > threshold;
-    setScrolled(last);
-    const handler = () => {
-      if (ticking) return;
-      ticking = true;
-      requestAnimationFrame(() => {
-        const next = window.scrollY > threshold;
-        if (next !== last) {
-          last = next;
-          setScrolled(next);
-        }
-        ticking = false;
-      });
-    };
-    window.addEventListener('scroll', handler, { passive: true });
-    return () => window.removeEventListener('scroll', handler);
-  }, [threshold]);
-  return scrolled;
-}
 
 function useReveal(threshold = 0.18) {
   const ref = useRef<HTMLDivElement>(null);
@@ -82,7 +56,6 @@ const PARTNER_UNIVERSITIES = [
 // ── Page ─────────────────────────────────────────────────────────────────
 
 export default function StudentsPage() {
-  const scrolled = useScrolled();
   const pricing = useReveal(0.15);
   const universities = useReveal(0.15);
   const ctaSection = useReveal(0.2);
@@ -102,27 +75,6 @@ export default function StudentsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-
-      {/* ═══ NAV ══════════════════════════════════════════════════════════ */}
-      <nav
-        className={`fixed top-0 z-50 w-full ${
-          scrolled ? 'bg-white/85 backdrop-blur-lg' : 'bg-transparent'
-        }`}
-        style={{ willChange: 'transform', transform: 'translateZ(0)' }}
-      >
-        <div className="mx-auto flex h-12 max-w-[1200px] items-center justify-between px-6 lg:px-10">
-          <Link href="/" className="text-[15px] tracking-[0.01em] text-[#1d1d1f]">
-            <span className="font-semibold">TakeMe</span>
-            <span className="ml-[3px] font-light text-[#86868b]">Mobility</span>
-          </Link>
-          <Link
-            href="/"
-            className="text-[13px] font-medium text-[#6e6e73] transition-colors duration-200 hover:text-[#1d1d1f]"
-          >
-            &larr; Back
-          </Link>
-        </div>
-      </nav>
 
       {/* ═══ HERO ═════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-[#f5f5f7] pt-20">
